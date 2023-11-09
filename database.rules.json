@@ -1,0 +1,70 @@
+{
+  "rules": {
+    ".read": "root.child('admins').child(auth.uid).val() === true",
+    ".write": "root.child('admins').child(auth.uid).val() === true",
+    "users": {
+      "$uid": {
+        ".read": "auth.uid === $uid",
+        ".write": "auth.uid === $uid"
+      }
+    },
+    "tracking": {
+      "$trackingKey": {
+        ".write": "!data.exists() && auth !== null && newData.child('uid').val() === auth.uid"
+      }
+    },
+    "userDataLists": {
+      "$uid": {
+        ".read": "auth.uid === $uid",
+        ".write": "auth.uid === $uid",
+        "$dataType": {
+          "$dataKey": {
+            ".read": "root.child('owners').child($dataType).child($dataKey).child(auth.uid).exists()",
+            ".write": "root.child('owners').child($dataType).child($dataKey).child(auth.uid).exists()",
+            ".validate": "newData.isNumber()"
+          }
+        }
+      }
+    },
+    "publicDataLists": {
+      "$dataType": {
+        ".read": true,
+        "$dataKey": {
+          ".write": "root.child('owners').child($dataType).child($dataKey).child(auth.uid).exists()",
+          ".validate": "newData.isNumber()"
+        }
+      }
+    },
+    "data": {
+      "$dataType": {
+        "$dataKey": {
+          ".read": "!data.exists() || (data.child('publicAccess').val() === true) || (root.child('owners').child($dataType).child($dataKey).child(auth.uid).exists()) || (data.child('connectionAccess/read').val() === true && root.child('connectionDataLists').child(data.child('connectionAccess/connectionType').val()).child(data.child('connectionAccess/connectionKey').val()).child(data.child('connectionAccess/uidDataType').val()).child(auth.uid).exists()) || (root.child('connectionDataLists').child('appUser').child(auth.uid).child($dataType).child($dataKey).exists())",
+          ".write": "(root.child('owners').child($dataType).child($dataKey).child(auth.uid).exists()) || (data.child('connectionAccess/write').val() === true && root.child('connectionDataLists').child(data.child('connectionAccess/connectionType').val()).child(data.child('connectionAccess/connectionKey').val()).child(data.child('connectionAccess/uidDataType').val()).child(auth.uid).exists())"
+        }
+      }
+    },
+    "owners": {
+      "$dataType": {
+        "$dataKey": {
+          ".read": "data.child(auth.uid).exists()",
+          ".write": "(!root.child('data').child($dataType).child($dataKey).exists()) || data.child(auth.uid).exists()"
+        }
+      }
+    },
+    "connectionDataLists": {
+      "$dataType": {
+        "$dataKey": {
+          ".read": "(root.child('data').child($dataType).child($dataKey).child('publicAccess').val() === true) || (root.child('owners').child($dataType).child($dataKey).child(auth.uid).exists())",
+          ".write": "root.child('owners').child($dataType).child($dataKey).child(auth.uid).exists()",
+          "$connectionType": {
+            ".read": true,
+            "$connectionKey": {
+              ".write": "auth !== null && ((root.child('data').child($dataType).child($dataKey).child('publicAccess').val() === true) || (!root.child('data').child($dataType).child($dataKey).exists()) || (root.child('owners').child($dataType).child($dataKey).child(auth.uid).exists()) || (root.child('data').child($dataType).child($dataKey).child('connectionAccess/read').val() === true && root.child('connectionDataLists').child(root.child('data').child($dataType).child($dataKey).child('connectionAccess/connectionType').val()).child(root.child('data').child($dataType).child($dataKey).child('connectionAccess/connectionKey').val()).child(root.child('data').child($dataType).child($dataKey).child('connectionAccess/uidDataType').val()).child(auth.uid).exists())) && ((root.child('data').child($connectionType).child($connectionKey).child('publicAccess').val() === true) || (!root.child('data').child($connectionType).child($connectionKey).exists()) || (root.child('owners').child($connectionType).child($connectionKey).child(auth.uid).exists()) || (root.child('data').child($connectionType).child($connectionKey).child('connectionAccess/read').val() === true && root.child('connectionDataLists').child(root.child('data').child($connectionType).child($connectionKey).child('connectionAccess/connectionType').val()).child(root.child('data').child($connectionType).child($connectionKey).child('connectionAccess/connectionKey').val()).child(root.child('data').child($connectionType).child($connectionKey).child('connectionAccess/uidDataType').val()).child(auth.uid).exists()))",
+              ".validate": "newData.isNumber()"
+            }
+          }
+        }
+      }
+    }
+  }
+}
