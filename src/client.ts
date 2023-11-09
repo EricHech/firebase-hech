@@ -3,3 +3,4 @@ export * from "./services/auth";
 export * from "./services/paths";
 export * from "./services/client-data";
 export * from "./services/client-storage";
+export * from "./services/init";
