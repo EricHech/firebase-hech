@@ -2,11 +2,20 @@ const path = require("path");
 
 module.exports = {
   entry: {
-    index: "./src/index.ts",
-    client: "./src/client.ts",
-    server: "./src/server.ts",
+    main: {
+      import: "./src/index.ts",
+      library: { name: "global", type: "commonjs" },
+    },
+    client: {
+      import: "./src/client.ts",
+      library: { name: "client", type: "commonjs" },
+    },
+    server: {
+      import: "./src/server.ts",
+      library: { name: "server", type: "commonjs" },
+    },
   },
-  devtool: "inline-source-map",
+  // devtool: "inline-source-map",
   module: {
     rules: [
       {

@@ -1,12 +1,8 @@
 {
   "name": "firebase-soil",
-  "version": "1.1.19",
+  "version": "1.1.22",
   "description": "A a strongly-typed opinionated wrapper around Firebase's Real-Time Database meant to supercharge Firebase and allow for better relational management and out-of-the-box security rules.",
-  "exports": {
-    ".": "./dist/index.bundle.js",
-    "./client": "./dist/client.bundle.js",
-    "./server": "./dist/server.bundle.js"
-  },
+  "main": "dist",
   "types": "dist/types/index.d.ts",
   "scripts": {
     "build": "webpack"

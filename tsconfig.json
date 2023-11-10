@@ -5,7 +5,8 @@
     "sourceMap": true,
     "resolveJsonModule": true,
     "esModuleInterop": true,
-    "declaration": true
+    "declaration": true,
+    "declarationDir": "./dist/types"
   },
   "exclude": ["node_modules"]
 }
