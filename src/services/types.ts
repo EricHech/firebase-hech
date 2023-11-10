@@ -1,4 +1,8 @@
 export interface SoilDatabase<AppUser extends {} = {}> {
+  /**
+   * Soil reserved name: Must be `publicAccess === true`
+   * Unique data for a logged in user; should be given both one exclusive and one inclusive user connection.
+   */
   appUser: AppUser;
   soilUserSettings: { value: string };
   soilFile: { downloadUrl: string };
