@@ -45,12 +45,8 @@ export const isoCreateUser = ({
   update,
   updateObject = {},
   skipUpdate,
-  data,
   now = Date.now(),
-}: Pick<
-  CreateDataParams<SoilDatabase, keyof SoilDatabase>,
-  "update" | "updateObject" | "skipUpdate" | "data" | "now"
-> & {
+}: Pick<CreateDataParams<SoilDatabase, keyof SoilDatabase>, "update" | "updateObject" | "skipUpdate" | "now"> & {
   user: Mandate<User, "uid">;
 }) => {
   updateObject[PATHS.user(user.uid)] = user;
@@ -59,7 +55,7 @@ export const isoCreateUser = ({
     update,
     dataType: "appUser",
     dataKey: user.uid,
-    data,
+    data: {},
     owners: [user.uid],
     publicAccess: true,
     updateObject,

@@ -38,11 +38,9 @@ export const createUser = ({
   updateObject = {},
   skipUpdate,
   now,
-  appUser,
 }: Pick<CreateDataParams<SoilDatabase, keyof SoilDatabase>, "updateObject" | "skipUpdate" | "now"> & {
   user: Mandate<User, "uid">;
-  appUser: SoilDatabase["appUser"];
-}) => isoCreateUser({ update, user, updateObject, skipUpdate, data: appUser, now });
+}) => isoCreateUser({ update, user, updateObject, skipUpdate, now });
 
 export const updateUser = (u: Mandate<User, "uid">) => isoUpdateUser(update, u);
 

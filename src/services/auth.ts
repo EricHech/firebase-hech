@@ -43,8 +43,7 @@ export const signUp = async (
   email: string,
   password: string,
   confirmPassword: string,
-  setError: (error: string) => void,
-  appUser: SoilDatabase["appUser"]
+  setError: (error: string) => void
 ) => {
   if (password !== confirmPassword) throw new Error("Password does not match the confirmation password");
 
@@ -65,7 +64,7 @@ export const signUp = async (
         emailVerified: false,
       };
 
-      await createUser({ user, appUser });
+      await createUser({ user });
 
       return user;
     })
@@ -94,7 +93,7 @@ export const signUpWithProvider = async (
 
       if (user.email) userUpdate.email = user.email;
 
-      await createUser({ user: userUpdate, appUser: {} });
+      await createUser({ user: userUpdate });
 
       return user;
     })
