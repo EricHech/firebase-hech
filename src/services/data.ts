@@ -64,7 +64,7 @@ export const isoUpdateUser = (
   u: Mandate<User, "uid">
 ) => update(PATHS.user(u.uid), u);
 
-export const isoGetUser = (get: GetFunction, uid: string) => get(PATHS.user(uid));
+export const isoGetUser = (get: GetFunction, uid: string) => get<User>(PATHS.user(uid));
 
 /*
  ██████╗ ███╗   ██╗    ██╗ ██████╗ ███████╗███████╗    ██╗   ██╗ █████╗ ██╗     ██╗   ██╗███████╗
