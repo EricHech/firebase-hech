@@ -14,7 +14,6 @@ import {
 } from "firebase/auth";
 import { createUser, updateUser } from "./client-data";
 import { User } from "./types";
-import { SoilDatabase } from "..";
 
 const getFriendlyAuthError = (errorMessage: string) => {
   if (errorMessage.includes("auth/user-not-found")) return "No user found that matches that email.";

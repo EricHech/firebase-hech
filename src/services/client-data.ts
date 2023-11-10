@@ -40,7 +40,6 @@ import type {
   ChangeDataKey,
 } from "./types";
 import type { SoilDatabase } from "..";
-import { getCurrentUser } from "./auth";
 
 export const createUser = ({
   user,
