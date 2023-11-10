@@ -1,15 +1,11 @@
 {
   "compilerOptions": {
-    "declarationDir": "./dist/",
-    "declaration": true,
-    "outDir": "./dist/",
+    "module": "commonjs",
+    "target": "ES6",
     "sourceMap": true,
-    "noImplicitAny": false,
-    "module": "es6",
-    "target": "es5",
-    "jsx": "react",
-    "allowJs": true,
-    "moduleResolution": "node",
-    "allowSyntheticDefaultImports": true
-  }
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "declaration": true
+  },
+  "exclude": ["node_modules"]
 }
