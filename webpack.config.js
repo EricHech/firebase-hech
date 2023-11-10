@@ -1,10 +1,21 @@
 const path = require("path");
 
 module.exports = {
+  // See: https://webpack.js.org/configuration/output/#outputlibrary for more information
+  // Also see: https://webpack.js.org/configuration/output/#outputlibrary
   entry: {
-    index: "./src/index.ts",
-    client: "./src/client.ts",
-    server: "./src/server.ts",
+    main: {
+      import: "./src/index.ts",
+      library: { name: "global", type: "commonjs" },
+    },
+    client: {
+      import: "./src/client.ts",
+      library: { name: "client", type: "commonjs" },
+    },
+    server: {
+      import: "./src/server.ts",
+      library: { name: "server", type: "commonjs" },
+    },
   },
   devtool: "inline-source-map",
   module: {
@@ -42,8 +53,5 @@ module.exports = {
     filename: "[name].bundle.js",
     path: path.resolve(__dirname, "dist"),
     clean: true,
-    // See: https://webpack.js.org/configuration/output/#outputlibrary for more information
-    // Also see: https://webpack.js.org/configuration/output/#outputlibrary
-    library: ["global", "client", "server"],
   },
 };
