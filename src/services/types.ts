@@ -1,5 +1,5 @@
-export interface SoilDatabase {
-  appUser: {};
+export interface SoilDatabase<AppUser extends {} = {}> {
+  appUser: AppUser;
   soilUserSettings: { value: string };
   soilFile: { downloadUrl: string };
 }
