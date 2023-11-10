@@ -35,11 +35,6 @@ import type {
 ██║  ██║╚██████╔╝   ██║   ██║  ██║
 ╚═╝  ╚═╝ ╚═════╝    ╚═╝   ╚═╝  ╚═╝
 */
-export const isoUpdateUser = (
-  update: <T extends object>(path: string, data: T) => Promise<void>,
-  u: Mandate<User, "uid">
-) => update(PATHS.user(u.uid), u);
-
 export const isoCreateUser = ({
   user,
   update,
@@ -63,6 +58,13 @@ export const isoCreateUser = ({
     now,
   });
 };
+
+export const isoUpdateUser = (
+  update: <T extends object>(path: string, data: T) => Promise<void>,
+  u: Mandate<User, "uid">
+) => update(PATHS.user(u.uid), u);
+
+export const isoGetUser = (get: GetFunction, uid: string) => get(PATHS.user(uid));
 
 /*
  ██████╗ ███╗   ██╗    ██╗ ██████╗ ███████╗███████╗    ██╗   ██╗ █████╗ ██╗     ██╗   ██╗███████╗
