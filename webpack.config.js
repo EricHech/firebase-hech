@@ -1,7 +1,6 @@
 const path = require("path");
 
 module.exports = {
-  // entry: "./src/index.ts",
   entry: {
     index: "./src/index.ts",
     client: "./src/client.ts",
@@ -42,5 +41,9 @@ module.exports = {
   output: {
     filename: "[name].bundle.js",
     path: path.resolve(__dirname, "dist"),
+    clean: true,
+    // See: https://webpack.js.org/configuration/output/#outputlibrary for more information
+    // Also see: https://webpack.js.org/configuration/output/#outputlibrary
+    library: ["global", "client", "server"],
   },
 };
