@@ -15,7 +15,7 @@ module.exports = {
       library: { name: "server", type: "commonjs" },
     },
   },
-  // devtool: "inline-source-map",
+  devtool: "source-map",
   module: {
     rules: [
       {
@@ -53,6 +53,9 @@ module.exports = {
     clean: true,
     // See: https://webpack.js.org/configuration/output/#outputlibrary for more information
     // Also see: https://webpack.js.org/configuration/output/#outputlibrary
-    library: ["global", "client", "server"],
+    library: {
+      name: "[name]",
+      type: "commonjs"
+    }
   },
 };

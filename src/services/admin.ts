@@ -6,22 +6,27 @@ import { cleanPushKey } from "./paths";
 // Types
 import type { ServiceAccount } from "firebase-admin/app";
 import type { QueryByKeyLimitParams, QueryOrderByChildParams } from "./types";
+import { TransactionResult } from "firebase/database";
 
 const getRef = (path: string, allowRootQuery: boolean = false) => {
-  if (!path || (!allowRootQuery && path === "/")) throw new Error("We don't like root queries");
+  if (!path || (!allowRootQuery && path === "/"))
+    throw new Error("We don't like root queries");
 
   return getDatabase().ref(path);
 };
 
-export const createAuthUser = (createRequest: CreateRequest) => getAuth().createUser(createRequest);
+export const createAuthUser = (createRequest: CreateRequest) =>
+  getAuth().createUser(createRequest);
 
 export const get = <T>(path: string) =>
   getRef(path)
     .get()
     .then((snap) => snap.val() as Nullable<T>);
 
-export const onChildAdded = <T>(path: string, cb: (val: Nullable<T>, key: string) => void) =>
-  getRef(path).on("child_added", (snap) => cb(snap.val(), snap.key!));
+export const onChildAdded = <T>(
+  path: string,
+  cb: (val: Nullable<T>, key: string) => void
+) => getRef(path).on("child_added", (snap) => cb(snap.val(), snap.key!));
 
 export const push = <T>(path: string, data: T) => getRef(path).push(data);
 
@@ -29,13 +34,21 @@ export const pushKey = (path: string) => cleanPushKey(getRef(path).push().key!);
 
 export const set = <T>(path: string, data: T) => getRef(path).set(data);
 
-export const update = <T extends object>(path: string, data: T, allowRootQuery: boolean = false) =>
-  getRef(path, allowRootQuery).update(data);
+export const update = <T extends object>(
+  path: string,
+  data: T,
+  allowRootQuery: boolean = false
+) => getRef(path, allowRootQuery).update(data);
 
 export const onValue = <T>(path: string, cb: (val: Nullable<T>) => void) =>
   getRef(path).on("value", (snap) => cb(snap.val()));
 
-export const queryOrderByChildEqualTo = <T>({ path, childKey, queryValue, limit = 1000 }: QueryOrderByChildParams) =>
+export const queryOrderByChildEqualTo = <T>({
+  path,
+  childKey,
+  queryValue,
+  limit = 1000,
+}: QueryOrderByChildParams) =>
   getRef(path)
     .orderByChild(String(childKey))
     .equalTo(queryValue)
@@ -80,8 +93,13 @@ export const initializeAdminApp = (
 
 export const remove = (path: string) => getRef(path).remove();
 
-export const transactionWithCb = <T>(path: string, cb: (val: Nullable<T>) => T) => getRef(path).transaction(cb);
+export const transactionWithCb = <T>(
+  path: string,
+  cb: (val: Nullable<T>) => T
+): Promise<TransactionResult> => getRef(path).transaction(cb);
 
-export const updateAuthUser = (uid: string, updateRequest: UpdateRequest) => getAuth().updateUser(uid, updateRequest);
+export const updateAuthUser = (uid: string, updateRequest: UpdateRequest) =>
+  getAuth().updateUser(uid, updateRequest);
 
-export const generatePasswordResetLink = (uid: string) => getAuth().generatePasswordResetLink(uid);
+export const generatePasswordResetLink = (uid: string) =>
+  getAuth().generatePasswordResetLink(uid);

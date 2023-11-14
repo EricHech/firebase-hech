@@ -1,11 +1,30 @@
 {
   "name": "firebase-soil",
-  "version": "1.1.22",
+  "type": "module",
+  "version": "1.1.32",
   "description": "A a strongly-typed opinionated wrapper around Firebase's Real-Time Database meant to supercharge Firebase and allow for better relational management and out-of-the-box security rules.",
-  "main": "dist",
   "types": "dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
+      "types": "./dist/types/index.d.ts"
+    },
+    "./client": {
+      "import": "./dist/client.js",
+      "require": "./dist/client.cjs",
+      "types": "./dist/types/client.d.ts"
+    },
+    "./server": {
+      "import": "./dist/server.js",
+      "require": "./dist/server.cjs",
+      "types": "./dist/types/server.d.ts"
+    }
+  },
   "scripts": {
-    "build": "webpack"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
   },
   "files": [
     "dist"
@@ -19,25 +38,13 @@
   "devDependencies": {
     "ts-loader": "^9.5.0",
     "typescript": "^5.2.2",
-    "webpack": "^5.89.0",
-    "webpack-cli": "^5.1.4"
+    "vite-plugin-dts": "^3.6.3"
   },
   "dependencies": {
     "@types/node": "^20.9.0",
-    "assert": "^2.1.0",
-    "browserify-zlib": "^0.2.0",
-    "buffer": "^6.0.3",
-    "crypto-browserify": "^3.12.0",
     "firebase": "^10.6.0",
     "firebase-admin": "^11.11.0",
-    "https-browserify": "^1.0.0",
-    "os-browserify": "^0.3.0",
-    "path-browserify": "^1.0.1",
-    "querystring-es3": "^0.2.1",
-    "stream-browserify": "^3.0.0",
-    "stream-http": "^3.2.0",
     "ts-node": "^10.9.1",
-    "url": "^0.11.3",
-    "util": "^0.12.5"
+    "vite": "^4.5.0"
   }
 }
