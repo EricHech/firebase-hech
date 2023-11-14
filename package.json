@@ -1,23 +1,23 @@
 {
   "name": "firebase-soil",
   "type": "module",
-  "version": "1.1.32",
+  "version": "1.1.34",
   "description": "A a strongly-typed opinionated wrapper around Firebase's Real-Time Database meant to supercharge Firebase and allow for better relational management and out-of-the-box security rules.",
   "types": "dist/types/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs",
+      "import": "./dist/main.es.js",
+      "require": "./dist/index.cjs.js",
       "types": "./dist/types/index.d.ts"
     },
     "./client": {
-      "import": "./dist/client.js",
-      "require": "./dist/client.cjs",
+      "import": "./dist/client.es.js",
+      "require": "./dist/client.cjs.js",
       "types": "./dist/types/client.d.ts"
     },
     "./server": {
-      "import": "./dist/server.js",
-      "require": "./dist/server.cjs",
+      "import": "./dist/server.es.js",
+      "require": "./dist/server.cjs.js",
       "types": "./dist/types/server.d.ts"
     }
   },
@@ -36,7 +36,6 @@
   "author": "Eric Hechavarria",
   "license": "ISC",
   "devDependencies": {
-    "ts-loader": "^9.5.0",
     "typescript": "^5.2.2",
     "vite-plugin-dts": "^3.6.3"
   },
