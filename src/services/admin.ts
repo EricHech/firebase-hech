@@ -6,7 +6,7 @@ import { cleanPushKey } from "./paths";
 // Types
 import type { ServiceAccount } from "firebase-admin/app";
 import type { QueryByKeyLimitParams, QueryOrderByChildParams } from "./types";
-import type { TransactionResult } from "@firebase/database-types/index";
+import type { TransactionResult } from "@firebase/database-types";
 
 const getRef = (path: string, allowRootQuery: boolean = false) => {
   if (!path || (!allowRootQuery && path === "/"))

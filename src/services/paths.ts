@@ -1,4 +1,4 @@
-import type { SoilDatabase } from "..";
+import type { SoilDatabase } from "./types";
 
 type DataType = keyof SoilDatabase;
 type DataKey = string | number | symbol;
