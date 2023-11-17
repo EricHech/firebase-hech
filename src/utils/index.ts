@@ -1,5 +1,4 @@
-import { SoilDatabase } from "..";
-import { UpdateObject } from "../services/types";
+import { SoilDatabase, UpdateObject } from "../services/types";
 
 const FIREBASE_MAX_UPDATE_LIMIT = 999;
 

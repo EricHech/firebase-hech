@@ -14,7 +14,8 @@ export default defineConfig({
       },
       name: "firebase-soil",
       // the proper extensions will be added
-      fileName: (format, name) => `${name}.${format}.js`,
+      fileName: (format, name) =>
+        `${name}.${format === 'es' ? 'm' : 'c'}js`,
       //   fileName: (format, entryName) => {
       //     // ESM format gets .js extension
       //     if (format === 'es') {

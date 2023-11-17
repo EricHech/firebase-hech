@@ -1,4 +1,4 @@
-import type { SoilDatabase } from "..";
+import type { SoilDatabase } from "../services/types";
 import {
   isoCreateData,
   isoUpdateData,

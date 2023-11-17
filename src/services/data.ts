@@ -1,4 +1,4 @@
-import type { SoilDatabase } from "..";
+import type { SoilDatabase } from "./types";
 
 // Helpers
 import { createGetUpdateObjectFunction, sleep } from "../utils";
