@@ -1,6 +1,6 @@
 {
   "name": "firebase-soil",
-  "version": "1.2.3",
+  "version": "1.2.4",
   "description": "A a strongly-typed opinionated wrapper around Firebase's Real-Time Database meant to supercharge Firebase and allow for better relational management and out-of-the-box security rules.",
   "exports": {
     ".": {
@@ -40,7 +40,8 @@
   "license": "ISC",
   "devDependencies": {
     "typescript": "^5.2.2",
-    "vite-plugin-dts": "^3.6.3"
+    "vite-plugin-dts": "^3.6.3",
+    "vite-plugin-externalize-deps": "^0.7.0"
   },
   "dependencies": {
     "@types/node": "^20.9.0",
