@@ -8,14 +8,14 @@ export default defineConfig({
     lib: {
       // Could also be a dictionary or array of multiple entry points
       entry: {
-        main: resolve(__dirname, "src/index.ts"),
+        index: resolve(__dirname, "src/index.ts"),
+        paths: resolve(__dirname, "src/paths.ts"),
         client: resolve(__dirname, "src/client.ts"),
         server: resolve(__dirname, "src/server.ts"),
       },
       name: "firebase-soil",
       // the proper extensions will be added
-      fileName: (format, name) =>
-        `${name}.${format === 'es' ? 'm' : 'c'}js`,
+      fileName: (format, name) => `${name}.${format === "es" ? "m" : "c"}js`,
       //   fileName: (format, entryName) => {
       //     // ESM format gets .js extension
       //     if (format === 'es') {

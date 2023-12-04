@@ -1,12 +1,17 @@
 {
   "name": "firebase-soil",
-  "version": "1.1.40",
+  "version": "1.2.0",
   "description": "A a strongly-typed opinionated wrapper around Firebase's Real-Time Database meant to supercharge Firebase and allow for better relational management and out-of-the-box security rules.",
   "exports": {
     ".": {
-      "import": "./dist/main.mjs",
+      "import": "./dist/index.mjs",
       "types": "./dist/types/index.d.ts",
-      "default": "./dist/main.cjs"
+      "default": "./dist/index.cjs"
+    },
+    "./paths": {
+      "import": "./dist/paths.mjs",
+      "types": "./dist/types/paths.d.ts",
+      "default": "./dist/paths.cjs"
     },
     "./client": {
       "import": "./dist/client.mjs",
