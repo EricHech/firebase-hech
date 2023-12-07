@@ -6,7 +6,7 @@ import { cleanPushKey } from "./paths";
 // Types
 import type { ServiceAccount } from "firebase-admin/app";
 import type { QueryByKeyLimitParams, QueryOrderByChildParams } from "./types";
-import type { TransactionResult } from "@firebase/database-types";
+import type { TransactionResult, Query } from "@firebase/database-types";
 
 const getRef = (path: string, allowRootQuery: boolean = false) => {
   if (!path || (!allowRootQuery && path === "/")) throw new Error("We don't like root queries");
@@ -21,8 +21,15 @@ export const get = <T>(path: string) =>
     .get()
     .then((snap) => snap.val() as Nullable<T>);
 
-export const onChildAdded = <T>(path: string, cb: (val: Nullable<T>, key: string) => void) =>
-  getRef(path).on("child_added", (snap) => cb(snap.val(), snap.key!));
+export const onChildAdded = <T>(
+  path: string,
+  cb: (val: Nullable<T>, key: string) => void,
+  limit?: { amount: number; direction: keyof Pick<Query, "limitToFirst" | "limitToLast"> }
+) => {
+  const query = limit ? getRef(path)[limit.direction](limit.amount) : getRef(path);
+
+  return query.on("child_added", (snap) => cb(snap.val(), snap.key!));
+};
 
 export const push = <T>(path: string, data: T) => getRef(path).push(data);
 
