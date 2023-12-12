@@ -235,7 +235,7 @@ export const removeOwners = async <T extends SoilDatabase, T2 extends keyof Soil
   updateObject,
   skipUpdate,
   owners,
-}: Pick<CreateDataParams<T, T2>, "dataType" | "dataKey" | "owners" | "update" | "updateObject" | "skipUpdate">) =>
+}: Pick<CreateDataParams<T, T2>, "dataType" | "dataKey" | "owners" | "updateObject" | "skipUpdate">) =>
   isoRemoveOwners({ update, dataType, dataKey, updateObject, skipUpdate, owners });
 
 export const createConnection = async <T extends SoilDatabase, T2 extends keyof SoilDatabase>({
