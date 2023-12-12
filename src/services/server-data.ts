@@ -226,10 +226,8 @@ export const addOwners = async <T extends SoilDatabase, T2 extends keyof SoilDat
   skipUpdate,
   now = Date.now(),
   owners,
-}: Pick<
-  CreateDataParams<T, T2>,
-  "dataType" | "dataKey" | "owners" | "update" | "updateObject" | "skipUpdate" | "now"
->) => isoAddOwners({ update, dataType, dataKey, updateObject, skipUpdate, owners, now });
+}: Pick<CreateDataParams<T, T2>, "dataType" | "dataKey" | "owners" | "updateObject" | "skipUpdate" | "now">) =>
+  isoAddOwners({ update, dataType, dataKey, updateObject, skipUpdate, owners, now });
 
 export const removeOwners = async <T extends SoilDatabase, T2 extends keyof SoilDatabase>({
   dataType,
