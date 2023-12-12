@@ -218,6 +218,46 @@ export const isoGetOwners = (get: GetFunction, dataType: keyof SoilDatabase, dat
 export const isoGetOwnersByType = (get: GetFunction, dataType: keyof SoilDatabase) =>
   get<Record<string, Record<string, number>>>(PATHS.ownerDataType(dataType));
 
+export const isoAddOwners = <T extends SoilDatabase, T2 extends keyof SoilDatabase>({
+  update,
+  updateObject = {},
+  skipUpdate,
+  dataType,
+  dataKey,
+  now,
+  owners,
+}: Pick<
+  CreateDataParams<T, T2>,
+  "dataType" | "dataKey" | "owners" | "update" | "updateObject" | "skipUpdate" | "now"
+>) => {
+  owners.forEach((uid) => {
+    /* eslint-disable no-param-reassign */
+    updateObject[PATHS.ownerDataKeyUid(dataType, dataKey, uid)] = now;
+    updateObject[PATHS.userDataKeyList(uid, dataType, dataKey)] = now;
+    /* eslint-enable no-param-reassign */
+  });
+
+  return skipUpdate ? updateObject : update("/", updateObject, true).then(() => updateObject);
+};
+
+export const isoRemoveOwners = <T extends SoilDatabase, T2 extends keyof SoilDatabase>({
+  update,
+  updateObject = {},
+  skipUpdate,
+  dataType,
+  dataKey,
+  owners,
+}: Pick<CreateDataParams<T, T2>, "dataType" | "dataKey" | "owners" | "update" | "updateObject" | "skipUpdate">) => {
+  owners.forEach((uid) => {
+    /* eslint-disable no-param-reassign */
+    updateObject[PATHS.ownerDataKeyUid(dataType, dataKey, uid)] = null;
+    updateObject[PATHS.userDataKeyList(uid, dataType, dataKey)] = null;
+    /* eslint-enable no-param-reassign */
+  });
+
+  return skipUpdate ? updateObject : update("/", updateObject, true).then(() => updateObject);
+};
+
 /*
 ██████╗  █████╗ ████████╗ █████╗
 ██╔══██╗██╔══██╗╚══██╔══╝██╔══██╗

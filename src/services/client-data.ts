@@ -23,6 +23,8 @@ import {
   isoCreateUser,
   isoTrackEvent,
   isoGetUser,
+  isoAddOwners,
+  isoRemoveOwners,
 } from "./data";
 import { get, update, soilUpdate, onChildAdded, onValue, push } from "./firebase";
 
@@ -181,6 +183,27 @@ export const upsertData = async <T extends SoilDatabase, T2 extends keyof SoilDa
     makeOwnersRequests,
     now,
   });
+
+export const addOwners = async <T extends SoilDatabase, T2 extends keyof SoilDatabase>({
+  dataType,
+  dataKey,
+  updateObject,
+  skipUpdate,
+  now = Date.now(),
+  owners,
+}: Pick<
+  CreateDataParams<T, T2>,
+  "dataType" | "dataKey" | "owners" | "update" | "updateObject" | "skipUpdate" | "now"
+>) => isoAddOwners({ update: soilUpdate, dataType, dataKey, updateObject, skipUpdate, owners, now });
+
+export const removeOwners = async <T extends SoilDatabase, T2 extends keyof SoilDatabase>({
+  dataType,
+  dataKey,
+  updateObject,
+  skipUpdate,
+  owners,
+}: Pick<CreateDataParams<T, T2>, "dataType" | "dataKey" | "owners" | "update" | "updateObject" | "skipUpdate">) =>
+  isoRemoveOwners({ update: soilUpdate, dataType, dataKey, updateObject, skipUpdate, owners });
 
 export const createConnection = async <T extends SoilDatabase, T2 extends keyof SoilDatabase>({
   updateObject,
