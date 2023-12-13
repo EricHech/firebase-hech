@@ -1,5 +1,5 @@
-import { initializeApp, getApps, FirebaseOptions, getApp } from "firebase/app";
-import { User as FirebaseUser, initializeAuth, indexedDBLocalPersistence, getAuth } from "firebase/auth";
+import { initializeApp, FirebaseOptions, getApp, FirebaseApp } from "firebase/app";
+import { User as FirebaseUser, initializeAuth, indexedDBLocalPersistence, getAuth, Auth } from "firebase/auth";
 import { signInAnon, firebaseUseDeviceLanguage } from "./auth";
 
 /*
@@ -15,22 +15,23 @@ export const initializeFirebase = (
   cb: (userData: Nullable<FirebaseUser>) => void,
   { anonymousSignIn, isNativePlatform }: { anonymousSignIn?: boolean; isNativePlatform?: boolean } = {}
 ) => {
+  let app: FirebaseApp;
   try {
-    return getAuth(getApp()).onAuthStateChanged(cb);
+    app = getApp();
   } catch (e) {
-    const app = initializeApp(firebaseOptions);
-
-    firebaseUseDeviceLanguage();
-
-    const auth = initializeAuth(
-      app,
-      isNativePlatform
-        ? { persistence: indexedDBLocalPersistence } //
-        : {}
-    );
-
-    if (anonymousSignIn) signInAnon();
-
-    return auth.onAuthStateChanged(cb);
+    app = initializeApp(firebaseOptions);
   }
+
+  let auth: Auth;
+  try {
+    auth = initializeAuth(app, isNativePlatform ? { persistence: indexedDBLocalPersistence } : {});
+  } catch (e) {
+    auth = getAuth();
+  }
+
+  firebaseUseDeviceLanguage();
+
+  if (anonymousSignIn) signInAnon();
+
+  return auth.onAuthStateChanged(cb);
 };
