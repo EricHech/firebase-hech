@@ -1,4 +1,4 @@
-- Note: To update the package, bump the version, run `yarn build`, push to git and `npm publish`. Then open `firebase-soil-ui`, run `yarn soil`, push to git and `npm publish`.
+- Note: To update the package, bump the version, push to git, and `npm publish`. Then open `firebase-soil-ui`, run `yarn soil`, bump the version, push to git, and `npm publish`.
 
 # SOIL Documentation
 SOIL is a strongly-typed opinionated wrapper around Firebase's Real-Time Database meant to supercharge Firebase and allow for better relational management and out-of-the-box security rules. It comes with a lot of other features as well, such as type-safety, easy authentication, and solutions for pagination, infinite scroll, and more as built-in results to using database keys effectively.
