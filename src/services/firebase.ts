@@ -103,6 +103,7 @@ export const set = <T>(path: string, data: T) =>
   database.set(getRef(path), data).catch(logAndThrow("set", path, { data }));
 
 const ownersPrefix = `${PATHS.OWNERS}/`;
+const connectionPrefix = `${PATHS.CONNECTION_DATA_LISTS}/`;
 const dataPrefix = `${PATHS.DATA}/`;
 
 export const soilUpdate = async <T extends object>(
@@ -113,19 +114,23 @@ export const soilUpdate = async <T extends object>(
 ) => {
   if (path === "/" && allowRootQuery) {
     const ownersUpdates = {} as Record<string, unknown>;
+    const connectionUpdates = {} as Record<string, unknown>;
     const dataUpdates = {} as Record<string, unknown>;
     const allOtherUpdates = {} as Record<string, unknown>;
     Object.entries(data).forEach(([p, d]) => {
       if (p.startsWith(ownersPrefix)) ownersUpdates[p] = d;
+      else if (p.startsWith(connectionPrefix)) connectionUpdates[p] = d;
       else if (p.startsWith(dataPrefix)) dataUpdates[p] = d;
       else allOtherUpdates[p] = d;
     });
     if (isDelete) {
       await Promise.all(Object.entries(allOtherUpdates).map(([key, val]) => set(key, val)));
       await Promise.all(Object.entries(dataUpdates).map(([key, val]) => set(key, val)));
+      await Promise.all(Object.entries(connectionUpdates).map(([key, val]) => set(key, val)));
       await Promise.all(Object.entries(ownersUpdates).map(([key, val]) => set(key, val)));
     } else {
       await Promise.all(Object.entries(ownersUpdates).map(([key, val]) => set(key, val)));
+      await Promise.all(Object.entries(connectionUpdates).map(([key, val]) => set(key, val)));
       await Promise.all(Object.entries(dataUpdates).map(([key, val]) => set(key, val)));
       await Promise.all(Object.entries(allOtherUpdates).map(([key, val]) => set(key, val)));
     }
