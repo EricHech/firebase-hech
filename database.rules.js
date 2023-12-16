@@ -90,6 +90,17 @@ const rules = {
       ".write": `!data.exists() && ${authNotNull} && newData.child('uid').val() === auth.uid`,
     },
   },
+  owners: {
+    $dataType: {
+      $dataKey: {
+        // You can only read your own ownership keys
+        ".read": "data.child(auth.uid).exists()",
+        // You can write ownership for a location if the data does not yet exist so that you can prepare to create the data
+        // You can also write new ownership for others if you yourself are an owner
+        ".write": `(${rootDataDoesNotExist}) || data.child(auth.uid).exists()`,
+      },
+    },
+  },
   userDataLists: {
     // Users have full read/write permissions on their ownership lists
     $uid: {
@@ -126,17 +137,6 @@ const rules = {
         )}) || (${readConnectionAccessBoolean} && ${connectionAccess}) || (${isAppUserConnected})`,
         // You can write a data location if you own it or you have connection write access
         ".write": `(${authIsDataOwner("$dataType")}) || (${writeConnectionAccessBoolean} && ${connectionAccess})`,
-      },
-    },
-  },
-  owners: {
-    $dataType: {
-      $dataKey: {
-        // You can only read your own ownership keys
-        ".read": "data.child(auth.uid).exists()",
-        // You can write ownership for a location if the data does not yet exist so that you can prepare to create the data
-        // You can also write new ownership for others if you yourself are an owner
-        ".write": `(${rootDataDoesNotExist}) || data.child(auth.uid).exists()`,
       },
     },
   },
