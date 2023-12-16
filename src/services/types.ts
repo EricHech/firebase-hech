@@ -1,14 +1,19 @@
 export interface SoilDatabase {
-  /** Soil reserved name: Must be `publicAccess === true` */
+  /** Soil reserved name: Must be `publicAccess === true`. */
   appUser: {};
+  /** Soil reserved name. */
   soilUserSettings: { value: string };
+  /** Soil reserved name. */
   soilFile: { downloadUrl: string; metadata?: Record<string, string> };
+  /** Soil reserved name. See README. */
+  remoteRequest: { remoteRequestUid: string };
 }
 
 export type StandardDataFields = {
   createdAt: number;
   updatedAt: number;
   deletedAt?: number;
+  remoteRequestUid?: string;
   connectionAccess?: {
     connectionType: keyof SoilDatabase;
     connectionKey: string;
@@ -73,6 +78,7 @@ export type CudDataParams<T extends SoilDatabase, T2 extends keyof SoilDatabase>
   dataType: T2;
   dataKey: string;
   publicAccess?: boolean;
+  remoteRequestUid?: StandardDataFields["remoteRequestUid"];
   now?: number;
 };
 

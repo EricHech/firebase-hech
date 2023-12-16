@@ -2,7 +2,7 @@
 const path = require("path");
 const fs = require("fs");
 
-// Miscellaneous
+// ---- Miscellaneous -------------------------------------------------------------------------------------------------
 const authIsAdmin = "root.child('admins').child(auth.uid).val() === true";
 const authUidIsUid = "auth.uid === $uid";
 const authNotNull = "auth !== null";
@@ -19,8 +19,20 @@ const publicAccess = "data.child('publicAccess').val() === true";
 const rootDataPublicAccess = `${rootData}.child('publicAccess').val() === true`;
 const rootDataPublicAccessArgs = (dataType, dataKey) =>
   `${rootDataArgs(dataType, dataKey)}.child('publicAccess').val() === true`;
+// --------------------------------------------------------------------------------------------------------------------
 
-// `connectionAccess`
+// ---- `remoteRequestUid` --------------------------------------------------------------------------------------------
+const sameRemoteRequestUid = `data.child('remoteRequestUid').val() === newData.child('remoteRequestUid').val()`;
+const createdYourRemoteRequestUid = `!data.child('remoteRequestUid').exists() && newData.child('remoteRequestUid').exists() && newData.child('remoteRequestUid').val() === auth.uid`;
+/** Either it's unchanged, it's new and it's you, or you're deleting the dataValue */
+const safeRemoteRequestUid = `((${sameRemoteRequestUid}) || (${createdYourRemoteRequestUid}) || !newData.exists())`;
+
+const isNewOwnedRemoteRequestUid = "!data.exists() && newData.child('remoteRequestUid').val() === auth.uid";
+const isExistingOwnedRemoteRequestUid = "data.child('remoteRequestUid').val() === auth.uid";
+const isNewOrExistingOwnedRemoteRequestUid = `(${isNewOwnedRemoteRequestUid}) || (${isExistingOwnedRemoteRequestUid})`;
+// --------------------------------------------------------------------------------------------------------------------
+
+// ---- `connectionAccess` --------------------------------------------------------------------------------------------
 const connectionAccessType = "data.child('connectionAccess/connectionType').val()";
 const rootDataConnectionAccessType = (dataType, dataKey) =>
   `${rootDataArgs(dataType, dataKey)}.child('connectionAccess/connectionType').val()`;
@@ -52,6 +64,7 @@ const hasRootReadConnectionAccess = (dataType, dataKey) =>
  */
 const isAppUserConnected =
   "root.child('connectionDataLists').child('appUser').child(auth.uid).child($dataType).child($dataKey).exists()";
+// --------------------------------------------------------------------------------------------------------------------
 
 /**
  * ! Overview:
@@ -131,12 +144,15 @@ const rules = {
     $dataType: {
       $dataKey: {
         // You can read a data location if it doesn't exist (so that you can listen for a location that will eventually exist)
-        // You can also read a data location if it is public access, you own it, you have connection read access, or you are connected to it
-        ".read": `!data.exists() || (${publicAccess}) || (${authIsDataOwner(
+        // You can also read a data location if it is public access, you own it, you have connection read access, you are connected to it, or have access via your remoteRequestUid
+        ".read": `!data.exists() || (${publicAccess}) || (${isExistingOwnedRemoteRequestUid}) || (${authIsDataOwner(
           "$dataType"
         )}) || (${readConnectionAccessBoolean} && ${connectionAccess}) || (${isAppUserConnected})`,
-        // You can write a data location if you own it or you have connection write access
-        ".write": `(${authIsDataOwner("$dataType")}) || (${writeConnectionAccessBoolean} && ${connectionAccess})`,
+        // You can write a data location if you own it, have connection write access, or have access via your remoteRequestUid
+        // Also, once set, disallow changing the `remoteRequestUid`
+        ".write": `(${safeRemoteRequestUid}) && ((${authIsDataOwner(
+          "$dataType"
+        )}) || (${isNewOrExistingOwnedRemoteRequestUid}) || (${writeConnectionAccessBoolean} && ${connectionAccess}))`,
       },
     },
   },

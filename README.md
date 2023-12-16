@@ -107,6 +107,13 @@ await createData({
 
 Here, we are saying that any `user` that is connected to the `manager` that owns this `project` also has access to read and write this `project`.
 
+## Remote Request
+There is one other way to have read/write access to data. This is by setting `remoteRequestUid`. This is not intended to determine ownership. This value, once set, cannot be changed, and it can only be set to your own uid. It is meant for creating remote request objects: `data/remoteRequest/dataKey/{object}`.
+
+Remote request objects are a concept whereby one user can make a request on behalf of another user via an API. For example, a manager sends an invite link to a new employee with a special key to a remote request. Upon logging in, this key is sent to the API which makes the remote request using the same permissions as the manager indicated by the `remoteRequestUid`. In the API, this is done via `initializeAdminRemoteRequestApp` instead of `initializeAdminApp`.
+
+In this way, a manager can add people to his team through the API while retaining the same database security rules as if he were to make this operation client-side.
+
 ## Once/Get/On/Use
 Firebase has a terminology which we have tried to extend: `onValue` and `onceValue`. The `on` represents an open data connection using Firebase's built-in websockets. Use this when you want a live subscription to the data. This is often likely the default. Sometimes, though, that is unnecessary. If you only need to fetch the data as in a normal CRUD API, you use `once`.
 

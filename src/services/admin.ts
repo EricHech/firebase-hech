@@ -1,11 +1,14 @@
 import admin from "firebase-admin";
 import { getDatabase } from "firebase-admin/database";
 import { CreateRequest, getAuth, UpdateRequest } from "firebase-admin/auth";
+
+// Helpers
+import { getDataKeyValue } from "./server-data";
 import { cleanPushKey } from "./paths";
 
 // Types
 import type { ServiceAccount } from "firebase-admin/app";
-import type { QueryByKeyLimitParams, QueryOrderByChildParams } from "./types";
+import type { QueryByKeyLimitParams, QueryOrderByChildParams, StatefulData } from "./types";
 import type { TransactionResult, Query } from "@firebase/database-types";
 
 const getRef = (path: string, allowRootQuery: boolean = false) => {
@@ -60,20 +63,20 @@ export const queryByKeyLimit = <T>({ path, limit }: QueryByKeyLimitParams) =>
 
 let initialized = false;
 export const initializeAdminApp = (
-  appOptions?: ServiceAccount,
-  databaseURL?: string,
-  { isDev }: { isDev?: boolean } = { isDev: false }
+  appOptions: ServiceAccount,
+  databaseURL: string,
+  { isDev, databaseAuthVariableOverride }: { isDev?: boolean; databaseAuthVariableOverride: { uid: string } } = {
+    isDev: false,
+    databaseAuthVariableOverride: undefined,
+  }
 ) => {
   const init = () => {
     if (!admin.apps.length && !initialized) {
-      admin.initializeApp(
-        appOptions && databaseURL
-          ? {
-              credential: admin.credential.cert(appOptions),
-              databaseURL,
-            }
-          : undefined
-      );
+      admin.initializeApp({
+        credential: admin.credential.cert(appOptions),
+        databaseURL,
+        databaseAuthVariableOverride,
+      });
       initialized = true;
     }
   };
@@ -86,6 +89,32 @@ export const initializeAdminApp = (
   else {
     init();
   }
+};
+
+/** If fetching the `remoteRequest` is successful, the admin app will be re-initialized, otherwise it will remain with full permissions. */
+export const initializeAdminRemoteRequestApp = async <T extends StatefulData<"remoteRequest">>(
+  remoteRequestKey: string,
+  appOptions: ServiceAccount,
+  databaseURL: string,
+  { isDev }: { isDev?: boolean } = { isDev: false }
+) => {
+  initializeAdminApp(appOptions, databaseURL, {
+    isDev,
+    databaseAuthVariableOverride: undefined,
+  });
+
+  const remoteRequest = await getDataKeyValue("remoteRequest", remoteRequestKey);
+  if (!remoteRequest.remoteRequestUid) return null;
+
+  await admin.app().delete();
+  initialized = false;
+
+  initializeAdminApp(appOptions, databaseURL, {
+    isDev,
+    databaseAuthVariableOverride: { uid: remoteRequest.remoteRequestUid },
+  });
+
+  return remoteRequest as T;
 };
 
 export const remove = (path: string) => getRef(path).remove();
