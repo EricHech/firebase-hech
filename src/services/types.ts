@@ -1,12 +1,18 @@
+export interface AppUser {}
+
+export interface RemoteRequest {
+  remoteRequestUid: string;
+}
+
 export interface SoilDatabase {
   /** Soil reserved name: Must be `publicAccess === true`. */
-  appUser: {};
+  appUser: AppUser;
   /** Soil reserved name. */
   soilUserSettings: { value: string };
   /** Soil reserved name. */
   soilFile: { downloadUrl: string; metadata?: Record<string, string> };
   /** Soil reserved name. See README. */
-  remoteRequest: { remoteRequestUid: string };
+  remoteRequest: RemoteRequest;
 }
 
 export type StandardDataFields = {
