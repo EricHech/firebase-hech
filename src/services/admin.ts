@@ -89,6 +89,8 @@ export const initializeAdminApp = (
   else {
     init();
   }
+
+  return admin.app();
 };
 
 /** If fetching the `remoteRequest` is successful, the admin app will be re-initialized, otherwise it will remain with full permissions. */
@@ -98,7 +100,7 @@ export const initializeAdminRemoteRequestApp = async <T extends StatefulData<"re
   databaseURL: string,
   { isDev }: { isDev?: boolean } = { isDev: false }
 ) => {
-  initializeAdminApp(appOptions, databaseURL, {
+  let app = initializeAdminApp(appOptions, databaseURL, {
     isDev,
     databaseAuthVariableOverride: undefined,
   });
@@ -106,15 +108,18 @@ export const initializeAdminRemoteRequestApp = async <T extends StatefulData<"re
   const remoteRequest = await getDataKeyValue("remoteRequest", remoteRequestKey);
   if (!remoteRequest.remoteRequestUid) return null;
 
-  await admin.app().delete();
+  await app.delete();
   initialized = false;
 
-  initializeAdminApp(appOptions, databaseURL, {
+  app = initializeAdminApp(appOptions, databaseURL, {
     isDev,
     databaseAuthVariableOverride: { uid: remoteRequest.remoteRequestUid },
   });
 
-  return remoteRequest as T;
+  return {
+    app,
+    remoteRequest: remoteRequest as T,
+  };
 };
 
 export const remove = (path: string) => getRef(path).remove();
