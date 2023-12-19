@@ -65,7 +65,7 @@ let initialized = false;
 export const initializeAdminApp = (
   appOptions: ServiceAccount,
   databaseURL: string,
-  { isDev, databaseAuthVariableOverride }: { isDev?: boolean; databaseAuthVariableOverride: { uid: string } } = {
+  { isDev, databaseAuthVariableOverride }: { isDev?: boolean; databaseAuthVariableOverride?: { uid: string } } = {
     isDev: false,
     databaseAuthVariableOverride: undefined,
   }
