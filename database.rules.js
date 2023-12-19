@@ -34,19 +34,25 @@ const isNewOrExistingOwnedRemoteRequestUid = `(${isNewOwnedRemoteRequestUid}) ||
 
 // ---- `connectionAccess` --------------------------------------------------------------------------------------------
 const connectionAccessType = "data.child('connectionAccess/connectionType').val()";
+const newConnectionAccessType = "newData.child('connectionAccess/connectionType').val()";
 const rootDataConnectionAccessType = (dataType, dataKey) =>
   `${rootDataArgs(dataType, dataKey)}.child('connectionAccess/connectionType').val()`;
 const connectionAccessKey = "data.child('connectionAccess/connectionKey').val()";
+const newConnectionAccessKey = "newData.child('connectionAccess/connectionKey').val()";
 const rootDataConnectionAccessKey = (dataType, dataKey) =>
   `${rootDataArgs(dataType, dataKey)}.child('connectionAccess/connectionKey').val()`;
 const uidDataType = "data.child('connectionAccess/uidDataType').val()";
+const newUidDataType = "newData.child('connectionAccess/uidDataType').val()";
 const rootDataUidDataType = (dataType, dataKey) =>
   `${rootDataArgs(dataType, dataKey)}.child('connectionAccess/uidDataType').val()`;
 const readConnectionAccessBoolean = "data.child('connectionAccess/read').val() === true";
+const newReadConnectionAccessBoolean = "newData.child('connectionAccess/read').val() === true";
 const rootDataReadConnectionAccessBoolean = (dataType, dataKey) =>
   `${rootDataArgs(dataType, dataKey)}.child('connectionAccess/read').val() === true`;
 const writeConnectionAccessBoolean = "data.child('connectionAccess/write').val() === true";
+const newWriteConnectionAccessBoolean = "newData.child('connectionAccess/write').val() === true";
 const connectionAccess = `root.child('connectionDataLists').child(${connectionAccessType}).child(${connectionAccessKey}).child(${uidDataType}).child(auth.uid).exists()`;
+const newConnectionAccess = `root.child('connectionDataLists').child(${newConnectionAccessType}).child(${newConnectionAccessKey}).child(${newUidDataType}).child(auth.uid).exists()`;
 const connectionAccessArgs = (accessType, accessKey, uidType) =>
   `root.child('connectionDataLists').child(${accessType}).child(${accessKey}).child(${uidType}).child(auth.uid).exists()`;
 const rootDataConnectionAccess = (dataType, dataKey) =>
@@ -147,12 +153,12 @@ const rules = {
         // You can also read a data location if it is public access, you own it, you have connection read access, you are connected to it, or have access via your remoteRequestUid
         ".read": `!data.exists() || (${publicAccess}) || (${isExistingOwnedRemoteRequestUid}) || (${authIsDataOwner(
           "$dataType"
-        )}) || (${readConnectionAccessBoolean} && ${connectionAccess}) || (${isAppUserConnected})`,
+        )}) || (${isAppUserConnected}) || (${readConnectionAccessBoolean} && ${connectionAccess}) || (${newReadConnectionAccessBoolean} && ${newConnectionAccess})`,
         // You can write a data location if you own it, have connection write access, or have access via your remoteRequestUid
         // Also, once set, disallow changing the `remoteRequestUid`
         ".write": `(${safeRemoteRequestUid}) && ((${authIsDataOwner(
           "$dataType"
-        )}) || (${isNewOrExistingOwnedRemoteRequestUid}) || (${writeConnectionAccessBoolean} && ${connectionAccess}))`,
+        )}) || (${isNewOrExistingOwnedRemoteRequestUid}) || (${writeConnectionAccessBoolean} && ${connectionAccess}) || (${newWriteConnectionAccessBoolean} && ${newConnectionAccess}))`,
       },
     },
   },
