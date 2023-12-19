@@ -1,6 +1,6 @@
 import { initializeApp, FirebaseOptions, getApp, FirebaseApp } from "firebase/app";
 import { User as FirebaseUser, initializeAuth, indexedDBLocalPersistence, getAuth, Auth } from "firebase/auth";
-import { signInAnon, firebaseUseDeviceLanguage } from "./auth";
+import { signInAnon } from "./auth";
 
 /*
 ██╗███╗   ██╗██╗████████╗██╗ █████╗ ██╗     ██╗███████╗███████╗
@@ -23,13 +23,17 @@ export const initializeFirebase = (
   }
 
   let auth: Auth;
-  try {
-    auth = initializeAuth(app, isNativePlatform ? { persistence: indexedDBLocalPersistence } : {});
-  } catch (e) {
+  if (isNativePlatform) {
+    try {
+      auth = initializeAuth(app, { persistence: indexedDBLocalPersistence });
+    } catch (e) {
+      auth = getAuth();
+    }
+  } else {
     auth = getAuth();
   }
 
-  firebaseUseDeviceLanguage();
+  auth.useDeviceLanguage();
 
   if (anonymousSignIn) signInAnon();
 
