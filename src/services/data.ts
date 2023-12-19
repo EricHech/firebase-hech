@@ -180,6 +180,16 @@ export const isoGetConnectionTypeConnections = <T2 extends keyof SoilDatabase, T
     )
   );
 
+export const isoGetUserDataType = <T2 extends keyof SoilDatabase, T22 extends keyof SoilDatabase>({
+  get,
+  dataType,
+  uid,
+}: {
+  get: GetFunction;
+  dataType: T2;
+  uid: string;
+}) => get<DataList[T22]>(PATHS.userDataTypeList(uid, dataType));
+
 export const isoGetDataKeyFieldValue = <T2 extends keyof SoilDatabase, T3 extends keyof Data<T2>>({
   get,
   dataType,

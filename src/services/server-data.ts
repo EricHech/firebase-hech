@@ -22,6 +22,7 @@ import {
   isoGetUser,
   isoAddOwners,
   isoRemoveOwners,
+  isoGetUserDataType,
 } from "./data";
 import { get, push, queryOrderByChildEqualTo, update } from "./admin";
 import type {
@@ -82,6 +83,14 @@ export const getConnectionTypeData = <T2 extends keyof SoilDatabase, T22 extends
     dataKey,
     connectionType,
   });
+
+export const getUserDataType = <T2 extends keyof SoilDatabase, T22 extends keyof SoilDatabase>({
+  dataType,
+  uid,
+}: {
+  dataType: T2;
+  uid: string;
+}) => isoGetUserDataType({ get, dataType, uid });
 
 export const getDataKeyFieldValue = <T2 extends keyof SoilDatabase, T3 extends keyof Data<T2>>({
   dataType,
