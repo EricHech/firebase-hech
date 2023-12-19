@@ -46,7 +46,6 @@ const newUidDataType = "newData.child('connectionAccess/uidDataType').val()";
 const rootDataUidDataType = (dataType, dataKey) =>
   `${rootDataArgs(dataType, dataKey)}.child('connectionAccess/uidDataType').val()`;
 const readConnectionAccessBoolean = "data.child('connectionAccess/read').val() === true";
-const newReadConnectionAccessBoolean = "newData.child('connectionAccess/read').val() === true";
 const rootDataReadConnectionAccessBoolean = (dataType, dataKey) =>
   `${rootDataArgs(dataType, dataKey)}.child('connectionAccess/read').val() === true`;
 const writeConnectionAccessBoolean = "data.child('connectionAccess/write').val() === true";
@@ -153,7 +152,7 @@ const rules = {
         // You can also read a data location if it is public access, you own it, you have connection read access, you are connected to it, or have access via your remoteRequestUid
         ".read": `!data.exists() || (${publicAccess}) || (${isExistingOwnedRemoteRequestUid}) || (${authIsDataOwner(
           "$dataType"
-        )}) || (${isAppUserConnected}) || (${readConnectionAccessBoolean} && ${connectionAccess}) || (${newReadConnectionAccessBoolean} && ${newConnectionAccess})`,
+        )}) || (${isAppUserConnected}) || (${readConnectionAccessBoolean} && ${connectionAccess})`,
         // You can write a data location if you own it, have connection write access, or have access via your remoteRequestUid
         // Also, once set, disallow changing the `remoteRequestUid`
         ".write": `(${safeRemoteRequestUid}) && ((${authIsDataOwner(
