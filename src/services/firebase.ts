@@ -74,12 +74,12 @@ export const getWithLimit = <T>(path: string, amount: number, version: "first" |
 export const onChildAdded = <T, K extends string>(
   path: string,
   cb: (val: T, key: K) => void,
-  limit?: { amount: number; direction: Extract<database.QueryConstraintType, "limitToFirst" | "limitToLast"> }
+  opts: { limit?: { amount: number; direction: Extract<database.QueryConstraintType, "limitToFirst" | "limitToLast"> } }
 ) =>
   database.onChildAdded(
-    limit ? database.query(getRef(path), database[limit.direction](limit.amount)) : getRef(path),
+    opts.limit ? database.query(getRef(path), database[opts.limit.direction](opts.limit.amount)) : getRef(path),
     (snap) => cb(snap.val(), snap.key! as K),
-    logAndThrow("onChildAdded", path, limit ? { data: { limit } } : undefined)
+    logAndThrow("onChildAdded", path, opts.limit ? { data: { limit: opts.limit } } : undefined)
   );
 
 export const onChildChanged = <T, K extends string>(path: string, cb: (val: T, key: K) => void) =>
