@@ -24,7 +24,7 @@ import {
   isoRemoveOwners,
   isoGetUserDataType,
 } from "./data";
-import { get, push, queryOrderByChildEqualTo, update } from "./admin";
+import { get, push, queryOrderByChildEqualTo, soilUpdate, update } from "./admin";
 import type {
   CreateDataParams,
   GetDataKeyValueParams,
@@ -110,12 +110,14 @@ export const createData = <T extends SoilDatabase, T2 extends keyof SoilDatabase
   connections,
   connectionAccess,
   now = Date.now(),
+  imitateClientUpdate,
 }: Omit<CreateDataParams<T, T2>, "update"> & {
   dataType: string;
   dataKey: string;
+  imitateClientUpdate?: boolean;
 }) =>
   isoCreateData({
-    update,
+    update: imitateClientUpdate ? update : soilUpdate,
     updateObject,
     skipUpdate,
     dataType,
@@ -141,9 +143,10 @@ export const updateData = <T extends SoilDatabase, T2 extends keyof SoilDatabase
   makeGetRequests,
   connectionAccess,
   now,
-}: Omit<UpdateDataParams<T, T2>, "update" | "get">) =>
+  imitateClientUpdate,
+}: Omit<UpdateDataParams<T, T2>, "update" | "get"> & { imitateClientUpdate?: boolean }) =>
   isoUpdateData({
-    update,
+    update: imitateClientUpdate ? update : soilUpdate,
     get,
     updateObject,
     skipUpdate,
@@ -171,9 +174,11 @@ export const upsertData = <T extends SoilDatabase, T2 extends keyof SoilDatabase
   connectionAccess,
   includeUpdatedAt,
   makeGetRequests,
-}: Omit<CreateDataParams<T, T2>, "update"> & Omit<UpdateDataParams<T, T2>, "update" | "get">) =>
+  imitateClientUpdate,
+}: Omit<CreateDataParams<T, T2>, "update"> &
+  Omit<UpdateDataParams<T, T2>, "update" | "get"> & { imitateClientUpdate?: boolean }) =>
   isoUpsertData({
-    update,
+    update: imitateClientUpdate ? update : soilUpdate,
     get,
     updateObject,
     skipUpdate,
@@ -207,9 +212,10 @@ export const removeData = <T extends SoilDatabase, T2 extends keyof SoilDatabase
   skipUpdate,
   dataType,
   dataKey,
-}: Omit<RemoveDataKeyParams<T, T2>, "update" | "get" | "publicAccess" | "now">) =>
+  imitateClientUpdate,
+}: Omit<RemoveDataKeyParams<T, T2>, "update" | "get" | "publicAccess" | "now"> & { imitateClientUpdate?: boolean }) =>
   isoRemoveData({
-    update,
+    update: imitateClientUpdate ? update : soilUpdate,
     get,
     updateObject,
     skipUpdate,
