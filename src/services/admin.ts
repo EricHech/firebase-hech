@@ -10,6 +10,7 @@ import { cleanPushKey } from "./paths";
 import type { ServiceAccount } from "firebase-admin/app";
 import type { QueryByKeyLimitParams, QueryOrderByChildParams, StatefulData } from "./types";
 import type { TransactionResult, Query } from "@firebase/database-types";
+import { isoSoilUpdate } from "./data";
 
 const getRef = (path: string, allowRootQuery: boolean = false) => {
   if (!path || (!allowRootQuery && path === "/")) throw new Error("We don't like root queries");
@@ -42,6 +43,14 @@ export const set = <T>(path: string, data: T) => getRef(path).set(data);
 
 export const update = <T extends object>(path: string, data: T, allowRootQuery: boolean = false) =>
   getRef(path, allowRootQuery).update(data);
+
+/** This is for mimicking the front end if using `initializeAdminRemoteRequestApp` on the server */
+export const soilUpdate = async (
+  path: string,
+  data: object,
+  allowRootQuery: boolean = false,
+  isDelete: boolean = false
+) => isoSoilUpdate({ update, set }, path, data, allowRootQuery, isDelete);
 
 export const onValue = <T>(path: string, cb: (val: Nullable<T>) => void) =>
   getRef(path).on("value", (snap) => cb(snap.val()));

@@ -1,7 +1,8 @@
 import * as database from "firebase/database";
 import * as storage from "firebase/storage";
 import { getDownloadURL, UploadTaskSnapshot as FirebaseUploadTaskSnapshot } from "firebase/storage";
-import { cleanPushKey, PATHS } from "./paths";
+import { cleanPushKey } from "./paths";
+import { isoSoilUpdate } from "./data";
 
 const getRef = (path: string, allowRootQuery: boolean = false) => {
   if (!path || (!allowRootQuery && path === "/")) throw new Error("We don't like root queries");
@@ -102,38 +103,12 @@ export const pushKey = (path: string) => cleanPushKey(database.push(getRef(path)
 export const set = <T>(path: string, data: T) =>
   database.set(getRef(path), data).catch(logAndThrow("set", path, { data }));
 
-const ownersPrefix = `${PATHS.OWNERS}/`;
-const connectionPrefix = `${PATHS.CONNECTION_DATA_LISTS}/`;
-const dataPrefix = `${PATHS.DATA}/`;
-
-export const soilUpdate = async <T extends object>(
+export const soilUpdate = async (
   path: string,
-  data: T,
+  data: object,
   allowRootQuery: boolean = false,
   isDelete: boolean = false
-) => {
-  if (path === "/" && allowRootQuery) {
-    const ownersUpdates = {} as Record<string, unknown>;
-    const dataUpdates = {} as Record<string, unknown>;
-    const allOtherUpdates = {} as Record<string, unknown>;
-    Object.entries(data).forEach(([p, d]) => {
-      if (p.startsWith(ownersPrefix)) ownersUpdates[p] = d;
-      else if (p.startsWith(dataPrefix)) dataUpdates[p] = d;
-      else allOtherUpdates[p] = d;
-    });
-    if (isDelete) {
-      await Promise.all(Object.entries(allOtherUpdates).map(([key, val]) => set(key, val)));
-      await Promise.all(Object.entries(dataUpdates).map(([key, val]) => set(key, val)));
-      await Promise.all(Object.entries(ownersUpdates).map(([key, val]) => set(key, val)));
-    } else {
-      await Promise.all(Object.entries(ownersUpdates).map(([key, val]) => set(key, val)));
-      await Promise.all(Object.entries(dataUpdates).map(([key, val]) => set(key, val)));
-      await Promise.all(Object.entries(allOtherUpdates).map(([key, val]) => set(key, val)));
-    }
-  } else {
-    await database.update(getRef(path, allowRootQuery), data).catch(logAndThrow("update", path, { data }));
-  }
-};
+) => isoSoilUpdate({ update, set }, path, data, allowRootQuery, isDelete);
 
 export const update = async <T extends object>(path: string, data: T, allowRootQuery: boolean = false) => {
   if (path === "/" && allowRootQuery) {

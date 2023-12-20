@@ -276,6 +276,41 @@ export const isoRemoveOwners = <T extends SoilDatabase, T2 extends keyof SoilDat
 ██████╔╝██║  ██║   ██║   ██║  ██║
 ╚═════╝ ╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝
 */
+const ownersPrefix = `${PATHS.OWNERS}/`;
+const dataPrefix = `${PATHS.DATA}/`;
+export const isoSoilUpdate = async (
+  soil: {
+    update: (path: string, d: object, allowRootQuery?: boolean, isDelete?: boolean) => Promise<void>;
+    set: <T>(path: string, data: T) => Promise<void>;
+  },
+  path: string,
+  data: object,
+  allowRootQuery: boolean = false,
+  isDelete: boolean = false
+) => {
+  if (path === "/" && allowRootQuery) {
+    const ownersUpdates = {} as Record<string, unknown>;
+    const dataUpdates = {} as Record<string, unknown>;
+    const allOtherUpdates = {} as Record<string, unknown>;
+    Object.entries(data).forEach(([p, d]) => {
+      if (p.startsWith(ownersPrefix)) ownersUpdates[p] = d;
+      else if (p.startsWith(dataPrefix)) dataUpdates[p] = d;
+      else allOtherUpdates[p] = d;
+    });
+    if (isDelete) {
+      await Promise.all(Object.entries(allOtherUpdates).map(([key, val]) => soil.set(key, val)));
+      await Promise.all(Object.entries(dataUpdates).map(([key, val]) => soil.set(key, val)));
+      await Promise.all(Object.entries(ownersUpdates).map(([key, val]) => soil.set(key, val)));
+    } else {
+      await Promise.all(Object.entries(ownersUpdates).map(([key, val]) => soil.set(key, val)));
+      await Promise.all(Object.entries(dataUpdates).map(([key, val]) => soil.set(key, val)));
+      await Promise.all(Object.entries(allOtherUpdates).map(([key, val]) => soil.set(key, val)));
+    }
+  } else {
+    await soil.update(path, data, allowRootQuery);
+  }
+};
+
 export const isoCreateData = async <T extends SoilDatabase, T2 extends keyof SoilDatabase>({
   update,
   updateObject = {},
