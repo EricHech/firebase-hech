@@ -324,7 +324,7 @@ export const isoUpdateData = async <T extends SoilDatabase, T2 extends keyof Soi
   data,
   owners = [],
   connections,
-  publicAccess = false,
+  publicAccess,
   connectionAccess,
   now = Date.now(),
   includeUpdatedAt = true,
@@ -332,13 +332,14 @@ export const isoUpdateData = async <T extends SoilDatabase, T2 extends keyof Soi
   makeConnectionsRequests = true,
   makeOwnersRequests = true,
 }: UpdateDataParams<T, T2>) => {
-  type NewData = typeof data & { publicAccess: boolean; updatedAt?: number };
+  type NewData = typeof data & { updatedAt?: number };
 
-  const newData = { ...data, publicAccess } as NewData;
+  const newData = { ...data } as NewData;
   if (includeUpdatedAt) newData.updatedAt = now;
 
   /* eslint-disable no-param-reassign */
   if (connectionAccess) updateObject[PATHS.dataKeyField(dataType, dataKey, "connectionAccess")] = connectionAccess;
+  if (publicAccess !== undefined) updateObject[PATHS.dataKeyField(dataType, dataKey, "publicAccess")] = publicAccess;
 
   Object.entries(newData).forEach(([childKey, childVal]) => {
     updateObject[PATHS.dataKeyField(dataType, dataKey, childKey)] = childVal;
@@ -391,7 +392,7 @@ export const isoUpsertData = async <T extends SoilDatabase, T2 extends keyof Soi
   dataKey,
   data,
   owners,
-  publicAccess = false,
+  publicAccess,
   connections,
   connectionAccess,
   includeUpdatedAt = true,

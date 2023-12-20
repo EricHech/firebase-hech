@@ -14,7 +14,7 @@ import type { CreateDataParams } from "./types";
 
 export const uploadFile = async ({
   owners,
-  publicAccess = false,
+  publicAccess,
   connections,
   connectionAccess,
   file,
@@ -41,7 +41,7 @@ export const uploadFile = async ({
 
 export const uploadFileResumable = ({
   owners,
-  publicAccess = false,
+  publicAccess,
   connections,
   connectionAccess,
   file,
