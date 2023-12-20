@@ -19,7 +19,6 @@ export type StandardDataFields = {
   createdAt: number;
   updatedAt: number;
   deletedAt?: number;
-  remoteRequestUid?: string;
   connectionAccess?: {
     connectionType: keyof SoilDatabase;
     connectionKey: string;
@@ -84,7 +83,6 @@ export type CudDataParams<T extends SoilDatabase, T2 extends keyof SoilDatabase>
   dataType: T2;
   dataKey: string;
   publicAccess?: boolean;
-  remoteRequestUid?: StandardDataFields["remoteRequestUid"];
   now?: number;
 };
 

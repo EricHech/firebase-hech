@@ -98,7 +98,6 @@ export const createData = async <T extends SoilDatabase, T2 extends keyof SoilDa
   publicAccess,
   connections,
   connectionAccess,
-  remoteRequestUid,
   now,
 }: Omit<CreateDataParams<T, T2>, "update">) =>
   isoCreateData({
@@ -112,7 +111,6 @@ export const createData = async <T extends SoilDatabase, T2 extends keyof SoilDa
     publicAccess,
     connections,
     connectionAccess,
-    remoteRequestUid,
     now,
   });
 
@@ -127,7 +125,6 @@ export const updateData = async <T extends SoilDatabase, T2 extends keyof SoilDa
   publicAccess,
   includeUpdatedAt,
   connectionAccess,
-  remoteRequestUid,
   makeGetRequests,
   makeConnectionsRequests,
   makeOwnersRequests,
@@ -146,7 +143,6 @@ export const updateData = async <T extends SoilDatabase, T2 extends keyof SoilDa
     publicAccess,
     includeUpdatedAt,
     connectionAccess,
-    remoteRequestUid,
     makeGetRequests,
     makeConnectionsRequests,
     makeOwnersRequests,
@@ -164,7 +160,6 @@ export const upsertData = async <T extends SoilDatabase, T2 extends keyof SoilDa
   connections,
   includeUpdatedAt,
   connectionAccess,
-  remoteRequestUid,
   makeGetRequests,
   makeConnectionsRequests,
   makeOwnersRequests,
@@ -183,7 +178,6 @@ export const upsertData = async <T extends SoilDatabase, T2 extends keyof SoilDa
     connections,
     includeUpdatedAt,
     connectionAccess,
-    remoteRequestUid,
     makeGetRequests,
     makeConnectionsRequests,
     makeOwnersRequests,
