@@ -70,6 +70,9 @@ export const initializeAdminApp = (
   }
 ) => {
   const init = () => {
+    // To account for hot-module-reloading potentially having the wrong app initialized due to `initializeAdminRemoteRequestApp`
+    if (admin.apps.length && isDev) admin.app().delete();
+
     if (!admin.apps.length) {
       admin.initializeApp({
         credential: admin.credential.cert(appOptions),
