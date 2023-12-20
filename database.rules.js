@@ -157,7 +157,7 @@ const rules = {
         // Also, once set, disallow changing the `remoteRequestUid`
         ".write": `(${safeRemoteRequestUid}) && ((${authIsDataOwner(
           "$dataType"
-        )}) || (${isNewOrExistingOwnedRemoteRequestUid}) || (${writeConnectionAccessBoolean} && ${connectionAccess}) || (${newWriteConnectionAccessBoolean} && ${newConnectionAccess}))`,
+        )}) || (${isNewOrExistingOwnedRemoteRequestUid}) || (${writeConnectionAccessBoolean} && ${connectionAccess}) || (!data.exists() && ${newWriteConnectionAccessBoolean} && ${newConnectionAccess}))`,
       },
     },
   },
