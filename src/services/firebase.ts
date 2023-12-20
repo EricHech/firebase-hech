@@ -71,8 +71,16 @@ export const getWithLimit = <T>(path: string, amount: number, version: "first" |
     .then((snap) => snap.val() as Nullable<T>)
     .catch(logAndThrow("getWithLimit", path));
 
-export const onChildAdded = <T, K extends string>(path: string, cb: (val: T, key: K) => void) =>
-  database.onChildAdded(getRef(path), (snap) => cb(snap.val(), snap.key! as K), logAndThrow("onChildAdded", path));
+export const onChildAdded = <T, K extends string>(
+  path: string,
+  cb: (val: T, key: K) => void,
+  limit?: { amount: number; direction: Extract<database.QueryConstraintType, "limitToFirst" | "limitToLast"> }
+) =>
+  database.onChildAdded(
+    limit ? database.query(getRef(path), database[limit.direction](limit.amount)) : getRef(path),
+    (snap) => cb(snap.val(), snap.key! as K),
+    logAndThrow("onChildAdded", path, limit ? { data: { limit } } : undefined)
+  );
 
 export const onChildChanged = <T, K extends string>(path: string, cb: (val: T, key: K) => void) =>
   database.onChildChanged(getRef(path), (snap) => cb(snap.val(), snap.key! as K), logAndThrow("onChildChanged", path));
@@ -106,23 +114,19 @@ export const soilUpdate = async <T extends object>(
 ) => {
   if (path === "/" && allowRootQuery) {
     const ownersUpdates = {} as Record<string, unknown>;
-    const connectionUpdates = {} as Record<string, unknown>;
     const dataUpdates = {} as Record<string, unknown>;
     const allOtherUpdates = {} as Record<string, unknown>;
     Object.entries(data).forEach(([p, d]) => {
       if (p.startsWith(ownersPrefix)) ownersUpdates[p] = d;
-      else if (p.startsWith(connectionPrefix)) connectionUpdates[p] = d;
       else if (p.startsWith(dataPrefix)) dataUpdates[p] = d;
       else allOtherUpdates[p] = d;
     });
     if (isDelete) {
       await Promise.all(Object.entries(allOtherUpdates).map(([key, val]) => set(key, val)));
       await Promise.all(Object.entries(dataUpdates).map(([key, val]) => set(key, val)));
-      await Promise.all(Object.entries(connectionUpdates).map(([key, val]) => set(key, val)));
       await Promise.all(Object.entries(ownersUpdates).map(([key, val]) => set(key, val)));
     } else {
       await Promise.all(Object.entries(ownersUpdates).map(([key, val]) => set(key, val)));
-      await Promise.all(Object.entries(connectionUpdates).map(([key, val]) => set(key, val)));
       await Promise.all(Object.entries(dataUpdates).map(([key, val]) => set(key, val)));
       await Promise.all(Object.entries(allOtherUpdates).map(([key, val]) => set(key, val)));
     }
