@@ -61,7 +61,6 @@ export const queryByKeyLimit = <T>({ path, limit }: QueryByKeyLimitParams) =>
     .once("value")
     .then((snap) => snap.val() as Nullable<T>);
 
-let initialized = false;
 export const initializeAdminApp = (
   appOptions: ServiceAccount,
   databaseURL: string,
@@ -71,13 +70,12 @@ export const initializeAdminApp = (
   }
 ) => {
   const init = () => {
-    if (!admin.apps.length && !initialized) {
+    if (!admin.apps.length) {
       admin.initializeApp({
         credential: admin.credential.cert(appOptions),
         databaseURL,
         databaseAuthVariableOverride,
       });
-      initialized = true;
     }
   };
 
@@ -109,7 +107,6 @@ export const initializeAdminRemoteRequestApp = async <T extends StatefulData<"re
   if (!remoteRequest.remoteRequestUid) return null;
 
   await app.delete();
-  initialized = false;
 
   app = initializeAdminApp(appOptions, databaseURL, {
     isDev,
