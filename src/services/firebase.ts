@@ -71,16 +71,8 @@ export const getWithLimit = <T>(path: string, amount: number, version: "first" |
     .then((snap) => snap.val() as Nullable<T>)
     .catch(logAndThrow("getWithLimit", path));
 
-export const onChildAdded = <T, K extends string>(
-  path: string,
-  cb: (val: T, key: K) => void,
-  opts: { limit?: { amount: number; direction: Extract<database.QueryConstraintType, "limitToFirst" | "limitToLast"> } }
-) =>
-  database.onChildAdded(
-    opts.limit ? database.query(getRef(path), database[opts.limit.direction](opts.limit.amount)) : getRef(path),
-    (snap) => cb(snap.val(), snap.key! as K),
-    logAndThrow("onChildAdded", path, opts.limit ? { data: { limit: opts.limit } } : undefined)
-  );
+export const onChildAdded = <T, K extends string>(path: string, cb: (val: T, key: K) => void) =>
+  database.onChildAdded(getRef(path), (snap) => cb(snap.val(), snap.key! as K), logAndThrow("onChildAdded", path));
 
 export const onChildChanged = <T, K extends string>(path: string, cb: (val: T, key: K) => void) =>
   database.onChildChanged(getRef(path), (snap) => cb(snap.val(), snap.key! as K), logAndThrow("onChildChanged", path));
