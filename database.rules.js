@@ -19,6 +19,13 @@ const publicAccess = "data.child('publicAccess').val() === true";
 const rootDataPublicAccess = `${rootData}.child('publicAccess').val() === true`;
 const rootDataPublicAccessArgs = (dataType, dataKey) =>
   `${rootDataArgs(dataType, dataKey)}.child('publicAccess').val() === true`;
+
+/**
+ * This makes `appUser` a necessary part of soil - it must be connected to everything that they want
+ * to read that is not public and that they do not own or have `connectionAccess/read` permissions.
+ */
+const isAppUserConnected = (type, key) =>
+  `root.child('connectionDataLists').child('appUser').child(auth.uid).child(${type}).child(${key}).exists()`;
 // --------------------------------------------------------------------------------------------------------------------
 
 // ---- `remoteRequestUid` --------------------------------------------------------------------------------------------
@@ -63,12 +70,12 @@ const rootDataConnectionAccess = (dataType, dataKey) =>
 const hasRootReadConnectionAccess = (dataType, dataKey) =>
   `${rootDataReadConnectionAccessBoolean(dataType, dataKey)} && ${rootDataConnectionAccess(dataType, dataKey)}`;
 
-/**
- * This makes `appUser` a necessary part of soil - it must be connected to everything that they want
- * to read that is not public and that they do not own or have `connectionAccess/read` permissions.
- */
-const isAppUserConnected =
-  "root.child('connectionDataLists').child('appUser').child(auth.uid).child($dataType).child($dataKey).exists()";
+const oneHalfOfConnectionWriteAccess = (type, key) =>
+  `(${rootDataPublicAccessArgs(type, key)}) || (${rootDataDoesNotExistArgs(type, key)}) || (${authIsDataOwnerArgs(
+    type,
+    key
+  )}) || (${isAppUserConnected(type, key)}) || (${hasRootReadConnectionAccess(type, key)})`;
+
 // --------------------------------------------------------------------------------------------------------------------
 
 /**
@@ -152,7 +159,10 @@ const rules = {
         // You can also read a data location if it is public access, you own it, you have connection read access, you are connected to it, or have access via your remoteRequestUid
         ".read": `!data.exists() || (${publicAccess}) || (${isExistingOwnedRemoteRequestUid}) || (${authIsDataOwner(
           "$dataType"
-        )}) || (${isAppUserConnected}) || (${readConnectionAccessBoolean} && ${connectionAccess})`,
+        )}) || (${isAppUserConnected(
+          "$dataType",
+          "$dataKey"
+        )}) || (${readConnectionAccessBoolean} && ${connectionAccess})`,
         // You can write a data location if you own it, have connection write access, or have access via your remoteRequestUid
         // Also, once set, disallow changing the `remoteRequestUid`
         ".write": `(${safeRemoteRequestUid}) && ((${authIsDataOwner(
@@ -175,23 +185,14 @@ const rules = {
           $connectionKey: {
             // You can only write new connections if both ends follow the same rules.
             // This is because connections give you read access to data, and they are always two-way.
-            // You must be logged in, and each end must be either: public, non-existant, owned, or have connection read access
+            // You must be logged in, and each end must be either: public, non-existant, owned, connected, or have connection read access
             // The non-existant check is for when we create connections that are just reference points but data is not actually at the location
             // ? Example: A user wanting to create a connection between a cart (that they own or doesn't technically exist) and a product (for which they have connection read access)
             // For managing creating new connections, see: "! Notes regarding making connections and reading data structure"
-            ".write": `${authNotNull} && ((${rootDataPublicAccessArgs(
+            ".write": `${authNotNull} && (${oneHalfOfConnectionWriteAccess(
               "$dataType",
               "$dataKey"
-            )}) || (${rootDataDoesNotExistArgs("$dataType", "$dataKey")}) || (${authIsDataOwnerArgs(
-              "$dataType",
-              "$dataKey"
-            )}) || (${hasRootReadConnectionAccess("$dataType", "$dataKey")})) && ((${rootDataPublicAccessArgs(
-              "$connectionType",
-              "$connectionKey"
-            )}) || (${rootDataDoesNotExistArgs("$connectionType", "$connectionKey")}) || (${authIsDataOwnerArgs(
-              "$connectionType",
-              "$connectionKey"
-            )}) || (${hasRootReadConnectionAccess("$connectionType", "$connectionKey")}))`,
+            )}) && (${oneHalfOfConnectionWriteAccess("$connectionType", "$connectionKey")})`,
             ".validate": isNumber,
           },
         },
