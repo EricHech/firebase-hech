@@ -103,6 +103,17 @@ export const initializeAdminApp = (
   return admin.app();
 };
 
+export const initializeAuthMimickApp = <T extends StatefulData<"remoteRequest">>(
+  uid: string,
+  appOptions: ServiceAccount,
+  databaseURL: string,
+  { isDev }: { isDev?: boolean } = { isDev: false }
+) =>
+  initializeAdminApp(appOptions, databaseURL, {
+    isDev,
+    databaseAuthVariableOverride: { uid },
+  });
+
 /** If fetching the `remoteRequest` is successful, the admin app will be re-initialized, otherwise it will remain with full permissions. */
 export const initializeAdminRemoteRequestApp = async <T extends StatefulData<"remoteRequest">>(
   remoteRequestKey: string,
@@ -120,13 +131,8 @@ export const initializeAdminRemoteRequestApp = async <T extends StatefulData<"re
 
   await app.delete();
 
-  app = initializeAdminApp(appOptions, databaseURL, {
-    isDev,
-    databaseAuthVariableOverride: { uid: remoteRequest.remoteRequestUid },
-  });
-
   return {
-    app,
+    app: initializeAuthMimickApp(remoteRequest.remoteRequestUid, appOptions, databaseURL, { isDev }),
     remoteRequest: remoteRequest as T,
   };
 };
