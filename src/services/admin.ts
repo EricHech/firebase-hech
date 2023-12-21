@@ -103,7 +103,7 @@ export const initializeAdminApp = (
   return admin.app();
 };
 
-export const initializeAuthMimickApp = <T extends StatefulData<"remoteRequest">>(
+export const initializeAuthMimickApp = (
   uid: string,
   appOptions: ServiceAccount,
   databaseURL: string,
