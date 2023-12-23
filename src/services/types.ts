@@ -15,6 +15,20 @@ export interface SoilDatabase {
   remoteRequest: RemoteRequest;
 }
 
+export type EmulatorOptions = {
+  database?: {
+    host: string;
+    port: number;
+  };
+  auth?: {
+    url: string;
+  };
+  storage?: {
+    host: string;
+    port: number;
+  }
+};
+
 export type StandardDataFields = {
   createdAt: number;
   updatedAt: number;
