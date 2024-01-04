@@ -45,6 +45,7 @@ export const isoCreateUser = ({
   user: Mandate<User, "uid">;
 }) => {
   updateObject[PATHS.user(user.uid)] = user;
+  if (user.username) updateObject[PATHS.username(user.username)] = user.uid;
 
   return isoCreateData({
     update,

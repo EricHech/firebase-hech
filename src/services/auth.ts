@@ -12,7 +12,7 @@ import {
   OAuthProvider,
   signInWithPopup,
 } from "firebase/auth";
-import { createUser, updateUser } from "./client-data";
+import { createUser, getUsername, updateUser } from "./client-data";
 import { User } from "./types";
 
 const getFriendlyAuthError = (errorMessage: string) => {
@@ -42,9 +42,17 @@ export const signUp = async (
   email: string,
   password: string,
   confirmPassword: string,
-  setError: (error: string) => void
+  setError: (error: string) => void,
+  validatedUsername?: string
 ) => {
-  if (password !== confirmPassword) throw new Error("Password does not match the confirmation password");
+  if (password !== confirmPassword) {
+    throw new Error("Password does not match the confirmation password");
+  }
+
+  if (validatedUsername) {
+    const existingUserUid = await getUsername(validatedUsername);
+    if (existingUserUid) throw new Error("This username is already in use.");
+  }
 
   const now = Date.now();
 
@@ -61,7 +69,10 @@ export const signUp = async (
         createdAt: now,
         updatedAt: now,
         emailVerified: false,
+        username: null,
       };
+
+      if (validatedUsername) user.username = validatedUsername;
 
       await createUser({ user });
 

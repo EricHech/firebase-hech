@@ -26,7 +26,7 @@ export type EmulatorOptions = {
   storage?: {
     host: string;
     port: number;
-  }
+  };
 };
 
 export type StandardDataFields = {
@@ -49,6 +49,8 @@ export type User = StandardDataFields &
     phoneNumber?: string;
     emailVerified?: boolean;
     photoUrl?: string;
+    /** This exists if you passed a username to the `signUp` method */
+    username?: string;
   }>;
 
 export type Data<T2 extends keyof SoilDatabase> = StandardDataFields & {

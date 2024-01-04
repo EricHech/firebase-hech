@@ -102,6 +102,14 @@ const rules = {
   // Admins have full read/write permissions on the database
   ".read": authIsAdmin,
   ".write": authIsAdmin,
+  usernames: {
+    $username: {
+      // Anyone, logged in or not, can read the list of usernames
+      ".read": "true",
+      // You can write your own uid here if it is a new username or if the existing username/uid is yours
+      ".write": "newData.val() === auth.uid && (!data.exists() || data.val() === auth.uid)",
+    },
+  },
   users: {
     // Users have full read/write permissions on themselves
     $uid: {
