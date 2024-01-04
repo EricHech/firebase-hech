@@ -103,6 +103,7 @@ const rules = {
   ".read": authIsAdmin,
   ".write": authIsAdmin,
   usernames: {
+    // * If using the `usernames` feature, it might be a good idea to use trigger functions to update this field if the `username` field is ever edited in `users` or `data/appUser`
     $username: {
       // Anyone, logged in or not, can read the list of usernames
       ".read": "true",
