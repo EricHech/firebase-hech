@@ -1,4 +1,4 @@
-import type { SoilDatabase } from "./types";
+import type { AppUser, SoilDatabase } from "./types";
 
 // Helpers
 import { createGetUpdateObjectFunction, sleep } from "../utils";
@@ -37,14 +37,14 @@ import type {
 */
 export const isoCreateUser = ({
   user,
-  username,
+  appUser,
   update,
   updateObject = {},
   skipUpdate,
   now = Date.now(),
 }: Pick<CreateDataParams<SoilDatabase, keyof SoilDatabase>, "update" | "updateObject" | "skipUpdate" | "now"> & {
   user: Mandate<User, "uid">;
-  username: Nullable<string>;
+  appUser: AppUser;
 }) => {
   updateObject[PATHS.user(user.uid)] = user;
 
@@ -52,7 +52,7 @@ export const isoCreateUser = ({
     update,
     dataType: "appUser",
     dataKey: user.uid,
-    data: { username: username as Maybe<string> },
+    data: appUser,
     owners: [user.uid],
     publicAccess: true,
     updateObject,

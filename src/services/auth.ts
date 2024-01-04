@@ -13,7 +13,7 @@ import {
   signInWithPopup,
 } from "firebase/auth";
 import { createUser, getUsername, updateUser } from "./client-data";
-import { User } from "./types";
+import { AppUser, User } from "./types";
 
 const getFriendlyAuthError = (errorMessage: string) => {
   if (errorMessage.includes("auth/user-not-found")) return "No user found that matches that email.";
@@ -39,18 +39,18 @@ export const createEmailUser = (email: string, password: string) =>
 export const firebaseUseDeviceLanguage = () => getAuth().useDeviceLanguage();
 
 export const signUp = async (
+  appUser: AppUser,
   email: string,
   password: string,
   confirmPassword: string,
-  setError: (error: string) => void,
-  username: Nullable<string> = null
+  setError: (error: string) => void
 ) => {
   if (password !== confirmPassword) {
     throw new Error("Password does not match the confirmation password");
   }
 
-  if (username) {
-    const existingUserUid = await getUsername(username);
+  if (appUser.username) {
+    const existingUserUid = await getUsername(appUser.username);
     if (existingUserUid) throw new Error("This username is already in use.");
   }
 
@@ -71,7 +71,7 @@ export const signUp = async (
         emailVerified: false,
       };
 
-      await createUser({ user, username });
+      await createUser({ user, appUser });
 
       return user;
     })
@@ -79,12 +79,10 @@ export const signUp = async (
 };
 
 export const signUpWithProvider = async (
+  appUser: AppUser,
   providerId: string,
   setError: (error: string) => void,
-  { username = null, customParameters }: { username?: Nullable<string>; customParameters?: Record<string, string> } = {
-    username: null,
-    customParameters: undefined,
-  }
+  customParameters?: Record<string, string>
 ) => {
   const provider = new OAuthProvider(providerId);
 
@@ -103,7 +101,7 @@ export const signUpWithProvider = async (
 
       if (user.email) userUpdate.email = user.email;
 
-      await createUser({ user: userUpdate, username });
+      await createUser({ user: userUpdate, appUser });
 
       return user;
     })

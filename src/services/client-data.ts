@@ -41,19 +41,20 @@ import type {
   GetOwnerDataParams,
   ModifyConnectionsType,
   ChangeDataKey,
+  AppUser,
 } from "./types";
 import type { SoilDatabase } from "..";
 
 export const createUser = ({
   user,
-  username,
+  appUser,
   updateObject = {},
   skipUpdate,
   now,
 }: Pick<CreateDataParams<SoilDatabase, keyof SoilDatabase>, "updateObject" | "skipUpdate" | "now"> & {
   user: Mandate<User, "uid">;
-  username: Nullable<string>;
-}) => isoCreateUser({ update, user, username, updateObject, skipUpdate, now });
+  appUser: AppUser;
+}) => isoCreateUser({ update, user, appUser, updateObject, skipUpdate, now });
 
 export const updateUser = (u: Mandate<User, "uid">) => isoUpdateUser(update, u);
 
