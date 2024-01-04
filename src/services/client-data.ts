@@ -25,6 +25,7 @@ import {
   isoGetUser,
   isoAddOwners,
   isoRemoveOwners,
+  isoGetUsername,
 } from "./data";
 import { get, update, soilUpdate, onChildAdded, onValue, push } from "./firebase";
 
@@ -55,6 +56,8 @@ export const createUser = ({
 export const updateUser = (u: Mandate<User, "uid">) => isoUpdateUser(update, u);
 
 export const getUser = (uid: string) => isoGetUser(get, uid);
+
+export const getUsername = (username: string) => isoGetUsername(get, username);
 
 export const onUserDataTypeListChildAdded = <T2 extends keyof SoilDatabase>({
   dataType,

@@ -10,6 +10,9 @@ export const PATHS = {
   USERS: "users",
   user: (uid: string) => `${PATHS.USERS}/${uid}`,
 
+  USERNAMES: "usernames",
+  username: (username: string) => `${PATHS.USERNAMES}/${username}`,
+
   TRACKING: "tracking",
   trackingKey: (trackingKey: string) => `${PATHS.TRACKING}/${trackingKey}`,
 

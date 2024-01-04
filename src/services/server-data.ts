@@ -23,6 +23,7 @@ import {
   isoAddOwners,
   isoRemoveOwners,
   isoGetUserDataType,
+  isoGetUsername,
 } from "./data";
 import { get, push, queryOrderByChildEqualTo, soilUpdate, update } from "./admin";
 import type {
@@ -49,6 +50,8 @@ export const createUser = ({
 export const updateUser = (u: Mandate<User, "uid">) => isoUpdateUser(update, u);
 
 export const getUser = (uid: string) => isoGetUser(get, uid);
+
+export const getUsername = (username: string) => isoGetUsername(get, username);
 
 export const getDataKeyValue = <T2 extends keyof SoilDatabase>(dataType: T2, dataKey: string) =>
   isoGetDataKeyValue<T2>(get, dataType, dataKey);
