@@ -46,12 +46,14 @@ import type { SoilDatabase } from "..";
 
 export const createUser = ({
   user,
+  username,
   updateObject = {},
   skipUpdate,
   now,
 }: Pick<CreateDataParams<SoilDatabase, keyof SoilDatabase>, "updateObject" | "skipUpdate" | "now"> & {
   user: Mandate<User, "uid">;
-}) => isoCreateUser({ update, user, updateObject, skipUpdate, now });
+  username: Nullable<string>;
+}) => isoCreateUser({ update, user, username, updateObject, skipUpdate, now });
 
 export const updateUser = (u: Mandate<User, "uid">) => isoUpdateUser(update, u);
 

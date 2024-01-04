@@ -37,21 +37,22 @@ import type {
 */
 export const isoCreateUser = ({
   user,
+  username,
   update,
   updateObject = {},
   skipUpdate,
   now = Date.now(),
 }: Pick<CreateDataParams<SoilDatabase, keyof SoilDatabase>, "update" | "updateObject" | "skipUpdate" | "now"> & {
   user: Mandate<User, "uid">;
+  username: Nullable<string>;
 }) => {
   updateObject[PATHS.user(user.uid)] = user;
-  if (user.username) updateObject[PATHS.username(user.username)] = user.uid;
 
   return isoCreateData({
     update,
     dataType: "appUser",
     dataKey: user.uid,
-    data: {},
+    data: { username: username as Maybe<string> },
     owners: [user.uid],
     publicAccess: true,
     updateObject,
@@ -237,7 +238,7 @@ export const isoAddOwners = <T extends SoilDatabase, T2 extends keyof SoilDataba
   skipUpdate,
   dataType,
   dataKey,
-  now,
+  now = Date.now(),
   owners,
 }: Pick<
   CreateDataParams<T, T2>,

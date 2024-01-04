@@ -43,14 +43,14 @@ export const signUp = async (
   password: string,
   confirmPassword: string,
   setError: (error: string) => void,
-  validatedUsername?: string
+  username: Nullable<string> = null
 ) => {
   if (password !== confirmPassword) {
     throw new Error("Password does not match the confirmation password");
   }
 
-  if (validatedUsername) {
-    const existingUserUid = await getUsername(validatedUsername);
+  if (username) {
+    const existingUserUid = await getUsername(username);
     if (existingUserUid) throw new Error("This username is already in use.");
   }
 
@@ -69,12 +69,9 @@ export const signUp = async (
         createdAt: now,
         updatedAt: now,
         emailVerified: false,
-        username: null,
       };
 
-      if (validatedUsername) user.username = validatedUsername;
-
-      await createUser({ user });
+      await createUser({ user, username });
 
       return user;
     })
@@ -84,7 +81,10 @@ export const signUp = async (
 export const signUpWithProvider = async (
   providerId: string,
   setError: (error: string) => void,
-  customParameters?: Record<string, string>
+  { username = null, customParameters }: { username?: Nullable<string>; customParameters?: Record<string, string> } = {
+    username: null,
+    customParameters: undefined,
+  }
 ) => {
   const provider = new OAuthProvider(providerId);
 
@@ -103,7 +103,7 @@ export const signUpWithProvider = async (
 
       if (user.email) userUpdate.email = user.email;
 
-      await createUser({ user: userUpdate });
+      await createUser({ user: userUpdate, username });
 
       return user;
     })
