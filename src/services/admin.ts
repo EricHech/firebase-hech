@@ -127,7 +127,7 @@ export const initializeAdminRemoteRequestApp = async <T extends StatefulData<"re
   });
 
   const remoteRequest = await getDataKeyValue("remoteRequest", remoteRequestKey);
-  if (!remoteRequest.remoteRequestUid) return null;
+  if (!remoteRequest?.remoteRequestUid) return null;
 
   await app.delete();
 
