@@ -47,6 +47,7 @@ export const isoCreateUser = ({
   appUser: AppUser;
 }) => {
   updateObject[PATHS.user(user.uid)] = user;
+  if (appUser.username) updateObject[PATHS.username(appUser.username)] = user.uid;
 
   return isoCreateData({
     update,
