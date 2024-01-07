@@ -91,12 +91,12 @@ export const initializeAdminApp = (
     }
   };
 
-  if (isDev)
+  if (isDev) {
     try {
       init();
       // eslint-disable-next-line no-empty
     } catch (e) {}
-  else {
+  } else {
     init();
   }
 
