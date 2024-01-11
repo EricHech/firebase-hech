@@ -27,7 +27,7 @@ import {
   isoRemoveOwners,
   isoGetUsername,
   isoSoilTransactionWithCb,
-  isoSoilIncrementWithCb,
+  isoSoilIncrement,
 } from "./data";
 import { get, update, soilUpdate, onChildAdded, onValue, push } from "./firebase";
 
@@ -46,7 +46,7 @@ import type {
   AppUser,
   SoilTransactionWithCbParams,
   Data,
-  SoilIncrementWithCb,
+  SoilIncrement,
 } from "./types";
 import type { SoilDatabase } from "..";
 import { transactionWithCb } from "./admin";
@@ -274,7 +274,7 @@ export const getConnectionTypeConnections = <T2 extends keyof SoilDatabase, T22 
     connectionType,
   });
 
-export const soilIncrementWithCb = <T2 extends keyof SoilDatabase, T3 extends keyof Data<T2>>({
+export const soilIncrement = <T2 extends keyof SoilDatabase, T3 extends keyof Data<T2>>({
   dataType,
   dataKey,
   field,
@@ -282,8 +282,8 @@ export const soilIncrementWithCb = <T2 extends keyof SoilDatabase, T3 extends ke
   makeGetRequests,
   makeConnectionsRequests,
   makeOwnersRequests,
-}: Omit<SoilIncrementWithCb<T2, T3>, "get" | "update">) =>
-  isoSoilIncrementWithCb({
+}: Omit<SoilIncrement<T2, T3>, "get" | "update">) =>
+  isoSoilIncrement({
     get,
     update,
     dataType,

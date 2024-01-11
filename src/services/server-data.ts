@@ -1,4 +1,4 @@
-import type { AppUser, SoilDatabase, SoilIncrementWithCb, SoilTransactionWithCbParams } from "../services/types";
+import type { AppUser, SoilDatabase, SoilIncrement, SoilTransactionWithCbParams } from "../services/types";
 import {
   isoCreateData,
   isoUpdateData,
@@ -25,7 +25,7 @@ import {
   isoGetUserDataType,
   isoGetUsername,
   isoSoilTransactionWithCb,
-  isoSoilIncrementWithCb,
+  isoSoilIncrement,
 } from "./data";
 import { get, push, queryOrderByChildEqualTo, soilUpdate, update, transactionWithCb } from "./admin";
 import type {
@@ -214,7 +214,7 @@ export const queryData = <T2 extends keyof SoilDatabase, T3 extends keyof Data<T
     limit,
   });
 
-export const soilIncrementWithCb = <T2 extends keyof SoilDatabase, T3 extends keyof Data<T2>>({
+export const soilIncrement = <T2 extends keyof SoilDatabase, T3 extends keyof Data<T2>>({
   dataType,
   dataKey,
   field,
@@ -222,8 +222,8 @@ export const soilIncrementWithCb = <T2 extends keyof SoilDatabase, T3 extends ke
   makeGetRequests,
   makeConnectionsRequests,
   makeOwnersRequests,
-}: Omit<SoilIncrementWithCb<T2, T3>, "get" | "update">) =>
-  isoSoilIncrementWithCb({
+}: Omit<SoilIncrement<T2, T3>, "get" | "update">) =>
+  isoSoilIncrement({
     get,
     update,
     dataType,

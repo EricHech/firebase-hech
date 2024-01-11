@@ -2,7 +2,7 @@ import type {
   AfterCollisionFreeUpdateHandler,
   AppUser,
   SoilDatabase,
-  SoilIncrementWithCb,
+  SoilIncrement,
   SoilTransactionWithCbParams,
 } from "./types";
 
@@ -528,7 +528,7 @@ const isoAfterCollisionFreeUpdateHandler = async <T2 extends keyof SoilDatabase,
   return update("/", updateObject, true);
 };
 
-export const isoSoilIncrementWithCb = async <T2 extends keyof SoilDatabase, T3 extends keyof Data<T2>>({
+export const isoSoilIncrement = async <T2 extends keyof SoilDatabase, T3 extends keyof Data<T2>>({
   get,
   update,
   delta,
@@ -538,7 +538,7 @@ export const isoSoilIncrementWithCb = async <T2 extends keyof SoilDatabase, T3 e
   makeGetRequests = true,
   makeConnectionsRequests = true,
   makeOwnersRequests = true,
-}: SoilIncrementWithCb<T2, T3>) => {
+}: SoilIncrement<T2, T3>) => {
   await update(PATHS.dataKey(dataType, dataKey), { [field]: increment(delta) });
 
   await isoAfterCollisionFreeUpdateHandler({

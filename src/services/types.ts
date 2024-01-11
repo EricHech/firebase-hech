@@ -206,10 +206,10 @@ export type AfterCollisionFreeUpdateHandler<T2 extends keyof SoilDatabase, T3 ex
   "get" | "update" | "dataType" | "dataKey" | "makeGetRequests" | "makeConnectionsRequests" | "makeOwnersRequests"
 >;
 
-export type SoilIncrementWithCb<
-  T2 extends keyof SoilDatabase,
-  T3 extends keyof Data<T2>
-> = AfterCollisionFreeUpdateHandler<T2, T3> & { field: T3; delta: number };
+export type SoilIncrement<T2 extends keyof SoilDatabase, T3 extends keyof Data<T2>> = AfterCollisionFreeUpdateHandler<
+  T2,
+  T3
+> & { field: T3; delta: number };
 
 export type SoilTransactionWithCbParams<
   T2 extends keyof SoilDatabase,
