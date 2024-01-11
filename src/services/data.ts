@@ -413,7 +413,6 @@ export const isoUpdateData = async <T2 extends keyof SoilDatabase>({
 
       existingConnectionEntries.forEach(([dType, dObject]) =>
         Object.keys(dObject).forEach((dKey) => {
-          updateObject[PATHS.connectionDataListConnectionKey(dataType, dataKey, dType, dKey)] = now;
           updateObject[PATHS.connectionDataListConnectionKey(dType, dKey, dataType, dataKey)] = now;
         })
       );
@@ -519,7 +518,6 @@ export const isoSoilTransactionWithCb = async <T2 extends keyof SoilDatabase, T3
 
       existingConnectionEntries.forEach(([dType, dObject]) =>
         Object.keys(dObject).forEach((dKey) => {
-          updateObject[PATHS.connectionDataListConnectionKey(dataType, dataKey, dType, dKey)] = now;
           updateObject[PATHS.connectionDataListConnectionKey(dType, dKey, dataType, dataKey)] = now;
         })
       );
