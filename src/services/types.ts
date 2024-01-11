@@ -201,10 +201,24 @@ export type QueryDataParams<T2 extends keyof SoilDatabase, T3 extends keyof Data
   limit?: number;
 };
 
-export type SoilTransactionWithCbParams<T2 extends keyof SoilDatabase, T3 extends keyof Data<T2>> = Pick<
+export type AfterCollisionFreeUpdateHandler<T2 extends keyof SoilDatabase, T3 extends keyof Data<T2>> = Pick<
   UpdateDataParams<T2>,
   "get" | "update" | "dataType" | "dataKey" | "makeGetRequests" | "makeConnectionsRequests" | "makeOwnersRequests"
-> & { field: T3; cb: (value: Nullable<Data<T2>[T3]>) => Data<T2>[T3] };
+>;
+
+export type SoilIncrementWithCb<
+  T2 extends keyof SoilDatabase,
+  T3 extends keyof Data<T2>
+> = AfterCollisionFreeUpdateHandler<T2, T3> & { field: T3; delta: number };
+
+export type SoilTransactionWithCbParams<
+  T2 extends keyof SoilDatabase,
+  T3 extends keyof Data<T2>
+> = AfterCollisionFreeUpdateHandler<T2, T3> & {
+  field: T3;
+  cb: (value: Nullable<Data<T2>[T3]>) => Data<T2>[T3];
+  transactionWithCb: <T>(path: string, cb: (val: Nullable<T>) => T) => Promise<unknown>;
+};
 
 export type ModifyConnectionsType<T2 extends keyof SoilDatabase> = Pick<
   CudDataParams<T2>,

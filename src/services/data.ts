@@ -1,4 +1,10 @@
-import type { AppUser, SoilDatabase, SoilTransactionWithCbParams } from "./types";
+import type {
+  AfterCollisionFreeUpdateHandler,
+  AppUser,
+  SoilDatabase,
+  SoilIncrementWithCb,
+  SoilTransactionWithCbParams,
+} from "./types";
 
 // Helpers
 import { createGetUpdateObjectFunction, sleep } from "../utils";
@@ -26,6 +32,7 @@ import type {
   ChangeDataKey,
   UpdateObject,
 } from "./types";
+import { increment } from "firebase/database";
 
 /*
  █████╗ ██╗   ██╗████████╗██╗  ██╗
@@ -481,22 +488,15 @@ export const isoUpsertData = async <T2 extends keyof SoilDatabase>({
   });
 };
 
-export const isoSoilTransactionWithCb = async <T2 extends keyof SoilDatabase, T3 extends keyof Data<T2>>({
+const isoAfterCollisionFreeUpdateHandler = async <T2 extends keyof SoilDatabase, T3 extends keyof Data<T2>>({
   get,
   update,
-  transactionWithCb,
-  cb,
   dataType,
   dataKey,
-  field,
   makeGetRequests = true,
   makeConnectionsRequests = true,
   makeOwnersRequests = true,
-}: SoilTransactionWithCbParams<T2, T3> & {
-  transactionWithCb: <T>(path: string, cb: (val: Nullable<T>) => T) => Promise<unknown>;
-}) => {
-  await transactionWithCb(PATHS.dataKeyField(dataType, dataKey, field), cb);
-
+}: AfterCollisionFreeUpdateHandler<T2, T3>) => {
   /* eslint-disable no-param-reassign */
   const now = Date.now();
   const updateObject: UpdateObject<T2> = {};
@@ -526,6 +526,55 @@ export const isoSoilTransactionWithCb = async <T2 extends keyof SoilDatabase, T3
   /* eslint-enable no-param-reassign */
 
   return update("/", updateObject, true);
+};
+
+export const isoSoilIncrementWithCb = async <T2 extends keyof SoilDatabase, T3 extends keyof Data<T2>>({
+  get,
+  update,
+  delta,
+  dataType,
+  dataKey,
+  field,
+  makeGetRequests = true,
+  makeConnectionsRequests = true,
+  makeOwnersRequests = true,
+}: SoilIncrementWithCb<T2, T3>) => {
+  await update(PATHS.dataKey(dataType, dataKey), { [field]: increment(delta) });
+
+  await isoAfterCollisionFreeUpdateHandler({
+    get,
+    update,
+    dataType,
+    dataKey,
+    makeGetRequests,
+    makeConnectionsRequests,
+    makeOwnersRequests,
+  });
+};
+
+export const isoSoilTransactionWithCb = async <T2 extends keyof SoilDatabase, T3 extends keyof Data<T2>>({
+  get,
+  update,
+  transactionWithCb,
+  cb,
+  dataType,
+  dataKey,
+  field,
+  makeGetRequests = true,
+  makeConnectionsRequests = true,
+  makeOwnersRequests = true,
+}: SoilTransactionWithCbParams<T2, T3>) => {
+  await transactionWithCb(PATHS.dataKeyField(dataType, dataKey, field), cb);
+
+  await isoAfterCollisionFreeUpdateHandler({
+    get,
+    update,
+    dataType,
+    dataKey,
+    makeGetRequests,
+    makeConnectionsRequests,
+    makeOwnersRequests,
+  });
 };
 
 export const isoCreateConnections = <T2 extends keyof SoilDatabase>({
