@@ -221,7 +221,7 @@ export const soilTransactionWithCb = <T2 extends keyof SoilDatabase, T3 extends 
   makeGetRequests,
   makeConnectionsRequests,
   makeOwnersRequests,
-}: SoilTransactionWithCbParams<T2, T3>) =>
+}: Omit<SoilTransactionWithCbParams<T2, T3>, "get" | "update" | "transactionWithCb">) =>
   isoSoilTransactionWithCb({
     get,
     update,
