@@ -29,7 +29,7 @@ import {
   isoSoilTransactionWithCb,
   isoSoilIncrement,
 } from "./data";
-import { get, update, soilUpdate, onChildAdded, onValue, push } from "./firebase";
+import { get, update, soilUpdate, onChildAdded, onValue, push, transactionWithCb } from "./firebase";
 
 // Types
 import type {
@@ -49,7 +49,6 @@ import type {
   SoilIncrement,
 } from "./types";
 import type { SoilDatabase } from "..";
-import { transactionWithCb } from "./admin";
 
 export const createUser = ({
   user,
