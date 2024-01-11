@@ -204,7 +204,7 @@ export type QueryDataParams<T2 extends keyof SoilDatabase, T3 extends keyof Data
 export type SoilTransactionWithCbParams<T2 extends keyof SoilDatabase, T3 extends keyof Data<T2>> = Pick<
   UpdateDataParams<T2>,
   "get" | "update" | "dataType" | "dataKey" | "makeGetRequests" | "makeConnectionsRequests" | "makeOwnersRequests"
-> & { field: T3; cb: (value: Nullable<Data<T2>>) => Data<T2> };
+> & { field: T3; cb: (value: Nullable<Data<T2>[T3]>) => Data<T2>[T3] };
 
 export type ModifyConnectionsType<T2 extends keyof SoilDatabase> = Pick<
   CudDataParams<T2>,

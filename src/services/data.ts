@@ -495,7 +495,7 @@ export const isoSoilTransactionWithCb = async <T2 extends keyof SoilDatabase, T3
 }: SoilTransactionWithCbParams<T2, T3> & {
   transactionWithCb: <T>(path: string, cb: (val: Nullable<T>) => T) => Promise<unknown>;
 }) => {
-  await transactionWithCb<Data<T2>>(PATHS.dataKeyField(dataType, dataKey, field), cb);
+  await transactionWithCb(PATHS.dataKeyField(dataType, dataKey, field), cb);
 
   /* eslint-disable no-param-reassign */
   const now = Date.now();
