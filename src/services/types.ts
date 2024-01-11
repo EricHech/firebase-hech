@@ -63,10 +63,10 @@ export type StatefulData<T2 extends keyof SoilDatabase> = Maybe<Nullable<Data<T2
 
 export type DataList = Record<keyof SoilDatabase, Record<string, number>>;
 
-export type UpdateObject<
-  T extends SoilDatabase = SoilDatabase,
-  T2 extends keyof SoilDatabase = keyof SoilDatabase
-> = Record<string, T[T2] | null | boolean | number | string | object>;
+export type UpdateObject<T2 extends keyof SoilDatabase = keyof SoilDatabase> = Record<
+  string,
+  SoilDatabase[T2] | null | boolean | number | string | object
+>;
 
 export type StatefulDataType<T2 extends keyof SoilDatabase> = Record<string, Nullable<StatefulData<T2>>>;
 
@@ -93,9 +93,9 @@ export type GetDataTypeValueParams<T2 extends keyof SoilDatabase> = {
   dataType: T2;
 };
 
-export type CudDataParams<T extends SoilDatabase, T2 extends keyof SoilDatabase> = {
-  update: (path: string, d: UpdateObject<T, T2>, allowRootQuery?: boolean, isDelete?: boolean) => Promise<void>;
-  updateObject?: UpdateObject<T, T2>;
+export type CudDataParams<T2 extends keyof SoilDatabase> = {
+  update: (path: string, d: UpdateObject<T2>, allowRootQuery?: boolean, isDelete?: boolean) => Promise<void>;
+  updateObject?: UpdateObject<T2>;
   skipUpdate?: boolean;
   dataType: T2;
   dataKey: string;
@@ -108,15 +108,15 @@ export type Connections = {
   key: string;
 }[];
 
-export type CreateDataParams<T extends SoilDatabase, T2 extends keyof SoilDatabase> = CudDataParams<T, T2> & {
-  data: T[T2];
+export type CreateDataParams<T2 extends keyof SoilDatabase> = CudDataParams<T2> & {
+  data: SoilDatabase[T2];
   owners: string[];
   connections?: Connections;
   connectionAccess?: StandardDataFields["connectionAccess"];
 };
 
 export type ChangeDataKey<T2 extends keyof SoilDatabase, T22 extends keyof SoilDatabase> = Pick<
-  CudDataParams<SoilDatabase, T2>,
+  CudDataParams<T2>,
   "update"
 > & {
   get: GetFunction;
@@ -126,9 +126,9 @@ export type ChangeDataKey<T2 extends keyof SoilDatabase, T22 extends keyof SoilD
   newDataKey: string;
 };
 
-export type UpdateDataParams<T extends SoilDatabase, T2 extends keyof SoilDatabase> = CudDataParams<T, T2> & {
+export type UpdateDataParams<T2 extends keyof SoilDatabase> = CudDataParams<T2> & {
   get: GetFunction;
-  data: Partial<T[T2]>;
+  data: Partial<SoilDatabase[T2]>;
   owners?: string[];
   connections?: Connections;
   connectionAccess?: StandardDataFields["connectionAccess"];
@@ -140,7 +140,7 @@ export type UpdateDataParams<T extends SoilDatabase, T2 extends keyof SoilDataba
   includeUpdatedAt?: boolean;
 };
 
-export type RemoveDataKeyParams<T extends SoilDatabase, T2 extends keyof SoilDatabase> = CudDataParams<T, T2> & {
+export type RemoveDataKeyParams<T2 extends keyof SoilDatabase> = CudDataParams<T2> & {
   get: GetFunction;
   existingOwners?: Nullable<string[]>;
   existingConnections?: DataList;
@@ -173,12 +173,12 @@ export type OnDataValueParams<T2 extends keyof SoilDatabase> = {
   cb: (data: Nullable<Data<T2>>) => void;
 };
 
-export type OnConnectionTypeChildAddedParams<T extends SoilDatabase, T2 extends keyof SoilDatabase> = {
-  onChildAdded: (path: string, cb: (val: Nullable<T[T2]>, key: string) => void) => VoidFunction;
+export type OnConnectionTypeChildAddedParams<T2 extends keyof SoilDatabase> = {
+  onChildAdded: (path: string, cb: (val: Nullable<SoilDatabase[T2]>, key: string) => void) => VoidFunction;
   dataType: T2;
   dataKey: string;
   connectionType: keyof SoilDatabase;
-  cb: (data: Nullable<T[T2]>) => void;
+  cb: (data: Nullable<SoilDatabase[T2]>) => void;
 };
 
 export type QueryOrderByChildParams = {
@@ -193,16 +193,21 @@ export type QueryByKeyLimitParams = {
   limit: number;
 };
 
-export type QueryDataParams<T extends SoilDatabase, T2 extends keyof SoilDatabase, T3 extends keyof T[T2]> = {
+export type QueryDataParams<T2 extends keyof SoilDatabase, T3 extends keyof Data<T2>> = {
   queryOrderByChildEqualTo: <QT>(params: QueryOrderByChildParams) => Promise<Nullable<QT>>;
   dataType: T2;
   childKey: T3;
-  queryValue: T[T2][T3];
+  queryValue: Data<T2>[T3];
   limit?: number;
 };
 
-export type ModifyConnectionsType<T extends SoilDatabase, T2 extends keyof SoilDatabase> = Pick<
-  CudDataParams<T, T2>,
+export type SoilTransactionWithCbParams<T2 extends keyof SoilDatabase, T3 extends keyof Data<T2>> = Pick<
+  UpdateDataParams<T2>,
+  "get" | "update" | "dataType" | "dataKey" | "makeGetRequests" | "makeConnectionsRequests" | "makeOwnersRequests"
+> & { field: T3; cb: (value: Nullable<Data<T2>>) => Data<T2> };
+
+export type ModifyConnectionsType<T2 extends keyof SoilDatabase> = Pick<
+  CudDataParams<T2>,
   "update" | "updateObject" | "now" | "skipUpdate"
 > & {
   connections: {

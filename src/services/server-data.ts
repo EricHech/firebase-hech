@@ -1,4 +1,4 @@
-import type { AppUser, SoilDatabase } from "../services/types";
+import type { AppUser, SoilDatabase, SoilTransactionWithCbParams } from "../services/types";
 import {
   isoCreateData,
   isoUpdateData,
@@ -24,8 +24,9 @@ import {
   isoRemoveOwners,
   isoGetUserDataType,
   isoGetUsername,
+  isoSoilTransactionWithCb,
 } from "./data";
-import { get, push, queryOrderByChildEqualTo, soilUpdate, update } from "./admin";
+import { get, push, queryOrderByChildEqualTo, soilUpdate, update, transactionWithCb } from "./admin";
 import type {
   CreateDataParams,
   GetDataKeyValueParams,
@@ -44,7 +45,7 @@ export const createUser = ({
   updateObject = {},
   skipUpdate,
   now,
-}: Pick<CreateDataParams<SoilDatabase, keyof SoilDatabase>, "updateObject" | "skipUpdate" | "now"> & {
+}: Pick<CreateDataParams<keyof SoilDatabase>, "updateObject" | "skipUpdate" | "now"> & {
   user: Mandate<User, "uid">;
   appUser: AppUser;
 }) => isoCreateUser({ update, user, appUser, updateObject, skipUpdate, now });
@@ -104,7 +105,7 @@ export const getDataKeyFieldValue = <T2 extends keyof SoilDatabase, T3 extends k
 }: Omit<GetDataKeyValueParams<T2>, "get"> & { field: T3 }) =>
   isoGetDataKeyFieldValue<T2, T3>({ get, dataType, dataKey, field });
 
-export const createData = <T extends SoilDatabase, T2 extends keyof SoilDatabase>({
+export const createData = <T2 extends keyof SoilDatabase>({
   updateObject,
   skipUpdate,
   dataType,
@@ -116,7 +117,7 @@ export const createData = <T extends SoilDatabase, T2 extends keyof SoilDatabase
   connectionAccess,
   now = Date.now(),
   imitateClientUpdate,
-}: Omit<CreateDataParams<T, T2>, "update"> & {
+}: Omit<CreateDataParams<T2>, "update"> & {
   dataType: string;
   dataKey: string;
   imitateClientUpdate?: boolean;
@@ -135,7 +136,7 @@ export const createData = <T extends SoilDatabase, T2 extends keyof SoilDatabase
     now,
   });
 
-export const updateData = <T extends SoilDatabase, T2 extends keyof SoilDatabase>({
+export const updateData = <T2 extends keyof SoilDatabase>({
   updateObject,
   skipUpdate,
   dataType,
@@ -149,7 +150,7 @@ export const updateData = <T extends SoilDatabase, T2 extends keyof SoilDatabase
   connectionAccess,
   now,
   imitateClientUpdate,
-}: Omit<UpdateDataParams<T, T2>, "update" | "get"> & { imitateClientUpdate?: boolean }) =>
+}: Omit<UpdateDataParams<T2>, "update" | "get"> & { imitateClientUpdate?: boolean }) =>
   isoUpdateData({
     update: imitateClientUpdate ? soilUpdate : update,
     get,
@@ -167,7 +168,7 @@ export const updateData = <T extends SoilDatabase, T2 extends keyof SoilDatabase
     now,
   });
 
-export const upsertData = <T extends SoilDatabase, T2 extends keyof SoilDatabase>({
+export const upsertData = <T2 extends keyof SoilDatabase>({
   updateObject,
   skipUpdate,
   dataType,
@@ -180,8 +181,8 @@ export const upsertData = <T extends SoilDatabase, T2 extends keyof SoilDatabase
   includeUpdatedAt,
   makeGetRequests,
   imitateClientUpdate,
-}: Omit<CreateDataParams<T, T2>, "update"> &
-  Omit<UpdateDataParams<T, T2>, "update" | "get"> & { imitateClientUpdate?: boolean }) =>
+}: Omit<CreateDataParams<T2>, "update"> &
+  Omit<UpdateDataParams<T2>, "update" | "get"> & { imitateClientUpdate?: boolean }) =>
   isoUpsertData({
     update: imitateClientUpdate ? soilUpdate : update,
     get,
@@ -198,12 +199,12 @@ export const upsertData = <T extends SoilDatabase, T2 extends keyof SoilDatabase
     makeGetRequests,
   });
 
-export const queryData = <T extends SoilDatabase, T2 extends keyof SoilDatabase, T3 extends keyof T[T2]>({
+export const queryData = <T2 extends keyof SoilDatabase, T3 extends keyof Data<T2>>({
   dataType,
   childKey,
   queryValue,
   limit,
-}: Omit<QueryDataParams<T, T2, T3>, "queryOrderByChildEqualTo">) =>
+}: Omit<QueryDataParams<T2, T3>, "queryOrderByChildEqualTo">) =>
   isoQueryData({
     queryOrderByChildEqualTo,
     dataType,
@@ -212,13 +213,35 @@ export const queryData = <T extends SoilDatabase, T2 extends keyof SoilDatabase,
     limit,
   });
 
-export const removeData = <T extends SoilDatabase, T2 extends keyof SoilDatabase>({
+export const soilTransactionWithCb = <T2 extends keyof SoilDatabase, T3 extends keyof Data<T2>>({
+  cb,
+  dataType,
+  dataKey,
+  field,
+  makeGetRequests,
+  makeConnectionsRequests,
+  makeOwnersRequests,
+}: SoilTransactionWithCbParams<T2, T3>) =>
+  isoSoilTransactionWithCb({
+    get,
+    update,
+    transactionWithCb,
+    cb,
+    dataType,
+    dataKey,
+    makeGetRequests,
+    makeConnectionsRequests,
+    makeOwnersRequests,
+    field,
+  });
+
+export const removeData = <T2 extends keyof SoilDatabase>({
   updateObject,
   skipUpdate,
   dataType,
   dataKey,
   imitateClientUpdate,
-}: Omit<RemoveDataKeyParams<T, T2>, "update" | "get" | "publicAccess" | "now"> & { imitateClientUpdate?: boolean }) =>
+}: Omit<RemoveDataKeyParams<T2>, "update" | "get" | "publicAccess" | "now"> & { imitateClientUpdate?: boolean }) =>
   isoRemoveData({
     update: imitateClientUpdate ? soilUpdate : update,
     get,
@@ -239,7 +262,7 @@ export const removeDataType = <T2 extends keyof SoilDatabase>(dataType: T2) =>
 export const getOwners = <T2 extends keyof SoilDatabase>(dataType: T2, dataKey: string) =>
   isoGetOwners(get, dataType, dataKey);
 
-export const addOwners = async <T extends SoilDatabase, T2 extends keyof SoilDatabase>({
+export const addOwners = async <T2 extends keyof SoilDatabase>({
   dataType,
   dataKey,
   updateObject,
@@ -247,7 +270,7 @@ export const addOwners = async <T extends SoilDatabase, T2 extends keyof SoilDat
   now = Date.now(),
   owners,
   imitateClientUpdate,
-}: Pick<CreateDataParams<T, T2>, "dataType" | "dataKey" | "owners" | "updateObject" | "skipUpdate" | "now"> & {
+}: Pick<CreateDataParams<T2>, "dataType" | "dataKey" | "owners" | "updateObject" | "skipUpdate" | "now"> & {
   imitateClientUpdate?: boolean;
 }) =>
   isoAddOwners({
@@ -260,22 +283,22 @@ export const addOwners = async <T extends SoilDatabase, T2 extends keyof SoilDat
     now,
   });
 
-export const removeOwners = async <T extends SoilDatabase, T2 extends keyof SoilDatabase>({
+export const removeOwners = async <T2 extends keyof SoilDatabase>({
   dataType,
   dataKey,
   updateObject,
   skipUpdate,
   owners,
-}: Pick<CreateDataParams<T, T2>, "dataType" | "dataKey" | "owners" | "updateObject" | "skipUpdate">) =>
+}: Pick<CreateDataParams<T2>, "dataType" | "dataKey" | "owners" | "updateObject" | "skipUpdate">) =>
   isoRemoveOwners({ update, dataType, dataKey, updateObject, skipUpdate, owners });
 
-export const createConnection = async <T extends SoilDatabase, T2 extends keyof SoilDatabase>({
+export const createConnection = async <T2 extends keyof SoilDatabase>({
   updateObject,
   skipUpdate,
   now = Date.now(),
   connections,
   imitateClientUpdate,
-}: Omit<ModifyConnectionsType<T, T2>, "update"> & { imitateClientUpdate?: boolean }) =>
+}: Omit<ModifyConnectionsType<T2>, "update"> & { imitateClientUpdate?: boolean }) =>
   isoCreateConnections({
     update: imitateClientUpdate ? soilUpdate : update,
     updateObject,
@@ -284,11 +307,11 @@ export const createConnection = async <T extends SoilDatabase, T2 extends keyof 
     now,
   });
 
-export const removeConnection = <T extends SoilDatabase, T2 extends keyof SoilDatabase>({
+export const removeConnection = <T2 extends keyof SoilDatabase>({
   connections,
   skipUpdate,
   updateObject,
-}: Pick<ModifyConnectionsType<T, T2>, "skipUpdate" | "updateObject" | "connections">) =>
+}: Pick<ModifyConnectionsType<T2>, "skipUpdate" | "updateObject" | "connections">) =>
   isoRemoveConnections({ update, connections, skipUpdate, updateObject });
 
 export const trackEvent = (eventName: string, metadata?: object) =>

@@ -26,6 +26,7 @@ import {
   isoAddOwners,
   isoRemoveOwners,
   isoGetUsername,
+  isoSoilTransactionWithCb,
 } from "./data";
 import { get, update, soilUpdate, onChildAdded, onValue, push } from "./firebase";
 
@@ -42,8 +43,11 @@ import type {
   ModifyConnectionsType,
   ChangeDataKey,
   AppUser,
+  SoilTransactionWithCbParams,
+  Data,
 } from "./types";
 import type { SoilDatabase } from "..";
+import { transactionWithCb } from "./admin";
 
 export const createUser = ({
   user,
@@ -51,7 +55,7 @@ export const createUser = ({
   updateObject = {},
   skipUpdate,
   now,
-}: Pick<CreateDataParams<SoilDatabase, keyof SoilDatabase>, "updateObject" | "skipUpdate" | "now"> & {
+}: Pick<CreateDataParams<keyof SoilDatabase>, "updateObject" | "skipUpdate" | "now"> & {
   user: Mandate<User, "uid">;
   appUser: AppUser;
 }) => isoCreateUser({ update, user, appUser, updateObject, skipUpdate, now });
@@ -94,7 +98,7 @@ export const onDataKeyValue = <T2 extends keyof SoilDatabase>({
   cb,
 }: Omit<OnDataValueParams<T2>, "onValue">) => isoOnDataKeyValue({ onValue, dataType, dataKey, cb });
 
-export const createData = async <T extends SoilDatabase, T2 extends keyof SoilDatabase>({
+export const createData = async <T2 extends keyof SoilDatabase>({
   updateObject,
   skipUpdate,
   dataType,
@@ -105,7 +109,7 @@ export const createData = async <T extends SoilDatabase, T2 extends keyof SoilDa
   connections,
   connectionAccess,
   now,
-}: Omit<CreateDataParams<T, T2>, "update">) =>
+}: Omit<CreateDataParams<T2>, "update">) =>
   isoCreateData({
     update: soilUpdate,
     updateObject,
@@ -120,7 +124,7 @@ export const createData = async <T extends SoilDatabase, T2 extends keyof SoilDa
     now,
   });
 
-export const updateData = async <T extends SoilDatabase, T2 extends keyof SoilDatabase>({
+export const updateData = async <T2 extends keyof SoilDatabase>({
   updateObject,
   skipUpdate,
   dataType,
@@ -135,7 +139,7 @@ export const updateData = async <T extends SoilDatabase, T2 extends keyof SoilDa
   makeConnectionsRequests,
   makeOwnersRequests,
   now,
-}: Omit<UpdateDataParams<T, T2>, "update" | "get" | "updateDataHandler" | "updateListHandler">) =>
+}: Omit<UpdateDataParams<T2>, "update" | "get" | "updateDataHandler" | "updateListHandler">) =>
   isoUpdateData({
     update: soilUpdate,
     get,
@@ -155,7 +159,7 @@ export const updateData = async <T extends SoilDatabase, T2 extends keyof SoilDa
     now,
   });
 
-export const upsertData = async <T extends SoilDatabase, T2 extends keyof SoilDatabase>({
+export const upsertData = async <T2 extends keyof SoilDatabase>({
   updateObject,
   skipUpdate,
   dataType,
@@ -170,7 +174,7 @@ export const upsertData = async <T extends SoilDatabase, T2 extends keyof SoilDa
   makeConnectionsRequests,
   makeOwnersRequests,
   now,
-}: Omit<CreateDataParams<T, T2> & UpdateDataParams<T, T2>, "update" | "get">) =>
+}: Omit<CreateDataParams<T2> & UpdateDataParams<T2>, "update" | "get">) =>
   isoUpsertData({
     update: soilUpdate,
     get,
@@ -190,31 +194,31 @@ export const upsertData = async <T extends SoilDatabase, T2 extends keyof SoilDa
     now,
   });
 
-export const addOwners = async <T extends SoilDatabase, T2 extends keyof SoilDatabase>({
+export const addOwners = async <T2 extends keyof SoilDatabase>({
   dataType,
   dataKey,
   updateObject,
   skipUpdate,
   now = Date.now(),
   owners,
-}: Pick<CreateDataParams<T, T2>, "dataType" | "dataKey" | "owners" | "updateObject" | "skipUpdate" | "now">) =>
+}: Pick<CreateDataParams<T2>, "dataType" | "dataKey" | "owners" | "updateObject" | "skipUpdate" | "now">) =>
   isoAddOwners({ update: soilUpdate, dataType, dataKey, updateObject, skipUpdate, owners, now });
 
-export const removeOwners = async <T extends SoilDatabase, T2 extends keyof SoilDatabase>({
+export const removeOwners = async <T2 extends keyof SoilDatabase>({
   dataType,
   dataKey,
   updateObject,
   skipUpdate,
   owners,
-}: Pick<CreateDataParams<T, T2>, "dataType" | "dataKey" | "owners" | "updateObject" | "skipUpdate">) =>
+}: Pick<CreateDataParams<T2>, "dataType" | "dataKey" | "owners" | "updateObject" | "skipUpdate">) =>
   isoRemoveOwners({ update: soilUpdate, dataType, dataKey, updateObject, skipUpdate, owners });
 
-export const createConnection = async <T extends SoilDatabase, T2 extends keyof SoilDatabase>({
+export const createConnection = async <T2 extends keyof SoilDatabase>({
   updateObject,
   skipUpdate,
   now = Date.now(),
   connections,
-}: Omit<ModifyConnectionsType<T, T2>, "update">) =>
+}: Omit<ModifyConnectionsType<T2>, "update">) =>
   isoCreateConnections({ update: soilUpdate, updateObject, skipUpdate, connections, now });
 
 export const getAllConnections = <T2 extends keyof SoilDatabase>(dataType: T2, dataKey: string) =>
@@ -268,12 +272,34 @@ export const getConnectionTypeConnections = <T2 extends keyof SoilDatabase, T22 
     connectionType,
   });
 
-export const removeData = async <T extends SoilDatabase, T2 extends keyof SoilDatabase>({
+export const soilTransactionWithCb = <T2 extends keyof SoilDatabase, T3 extends keyof Data<T2>>({
+  cb,
+  dataType,
+  dataKey,
+  field,
+  makeGetRequests,
+  makeConnectionsRequests,
+  makeOwnersRequests,
+}: SoilTransactionWithCbParams<T2, T3>) =>
+  isoSoilTransactionWithCb({
+    get,
+    update,
+    transactionWithCb,
+    cb,
+    dataType,
+    dataKey,
+    makeGetRequests,
+    makeConnectionsRequests,
+    makeOwnersRequests,
+    field,
+  });
+
+export const removeData = async <T2 extends keyof SoilDatabase>({
   updateObject,
   skipUpdate,
   dataType,
   dataKey,
-}: Omit<RemoveDataKeyParams<T, T2>, "update" | "get" | "now" | "publicAccess">) =>
+}: Omit<RemoveDataKeyParams<T2>, "update" | "get" | "now" | "publicAccess">) =>
   isoRemoveData({ update: soilUpdate, get, updateObject, skipUpdate, dataType, dataKey });
 
 export const getOwners = <T2 extends keyof SoilDatabase>(dataType: T2, dataKey: string) =>
@@ -290,11 +316,11 @@ export const getAdminValue = (uid: string) => isoGetAdminValue(get, uid);
 export const onUserValue = (uid: string, cb: (user: Nullable<Mandate<User, "uid">>) => void) =>
   isoOnUserValue(onValue, uid, cb);
 
-export const removeConnection = <T extends SoilDatabase, T2 extends keyof SoilDatabase>({
+export const removeConnection = <T2 extends keyof SoilDatabase>({
   connections,
   skipUpdate,
   updateObject,
-}: Pick<ModifyConnectionsType<T, T2>, "skipUpdate" | "updateObject" | "connections">) =>
+}: Pick<ModifyConnectionsType<T2>, "skipUpdate" | "updateObject" | "connections">) =>
   isoRemoveConnections({ update, connections, skipUpdate, updateObject });
 
 export const trackEvent = (eventName: string, metadata?: object) =>

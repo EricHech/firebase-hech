@@ -2,9 +2,9 @@ import { SoilDatabase, UpdateObject } from "../services/types";
 
 const FIREBASE_MAX_UPDATE_LIMIT = 999;
 
-export const createGetUpdateObjectFunction = <T extends SoilDatabase, T2 extends keyof SoilDatabase>() => {
+export const createGetUpdateObjectFunction = <T2 extends keyof SoilDatabase>() => {
   let updateCount = 0;
-  const updateObjects: UpdateObject<T, T2>[] = [];
+  const updateObjects: UpdateObject<T2>[] = [];
 
   // Group the number of updates that will trigger a firebase function so that we remain under the `FIREBASE_MAX_UPDATE_LIMIT`
   const getUpdateObject = (incrementCount: boolean = true) => {

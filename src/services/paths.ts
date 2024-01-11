@@ -1,7 +1,6 @@
-import type { SoilDatabase } from "./types";
+import type { Data, SoilDatabase } from "./types";
 
-type DataType = keyof SoilDatabase;
-type DataKey = string | number | symbol;
+type DataKey = string;
 
 export const PATHS = {
   ADMINS: "admins",
@@ -17,38 +16,47 @@ export const PATHS = {
   trackingKey: (trackingKey: string) => `${PATHS.TRACKING}/${trackingKey}`,
 
   DATA: "data",
-  dataType: (dataType: DataType) => `${PATHS.DATA}/${dataType}`,
-  dataKey: (dataType: DataType, dataKey: DataKey) => `${PATHS.DATA}/${dataType}/${String(dataKey)}`,
-  dataKeyField: (dataType: DataType, dataKey: DataKey, dataField: DataKey) =>
-    `${PATHS.DATA}/${dataType}/${String(dataKey)}/${String(dataField)}`,
+  dataType: <T2 extends keyof SoilDatabase>(dataType: T2) => `${PATHS.DATA}/${dataType}`,
+  dataKey: <T2 extends keyof SoilDatabase>(dataType: T2, dataKey: DataKey) =>
+    `${PATHS.DATA}/${dataType}/${String(dataKey)}`,
+  dataKeyField: <T2 extends keyof SoilDatabase, T3 extends keyof Data<T2>>(
+    dataType: T2,
+    dataKey: DataKey,
+    dataField: T3
+  ) => `${PATHS.DATA}/${dataType}/${String(dataKey)}/${String(dataField)}`,
 
   OWNERS: "owners",
-  ownerDataType: (dataType: DataType) => `${PATHS.OWNERS}/${dataType}`,
-  ownerDataKey: (dataType: DataType, dataKey: DataKey) => `${PATHS.OWNERS}/${dataType}/${String(dataKey)}`,
-  ownerDataKeyUid: (dataType: DataType, dataKey: DataKey, uid: string) =>
+  ownerDataType: <T2 extends keyof SoilDatabase>(dataType: T2) => `${PATHS.OWNERS}/${dataType}`,
+  ownerDataKey: <T2 extends keyof SoilDatabase>(dataType: T2, dataKey: DataKey) =>
+    `${PATHS.OWNERS}/${dataType}/${String(dataKey)}`,
+  ownerDataKeyUid: <T2 extends keyof SoilDatabase>(dataType: T2, dataKey: DataKey, uid: string) =>
     `${PATHS.OWNERS}/${dataType}/${String(dataKey)}/${uid}`,
 
   USER_DATA_LISTS: "userDataLists",
   userDataList: (uid: string) => `${PATHS.USER_DATA_LISTS}/${uid}`,
-  userDataTypeList: (uid: string, dataType: DataType) => `${PATHS.USER_DATA_LISTS}/${uid}/${dataType}`,
-  userDataKeyList: (uid: string, dataType: DataType, dataKey: DataKey) =>
+  userDataTypeList: <T2 extends keyof SoilDatabase>(uid: string, dataType: T2) =>
+    `${PATHS.USER_DATA_LISTS}/${uid}/${dataType}`,
+  userDataKeyList: <T2 extends keyof SoilDatabase>(uid: string, dataType: T2, dataKey: DataKey) =>
     `${PATHS.USER_DATA_LISTS}/${uid}/${dataType}/${String(dataKey)}`,
 
   PUBLIC_DATA_LISTS: "publicDataLists",
-  publicDataTypeList: (dataType: DataType) => `${PATHS.PUBLIC_DATA_LISTS}/${dataType}`,
-  publicDataKeyList: (dataType: DataType, dataKey: DataKey) =>
+  publicDataTypeList: <T2 extends keyof SoilDatabase>(dataType: T2) => `${PATHS.PUBLIC_DATA_LISTS}/${dataType}`,
+  publicDataKeyList: <T2 extends keyof SoilDatabase>(dataType: T2, dataKey: DataKey) =>
     `${PATHS.PUBLIC_DATA_LISTS}/${dataType}/${String(dataKey)}`,
 
   CONNECTION_DATA_LISTS: "connectionDataLists",
-  connectionDataListType: (dataType: DataType) => `${PATHS.CONNECTION_DATA_LISTS}/${dataType}`,
-  connectionDataListKey: (dataType: DataType, dataKey: DataKey) =>
+  connectionDataListType: <T2 extends keyof SoilDatabase>(dataType: T2) => `${PATHS.CONNECTION_DATA_LISTS}/${dataType}`,
+  connectionDataListKey: <T2 extends keyof SoilDatabase>(dataType: T2, dataKey: DataKey) =>
     `${PATHS.CONNECTION_DATA_LISTS}/${dataType}/${String(dataKey)}`,
-  connectionDataListConnectionType: (dataType: DataType, dataKey: DataKey, connectionType: DataType) =>
-    `${PATHS.CONNECTION_DATA_LISTS}/${dataType}/${String(dataKey)}/${connectionType}`,
-  connectionDataListConnectionKey: (
-    dataType: DataType,
+  connectionDataListConnectionType: <T2 extends keyof SoilDatabase, T22 extends keyof SoilDatabase>(
+    dataType: T2,
     dataKey: DataKey,
-    connectionType: DataType,
+    connectionType: T22
+  ) => `${PATHS.CONNECTION_DATA_LISTS}/${dataType}/${String(dataKey)}/${connectionType}`,
+  connectionDataListConnectionKey: <T2 extends keyof SoilDatabase, T22 extends keyof SoilDatabase>(
+    dataType: T2,
+    dataKey: DataKey,
+    connectionType: T22,
     connectionKey: DataKey
   ) => `${PATHS.CONNECTION_DATA_LISTS}/${dataType}/${String(dataKey)}/${connectionType}/${String(connectionKey)}`,
 };

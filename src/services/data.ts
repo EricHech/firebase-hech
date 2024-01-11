@@ -1,4 +1,4 @@
-import type { AppUser, SoilDatabase } from "./types";
+import type { AppUser, SoilDatabase, SoilTransactionWithCbParams } from "./types";
 
 // Helpers
 import { createGetUpdateObjectFunction, sleep } from "../utils";
@@ -42,7 +42,7 @@ export const isoCreateUser = ({
   updateObject = {},
   skipUpdate,
   now = Date.now(),
-}: Pick<CreateDataParams<SoilDatabase, keyof SoilDatabase>, "update" | "updateObject" | "skipUpdate" | "now"> & {
+}: Pick<CreateDataParams<keyof SoilDatabase>, "update" | "updateObject" | "skipUpdate" | "now"> & {
   user: Mandate<User, "uid">;
   appUser: AppUser;
 }) => {
@@ -105,13 +105,13 @@ export const isoOnDataKeyValue = <T2 extends keyof SoilDatabase>({
   cb,
 }: OnDataValueParams<T2>) => onValue(PATHS.dataKey(dataType, dataKey), cb);
 
-export const isoOnToGetTypeChildAdded = <T extends SoilDatabase, T2 extends keyof SoilDatabase>({
+export const isoOnToGetTypeChildAdded = <T2 extends keyof SoilDatabase>({
   onChildAdded,
   dataType,
   dataKey,
   connectionType,
   cb,
-}: OnConnectionTypeChildAddedParams<T, T2>) =>
+}: OnConnectionTypeChildAddedParams<T2>) =>
   onChildAdded(PATHS.connectionDataListConnectionType(dataType, dataKey, connectionType), cb);
 
 /*
@@ -207,14 +207,19 @@ export const isoGetDataKeyFieldValue = <T2 extends keyof SoilDatabase, T3 extend
   field: T3;
 }) => get<Data<T2>[T3]>(PATHS.dataKeyField(dataType, dataKey, field));
 
-export const isoQueryData = <T extends SoilDatabase, T2 extends keyof SoilDatabase, T3 extends keyof T[T2]>({
+export const isoQueryData = <T2 extends keyof SoilDatabase, T3 extends keyof Data<T2>>({
   queryOrderByChildEqualTo,
   dataType,
   childKey,
   queryValue,
   limit,
-}: QueryDataParams<T, T2, T3>) =>
-  queryOrderByChildEqualTo<T[T2]>({ path: PATHS.dataType(dataType), childKey, limit, queryValue: String(queryValue) });
+}: QueryDataParams<T2, T3>) =>
+  queryOrderByChildEqualTo<Data<T2>>({
+    path: PATHS.dataType(dataType),
+    childKey,
+    limit,
+    queryValue: String(queryValue),
+  });
 
 /*
  ██████╗ ██╗    ██╗███╗   ██╗███████╗██████╗ ███████╗
@@ -233,7 +238,7 @@ export const isoGetOwners = (get: GetFunction, dataType: keyof SoilDatabase, dat
 export const isoGetOwnersByType = (get: GetFunction, dataType: keyof SoilDatabase) =>
   get<Record<string, Record<string, number>>>(PATHS.ownerDataType(dataType));
 
-export const isoAddOwners = <T extends SoilDatabase, T2 extends keyof SoilDatabase>({
+export const isoAddOwners = <T2 extends keyof SoilDatabase>({
   update,
   updateObject = {},
   skipUpdate,
@@ -242,7 +247,7 @@ export const isoAddOwners = <T extends SoilDatabase, T2 extends keyof SoilDataba
   now = Date.now(),
   owners,
 }: Pick<
-  CreateDataParams<T, T2>,
+  CreateDataParams<T2>,
   "dataType" | "dataKey" | "owners" | "update" | "updateObject" | "skipUpdate" | "now"
 >) => {
   owners.forEach((uid) => {
@@ -255,14 +260,14 @@ export const isoAddOwners = <T extends SoilDatabase, T2 extends keyof SoilDataba
   return skipUpdate ? updateObject : update("/", updateObject, true).then(() => updateObject);
 };
 
-export const isoRemoveOwners = <T extends SoilDatabase, T2 extends keyof SoilDatabase>({
+export const isoRemoveOwners = <T2 extends keyof SoilDatabase>({
   update,
   updateObject = {},
   skipUpdate,
   dataType,
   dataKey,
   owners,
-}: Pick<CreateDataParams<T, T2>, "dataType" | "dataKey" | "owners" | "update" | "updateObject" | "skipUpdate">) => {
+}: Pick<CreateDataParams<T2>, "dataType" | "dataKey" | "owners" | "update" | "updateObject" | "skipUpdate">) => {
   owners.forEach((uid) => {
     /* eslint-disable no-param-reassign */
     updateObject[PATHS.ownerDataKeyUid(dataType, dataKey, uid)] = null;
@@ -316,7 +321,7 @@ export const isoSoilUpdate = async (
   }
 };
 
-export const isoCreateData = async <T extends SoilDatabase, T2 extends keyof SoilDatabase>({
+export const isoCreateData = async <T2 extends keyof SoilDatabase>({
   update,
   updateObject = {},
   skipUpdate,
@@ -328,7 +333,7 @@ export const isoCreateData = async <T extends SoilDatabase, T2 extends keyof Soi
   connections,
   connectionAccess,
   now = Date.now(),
-}: CreateDataParams<T, T2>) => {
+}: CreateDataParams<T2>) => {
   /* eslint-disable no-param-reassign */
   owners.forEach((uid) => {
     updateObject[PATHS.ownerDataKeyUid(dataType, dataKey, uid)] = now;
@@ -354,7 +359,7 @@ export const isoCreateData = async <T extends SoilDatabase, T2 extends keyof Soi
   return skipUpdate ? updateObject : update("/", updateObject, true).then(() => updateObject);
 };
 
-export const isoUpdateData = async <T extends SoilDatabase, T2 extends keyof SoilDatabase>({
+export const isoUpdateData = async <T2 extends keyof SoilDatabase>({
   update,
   get,
   updateObject = {},
@@ -371,7 +376,7 @@ export const isoUpdateData = async <T extends SoilDatabase, T2 extends keyof Soi
   makeGetRequests = true,
   makeConnectionsRequests = true,
   makeOwnersRequests = true,
-}: UpdateDataParams<T, T2>) => {
+}: UpdateDataParams<T2>) => {
   type NewData = typeof data & { updatedAt?: number };
 
   const newData = { ...data } as NewData;
@@ -381,8 +386,8 @@ export const isoUpdateData = async <T extends SoilDatabase, T2 extends keyof Soi
   if (connectionAccess) updateObject[PATHS.dataKeyField(dataType, dataKey, "connectionAccess")] = connectionAccess;
   if (publicAccess !== undefined) updateObject[PATHS.dataKeyField(dataType, dataKey, "publicAccess")] = publicAccess;
 
-  Object.entries(newData).forEach(([childKey, childVal]) => {
-    updateObject[PATHS.dataKeyField(dataType, dataKey, childKey)] = childVal;
+  (Object.entries(newData) as [keyof NewData, ValueOf<NewData>][]).forEach(([childKey, childVal]) => {
+    if (childVal !== undefined) updateObject[PATHS.dataKeyField(dataType, dataKey, childKey)] = childVal;
   });
 
   if (makeGetRequests && makeOwnersRequests) {
@@ -423,7 +428,7 @@ export const isoUpdateData = async <T extends SoilDatabase, T2 extends keyof Soi
   return skipUpdate ? updateObject : update("/", updateObject, true).then(() => updateObject);
 };
 
-export const isoUpsertData = async <T extends SoilDatabase, T2 extends keyof SoilDatabase>({
+export const isoUpsertData = async <T2 extends keyof SoilDatabase>({
   update,
   get,
   updateObject,
@@ -437,7 +442,7 @@ export const isoUpsertData = async <T extends SoilDatabase, T2 extends keyof Soi
   connectionAccess,
   includeUpdatedAt = true,
   makeGetRequests = true,
-}: CreateDataParams<T, T2> & UpdateDataParams<T, T2>) => {
+}: CreateDataParams<T2> & UpdateDataParams<T2>) => {
   const dataCreatedAt = await isoGetDataKeyFieldValue({
     get,
     dataType,
@@ -477,13 +482,61 @@ export const isoUpsertData = async <T extends SoilDatabase, T2 extends keyof Soi
   });
 };
 
-export const isoCreateConnections = <T extends SoilDatabase, T2 extends keyof SoilDatabase>({
+export const isoSoilTransactionWithCb = async <T2 extends keyof SoilDatabase, T3 extends keyof Data<T2>>({
+  get,
+  update,
+  transactionWithCb,
+  cb,
+  dataType,
+  dataKey,
+  field,
+  makeGetRequests = true,
+  makeConnectionsRequests = true,
+  makeOwnersRequests = true,
+}: SoilTransactionWithCbParams<T2, T3> & {
+  transactionWithCb: <T>(path: string, cb: (val: Nullable<T>) => T) => Promise<unknown>;
+}) => {
+  await transactionWithCb<Data<T2>>(PATHS.dataKeyField(dataType, dataKey, field), cb);
+
+  /* eslint-disable no-param-reassign */
+  const now = Date.now();
+  const updateObject: UpdateObject<T2> = {};
+
+  if (makeGetRequests && makeOwnersRequests) {
+    const existingOwners = await isoGetOwners(get, dataType, dataKey);
+    Object.keys(existingOwners || {}).forEach((uid) => {
+      updateObject[PATHS.userDataKeyList(uid, dataType, dataKey)] = now;
+    });
+  }
+
+  if (makeGetRequests && makeConnectionsRequests) {
+    const existingConnections = await isoGetAllConnections(get, dataType, dataKey);
+    if (existingConnections) {
+      const existingConnectionEntries = Object.entries(existingConnections) as [
+        keyof typeof existingConnections,
+        ValueOf<typeof existingConnections>
+      ][];
+
+      existingConnectionEntries.forEach(([dType, dObject]) =>
+        Object.keys(dObject).forEach((dKey) => {
+          updateObject[PATHS.connectionDataListConnectionKey(dataType, dataKey, dType, dKey)] = now;
+          updateObject[PATHS.connectionDataListConnectionKey(dType, dKey, dataType, dataKey)] = now;
+        })
+      );
+    }
+  }
+  /* eslint-enable no-param-reassign */
+
+  return update("/", updateObject, true);
+};
+
+export const isoCreateConnections = <T2 extends keyof SoilDatabase>({
   update,
   updateObject = {},
   skipUpdate,
   now = Date.now(),
   connections,
-}: ModifyConnectionsType<T, T2>) => {
+}: ModifyConnectionsType<T2>) => {
   connections.forEach(({ dataType, dataKey, connectionType, connectionKey }) => {
     /* eslint-disable no-param-reassign */
     updateObject[PATHS.connectionDataListConnectionKey(dataType, dataKey, connectionType, connectionKey)] = now;
@@ -502,7 +555,7 @@ export const isoCreateConnections = <T extends SoilDatabase, T2 extends keyof So
 ██║  ██║███████╗██║ ╚═╝ ██║╚██████╔╝ ╚████╔╝ ███████╗
 ╚═╝  ╚═╝╚══════╝╚═╝     ╚═╝ ╚═════╝   ╚═══╝  ╚══════╝
 */
-export const isoRemoveData = async <T extends SoilDatabase, T2 extends keyof SoilDatabase>({
+export const isoRemoveData = async <T2 extends keyof SoilDatabase>({
   update,
   get,
   updateObject = {},
@@ -511,7 +564,7 @@ export const isoRemoveData = async <T extends SoilDatabase, T2 extends keyof Soi
   dataKey,
   existingOwners,
   existingConnections,
-}: Omit<RemoveDataKeyParams<T, T2>, "publicAccess" | "now">) => {
+}: Omit<RemoveDataKeyParams<T2>, "publicAccess" | "now">) => {
   /* eslint-disable no-param-reassign */
   (
     Object.entries(existingConnections || (await isoGetAllConnections(get, dataType, dataKey)) || {}) as [
@@ -539,12 +592,12 @@ export const isoRemoveData = async <T extends SoilDatabase, T2 extends keyof Soi
 };
 
 /** ! CAREFUL */
-export const isoRemoveDataType = async <T extends SoilDatabase, T2 extends keyof SoilDatabase>({
+export const isoRemoveDataType = async <T2 extends keyof SoilDatabase>({
   update,
   get,
   dataType,
-}: Omit<RemoveDataKeyParams<T, T2>, "publicAccess" | "now" | "dataKey" | "skipUpdate" | "updateObject">) => {
-  const { updateObjects, getUpdateObject } = createGetUpdateObjectFunction<T, T2>();
+}: Omit<RemoveDataKeyParams<T2>, "publicAccess" | "now" | "dataKey" | "skipUpdate" | "updateObject">) => {
+  const { updateObjects, getUpdateObject } = createGetUpdateObjectFunction<T2>();
   /* eslint-disable no-param-reassign */
   const connections = await isoGetAllConnectionsByType(get, dataType);
   if (connections) {
@@ -585,12 +638,12 @@ export const isoRemoveDataType = async <T extends SoilDatabase, T2 extends keyof
   }
 };
 
-export const isoRemoveConnections = <T extends SoilDatabase, T2 extends keyof SoilDatabase>({
+export const isoRemoveConnections = <T2 extends keyof SoilDatabase>({
   update,
   updateObject = {},
   skipUpdate,
   connections,
-}: ModifyConnectionsType<T, T2>) => {
+}: ModifyConnectionsType<T2>) => {
   connections.forEach(({ dataType, dataKey, connectionType, connectionKey }) => {
     /* eslint-disable no-param-reassign */
     updateObject[PATHS.connectionDataListConnectionKey(dataType, dataKey, connectionType, connectionKey)] = null;
@@ -639,9 +692,9 @@ export const isoChangeDataKey = async <T2 extends keyof SoilDatabase, T22 extend
     [] as Connections
   );
 
-  const updateObject: UpdateObject<SoilDatabase, T2> = {};
+  const updateObject: UpdateObject<T2> = {};
 
-  await isoCreateData<SoilDatabase, T2>({
+  await isoCreateData<T2>({
     update,
     updateObject,
     skipUpdate: true,

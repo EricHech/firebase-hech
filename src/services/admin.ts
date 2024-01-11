@@ -3,14 +3,14 @@ import { getDatabase } from "firebase-admin/database";
 import { CreateRequest, getAuth, UpdateRequest } from "firebase-admin/auth";
 
 // Helpers
+import { isoSoilUpdate } from "./data";
 import { getDataKeyValue } from "./server-data";
 import { cleanPushKey } from "./paths";
 
 // Types
 import type { ServiceAccount } from "firebase-admin/app";
 import type { QueryByKeyLimitParams, QueryOrderByChildParams, StatefulData } from "./types";
-import type { TransactionResult, Query } from "@firebase/database-types";
-import { isoSoilUpdate } from "./data";
+import type { Query } from "@firebase/database-types";
 
 const getRef = (path: string, allowRootQuery: boolean = false) => {
   if (!path || (!allowRootQuery && path === "/")) throw new Error("We don't like root queries");
@@ -139,8 +139,7 @@ export const initializeAdminRemoteRequestApp = async <T extends StatefulData<"re
 
 export const remove = (path: string) => getRef(path).remove();
 
-export const transactionWithCb = <T>(path: string, cb: (val: Nullable<T>) => T): Promise<TransactionResult> =>
-  getRef(path).transaction(cb);
+export const transactionWithCb = <T>(path: string, cb: (val: Nullable<T>) => T) => getRef(path).transaction(cb);
 
 export const updateAuthUser = (uid: string, updateRequest: UpdateRequest) => getAuth().updateUser(uid, updateRequest);
 

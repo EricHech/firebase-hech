@@ -19,7 +19,7 @@ export const uploadFile = async ({
   connectionAccess,
   file,
   dataKey = pushKey(PATHS.dataType("soilFile")),
-}: Pick<CreateDataParams<SoilDatabase, "soilFile">, "owners" | "publicAccess" | "connections" | "connectionAccess"> & {
+}: Pick<CreateDataParams<"soilFile">, "owners" | "publicAccess" | "connections" | "connectionAccess"> & {
   dataKey?: string;
   file: Blob | Uint8Array | ArrayBuffer;
 }) => {
@@ -46,7 +46,7 @@ export const uploadFileResumable = ({
   connectionAccess,
   file,
   dataKey = pushKey(PATHS.dataType("soilFile")),
-}: Pick<CreateDataParams<SoilDatabase, "soilFile">, "owners" | "publicAccess" | "connections" | "connectionAccess"> & {
+}: Pick<CreateDataParams<"soilFile">, "owners" | "publicAccess" | "connections" | "connectionAccess"> & {
   dataKey?: string;
   file: Blob | Uint8Array | ArrayBuffer;
 }) => {
