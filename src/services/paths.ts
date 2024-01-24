@@ -66,3 +66,17 @@ export const generateDbKey = (...keys: string[]) => keys.join(DB_DELIMITER);
 export const parseDbKey = (dbKey: string) => dbKey.split(DB_DELIMITER);
 
 export const cleanPushKey = (key: string) => key.replace(/_/g, "aa");
+
+/**
+ * This function standardizes keys that are generated from existing keys but have no inherent order,
+ * for example: when creating a key representing a chat message between two people: `{uid}__{uid}`.
+ * @param keys The keys meant to be joined, this should not exceed roughly thirty Firebase pushKeys.
+ */
+export const generateSortedDbKey = (...keys: string[]) =>
+  generateDbKey(
+    ...keys.sort((a, b) => {
+      if (a < b) return -1;
+      if (a > b) return 1;
+      return 0;
+    })
+  );
