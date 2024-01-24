@@ -97,19 +97,65 @@ export const getWithLimit = <T>(path: string, amount: number, version: "first" |
 export const onChildAdded = <T, K extends string>(
   path: string,
   cb: (val: T, key: K) => void,
-  limit?: { amount: number; direction: Extract<database.QueryConstraintType, "limitToFirst" | "limitToLast"> }
+  paginate?: {
+    amount: number;
+    direction: Extract<database.QueryConstraintType, "limitToFirst" | "limitToLast">;
+    orderBy: "value" | { path: string };
+  }
 ) =>
   database.onChildAdded(
-    limit ? database.query(getRef(path), database[limit.direction](limit.amount)) : getRef(path),
+    paginate
+      ? database.query(
+          getRef(path),
+          paginate.orderBy === "value" ? database.orderByValue() : database.orderByChild(paginate.orderBy.path),
+          database[paginate.direction](paginate.amount)
+        )
+      : getRef(path),
     (snap) => cb(snap.val(), snap.key! as K),
-    logAndThrow("onChildAdded", path, limit ? { data: { limit } } : undefined)
+    logAndThrow("onChildAdded", path, paginate ? { data: { paginate } } : undefined)
   );
 
-export const onChildChanged = <T, K extends string>(path: string, cb: (val: T, key: K) => void) =>
-  database.onChildChanged(getRef(path), (snap) => cb(snap.val(), snap.key! as K), logAndThrow("onChildChanged", path));
+export const onChildChanged = <T, K extends string>(
+  path: string,
+  cb: (val: T, key: K) => void,
+  paginate?: {
+    amount: number;
+    direction: Extract<database.QueryConstraintType, "limitToFirst" | "limitToLast">;
+    orderBy: "value" | { path: string };
+  }
+) =>
+  database.onChildChanged(
+    paginate
+      ? database.query(
+          getRef(path),
+          paginate.orderBy === "value" ? database.orderByValue() : database.orderByChild(paginate.orderBy.path),
+          database[paginate.direction](paginate.amount)
+        )
+      : getRef(path),
+    (snap) => cb(snap.val(), snap.key! as K),
+    logAndThrow("onChildChanged", path, paginate ? { data: { paginate } } : undefined)
+  );
 
-export const onChildRemoved = <K extends string>(path: string, cb: (key: K) => void) =>
-  database.onChildRemoved(getRef(path), (snap) => cb(snap.key! as K), logAndThrow("onChildRemoved", path));
+export const onChildRemoved = <K extends string>(
+  path: string,
+  cb: (key: K) => void,
+  paginate?: {
+    amount: number;
+    direction: Extract<database.QueryConstraintType, "limitToFirst" | "limitToLast">;
+    orderBy: "value" | { path: string };
+  }
+) =>
+  database.onChildRemoved(
+    paginate
+      ? database.query(
+          getRef(path),
+          paginate.orderBy === "value" ? database.orderByValue() : database.orderByChild(paginate.orderBy.path),
+          database[paginate.direction](paginate.amount)
+        )
+      : getRef(path),
+    (snap) => cb(snap.key! as K),
+    logAndThrow("onChildRemoved", path, paginate ? { data: { paginate } } : undefined)
+  );
 
 export const push = <T>(path: string, data: T) => {
   try {
