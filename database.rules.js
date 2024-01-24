@@ -188,9 +188,9 @@ const rules = {
         // You can write the connections if you own the data or if you have connection write access
         ".write": authIsDataOwner("$dataType"),
         $connectionType: {
-          // But really, you can read all the keys of a connection so that you can listen to the connection lists
+          // But really, as long as you are logged in, you can read all the keys of a connection so that you can listen to the connection lists
           // ? Example: A user wanting to read connections between a product and a category, neither of which they own
-          ".read": true,
+          ".read": authNotNull,
           $connectionKey: {
             // You can only write new connections if both ends follow the same rules.
             // This is because connections give you read access to data, and they are always two-way.
