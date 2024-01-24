@@ -79,7 +79,6 @@ export const getOrderByChildWithLimit = <T>(
 
 export const getOrderByValueWithLimit = <T>(
   path: string,
-  childPath: string,
   limit: { amount: number; direction: Extract<database.QueryConstraintType, "limitToFirst" | "limitToLast"> }
 ) =>
   database
