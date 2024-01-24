@@ -20,6 +20,8 @@ const logAndThrow =
       | "onChildChanged"
       | "onChildRemoved"
       | "onChildEqualTo"
+      | "getChildrenEqualTo"
+      | "getOrderByWithLimit"
       | "getWithLimit"
       | "push"
       | "update"
@@ -62,7 +64,17 @@ export const getChildrenEqualTo = <T, V extends GetChildrenEqualTo["val"]>(
   database
     .get(database.query(getRef(path), database.orderByChild(childPath), database.equalTo(equalToValue)))
     .then((snap) => snap.val() as Nullable<T>)
-    .catch(logAndThrow("onChildEqualTo", path));
+    .catch(logAndThrow("getChildrenEqualTo", path));
+
+export const getOrderByWithLimit = <T>(
+  path: string,
+  childPath: string,
+  limit: { amount: number; direction: Extract<database.QueryConstraintType, "limitToFirst" | "limitToLast"> }
+) =>
+  database
+    .get(database.query(getRef(path), database.orderByChild(childPath), database[limit.direction](limit.amount)))
+    .then((snap) => snap.val() as Nullable<T>)
+    .catch(logAndThrow("getOrderByWithLimit", path));
 
 export const getWithLimit = <T>(path: string, amount: number, version: "first" | "last") =>
   database
