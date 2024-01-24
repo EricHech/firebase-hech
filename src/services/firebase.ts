@@ -97,10 +97,13 @@ export const getWithLimit = <T>(path: string, amount: number, version: "first" |
 export const onChildAdded = <T, K extends string>(
   path: string,
   cb: (val: T, key: K) => void,
-  paginate?: RequireAtLeastOne<{
-    limit?: { amount: number; direction: Extract<database.QueryConstraintType, "limitToFirst" | "limitToLast"> };
-    orderBy?: "value" | { path: string };
-  }>
+  paginate?: RequireAtLeastOne<
+    {
+      limit?: { amount: number; direction: "limitToFirst" | "limitToLast" };
+      orderBy?: "value" | { path: string };
+    },
+    "limit" | "orderBy"
+  >
 ) => {
   const contraints: database.QueryConstraint[] = [];
   if (paginate?.orderBy) {
@@ -122,10 +125,13 @@ export const onChildAdded = <T, K extends string>(
 export const onChildChanged = <T, K extends string>(
   path: string,
   cb: (val: T, key: K) => void,
-  paginate?: RequireAtLeastOne<{
-    limit?: { amount: number; direction: Extract<database.QueryConstraintType, "limitToFirst" | "limitToLast"> };
-    orderBy?: "value" | { path: string };
-  }>
+  paginate?: RequireAtLeastOne<
+    {
+      limit?: { amount: number; direction: "limitToFirst" | "limitToLast" };
+      orderBy?: "value" | { path: string };
+    },
+    "limit" | "orderBy"
+  >
 ) => {
   const contraints: database.QueryConstraint[] = [];
   if (paginate?.orderBy) {
@@ -147,10 +153,13 @@ export const onChildChanged = <T, K extends string>(
 export const onChildRemoved = <K extends string>(
   path: string,
   cb: (key: K) => void,
-  paginate?: RequireAtLeastOne<{
-    limit?: { amount: number; direction: Extract<database.QueryConstraintType, "limitToFirst" | "limitToLast"> };
-    orderBy?: "value" | { path: string };
-  }>
+  paginate?: RequireAtLeastOne<
+    {
+      limit?: { amount: number; direction: "limitToFirst" | "limitToLast" };
+      orderBy?: "value" | { path: string };
+    },
+    "limit" | "orderBy"
+  >
 ) => {
   const contraints: database.QueryConstraint[] = [];
   if (paginate?.orderBy) {

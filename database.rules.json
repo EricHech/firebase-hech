@@ -32,6 +32,7 @@
         ".read": "auth.uid === $uid",
         ".write": "auth.uid === $uid",
         "$dataType": {
+          ".indexOn": ".value",
           "$dataKey": {
             ".read": "root.child('owners').child($dataType).child($dataKey).child(auth.uid).exists()",
             ".write": "root.child('owners').child($dataType).child($dataKey).child(auth.uid).exists()",
@@ -43,6 +44,7 @@
     "publicDataLists": {
       "$dataType": {
         ".read": true,
+        ".indexOn": ".value",
         "$dataKey": {
           ".write": "root.child('owners').child($dataType).child($dataKey).child(auth.uid).exists()",
           ".validate": "newData.isNumber()"

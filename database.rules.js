@@ -141,6 +141,7 @@ const rules = {
       ".read": authUidIsUid,
       ".write": authUidIsUid,
       $dataType: {
+        ".indexOn": ".value",
         // If you own the data, you can also make other people owners of the data and therefore add to their ownership lists
         $dataKey: {
           ".read": authIsDataOwner("$dataType"),
@@ -154,6 +155,7 @@ const rules = {
     $dataType: {
       // Public lists are public to all...
       ".read": true,
+      ".indexOn": ".value",
       $dataKey: {
         // ...but they can only be written to by their owners
         ".write": authIsDataOwner("$dataType"),
