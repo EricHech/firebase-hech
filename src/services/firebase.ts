@@ -124,11 +124,12 @@ const getContraints = (paginate: Maybe<ListenerPaginationOptions>) => {
     }
 
     if (paginate.limit) {
-      const { direction, amount, exclusiveStart } = paginate.limit;
+      const { direction, amount, exclusiveTermination } = paginate.limit;
       contraints.push(database[direction](amount));
 
-      if (exclusiveStart !== undefined) {
-        contraints.push(database.startAfter(exclusiveStart));
+      if (exclusiveTermination !== undefined) {
+        const version = direction === "limitToLast" ? "endBefore" : "startAfter";
+        contraints.push(database[version](exclusiveTermination));
       }
     } else if (paginate.exclusiveBetween) {
       const { start, end } = paginate.exclusiveBetween;
