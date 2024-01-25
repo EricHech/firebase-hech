@@ -91,12 +91,20 @@ export const getOrderByChildWithLimit = <T>(
 export const getOrderByWithLimit = <T>(
   path: string,
   orderBy: Extract<database.QueryConstraintType, "orderByValue" | "orderByKey">,
-  limit: { amount: number; direction: Extract<database.QueryConstraintType, "limitToFirst" | "limitToLast"> }
-) =>
-  database
-    .get(database.query(getRef(path), database[orderBy](), database[limit.direction](limit.amount)))
+  { amount, direction, exclusiveTermination }: Mandate<ListenerPaginationOptions, "limit">["limit"]
+) => {
+  const contraints = [database[orderBy](), database[direction](amount)];
+
+  if (exclusiveTermination !== undefined) {
+    const version = direction === "limitToLast" ? "endBefore" : "startAfter";
+    contraints.push(database[version](exclusiveTermination));
+  }
+
+  return database
+    .get(database.query(getRef(path), ...contraints))
     .then((snap) => snap.val() as Nullable<T>)
     .catch(logAndThrow("getOrderByWithLimit", path));
+};
 
 export const getOrderByExclusiveBetween = <T>(
   path: string,
