@@ -22,7 +22,8 @@ const logAndThrow =
       | "onChildEqualTo"
       | "getChildrenEqualTo"
       | "getOrderByChildWithLimit"
-      | "getOrderByValueWithLimit"
+      | "getOrderByWithLimit"
+      | "getOrderByExclusiveBetween"
       | "getWithLimit"
       | "push"
       | "update"
@@ -54,7 +55,16 @@ export const get = <T>(path: string) =>
     .then((snap) => snap.val() as T)
     .catch(logAndThrow("get", path));
 
-// TODO: Maybe make the val typesafe, but it isn't possible if the path is double nested (e.g. thing/thang)
+export const getWithLimit = <T>(
+  path: string,
+  amount: number,
+  direction: Extract<database.QueryConstraintType, "limitToFirst" | "limitToLast">
+) =>
+  database
+    .get(database.query(getRef(path), database[direction](amount)))
+    .then((snap) => snap.val() as Nullable<T>)
+    .catch(logAndThrow("getWithLimit", path));
+
 export type GetChildrenEqualTo = { path: string; val: string | number | boolean | null };
 
 export const getChildrenEqualTo = <T, V extends GetChildrenEqualTo["val"]>(
@@ -77,22 +87,26 @@ export const getOrderByChildWithLimit = <T>(
     .then((snap) => snap.val() as Nullable<T>)
     .catch(logAndThrow("getOrderByChildWithLimit", path));
 
-export const getOrderByValueWithLimit = <T>(
+export const getOrderByWithLimit = <T>(
   path: string,
+  orderBy: Extract<database.QueryConstraintType, "orderByValue" | "orderByKey">,
   limit: { amount: number; direction: Extract<database.QueryConstraintType, "limitToFirst" | "limitToLast"> }
 ) =>
   database
-    .get(database.query(getRef(path), database.orderByValue(), database[limit.direction](limit.amount)))
+    .get(database.query(getRef(path), database[orderBy](), database[limit.direction](limit.amount)))
     .then((snap) => snap.val() as Nullable<T>)
-    .catch(logAndThrow("getOrderByValueWithLimit", path));
+    .catch(logAndThrow("getOrderByWithLimit", path));
 
-export const getWithLimit = <T>(path: string, amount: number, version: "first" | "last") =>
+export const getOrderByExclusiveBetween = <T>(
+  path: string,
+  orderBy: Extract<database.QueryConstraintType, "orderByValue" | "orderByKey">,
+  start: string | number,
+  end: string | number
+) =>
   database
-    .get(
-      database.query(getRef(path), version === "first" ? database.limitToFirst(amount) : database.limitToLast(amount))
-    )
+    .get(database.query(getRef(path), database[orderBy](), database.startAfter(start), database.endBefore(end)))
     .then((snap) => snap.val() as Nullable<T>)
-    .catch(logAndThrow("getWithLimit", path));
+    .catch(logAndThrow("getOrderByExclusiveBetween", path));
 
 export const onChildAdded = <T, K extends string>(
   path: string,
