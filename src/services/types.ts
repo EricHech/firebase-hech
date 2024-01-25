@@ -161,12 +161,19 @@ export type GetOwnersDataParams<T2 extends keyof SoilDatabase> = {
 
 export type ListenerPaginationOptions = { orderBy?: "key" | "value" | { path: string } } & (
   | {
-      limit?: { amount: number; direction: "limitToFirst" | "limitToLast"; exclusiveTermination?: string | number };
+      exclusiveSide: { direction: "high" | "low"; exclusiveTermination: string | number };
       exclusiveBetween?: undefined;
+      limit?: undefined;
     }
   | {
       exclusiveBetween?: { start: string | number; end: string | number };
+      exclusiveSide?: undefined;
       limit?: undefined;
+    }
+  | {
+      limit?: { amount: number; direction: "limitToFirst" | "limitToLast"; exclusiveTermination?: string | number };
+      exclusiveSide?: undefined;
+      exclusiveBetween?: undefined;
     }
 );
 

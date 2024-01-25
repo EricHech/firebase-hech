@@ -131,7 +131,14 @@ const getContraints = (paginate: Maybe<ListenerPaginationOptions>) => {
       contraints.push(order);
     }
 
-    if (paginate.limit) {
+    if (paginate.exclusiveSide) {
+      const { direction, exclusiveTermination } = paginate.exclusiveSide;
+      const version = direction === "high" ? "startAfter" : "endBefore";
+      contraints.push(database[version](exclusiveTermination));
+    } else if (paginate.exclusiveBetween) {
+      const { start, end } = paginate.exclusiveBetween;
+      contraints.push(database.startAfter(start), database.endBefore(end));
+    } else if (paginate.limit) {
       const { direction, amount, exclusiveTermination } = paginate.limit;
       contraints.push(database[direction](amount));
 
@@ -139,9 +146,6 @@ const getContraints = (paginate: Maybe<ListenerPaginationOptions>) => {
         const version = direction === "limitToLast" ? "endBefore" : "startAfter";
         contraints.push(database[version](exclusiveTermination));
       }
-    } else if (paginate.exclusiveBetween) {
-      const { start, end } = paginate.exclusiveBetween;
-      contraints.push(database.startAfter(start), database.endBefore(end));
     }
   }
 
