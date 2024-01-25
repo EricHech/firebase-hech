@@ -3,6 +3,7 @@ import * as storage from "firebase/storage";
 import { getDownloadURL, UploadTaskSnapshot as FirebaseUploadTaskSnapshot } from "firebase/storage";
 import { cleanPushKey } from "./paths";
 import { isoSoilUpdate } from "./data";
+import { ListenerPaginationOptions } from "./types";
 
 const getRef = (path: string, allowRootQuery: boolean = false) => {
   if (!path || (!allowRootQuery && path === "/")) throw new Error("We don't like root queries");
@@ -108,18 +109,7 @@ export const getOrderByExclusiveBetween = <T>(
     .then((snap) => snap.val() as Nullable<T>)
     .catch(logAndThrow("getOrderByExclusiveBetween", path));
 
-type PaginateOptions = { orderBy?: "key" | "value" | { path: string } } & (
-  | {
-      limit?: { amount: number; direction: "limitToFirst" | "limitToLast" };
-      exclusiveBetween?: undefined;
-    }
-  | {
-      exclusiveBetween?: { start: string | number; end: string | number };
-      limit?: undefined;
-    }
-);
-
-const getContraints = (paginate: Maybe<PaginateOptions>) => {
+const getContraints = (paginate: Maybe<ListenerPaginationOptions>) => {
   const contraints: database.QueryConstraint[] = [];
 
   if (paginate) {
@@ -148,7 +138,7 @@ const getContraints = (paginate: Maybe<PaginateOptions>) => {
 export const onChildAdded = <T, K extends string>(
   path: string,
   cb: (val: T, key: K) => void,
-  paginate?: PaginateOptions
+  paginate?: ListenerPaginationOptions
 ) => {
   const contraints = getContraints(paginate);
 
@@ -162,7 +152,7 @@ export const onChildAdded = <T, K extends string>(
 export const onChildChanged = <T, K extends string>(
   path: string,
   cb: (val: T, key: K) => void,
-  paginate?: PaginateOptions
+  paginate?: ListenerPaginationOptions
 ) => {
   const contraints = getContraints(paginate);
 
@@ -173,7 +163,11 @@ export const onChildChanged = <T, K extends string>(
   );
 };
 
-export const onChildRemoved = <K extends string>(path: string, cb: (key: K) => void, paginate?: PaginateOptions) => {
+export const onChildRemoved = <K extends string>(
+  path: string,
+  cb: (key: K) => void,
+  paginate?: ListenerPaginationOptions
+) => {
   const contraints = getContraints(paginate);
 
   return database.onChildRemoved(

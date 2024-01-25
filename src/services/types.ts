@@ -159,6 +159,17 @@ export type GetOwnersDataParams<T2 extends keyof SoilDatabase> = {
   dataKey: string;
 };
 
+export type ListenerPaginationOptions = { orderBy?: "key" | "value" | { path: string } } & (
+  | {
+      limit?: { amount: number; direction: "limitToFirst" | "limitToLast" };
+      exclusiveBetween?: undefined;
+    }
+  | {
+      exclusiveBetween?: { start: string | number; end: string | number };
+      limit?: undefined;
+    }
+);
+
 export type OnUserDataTypeListChildAddedParams<T2 extends keyof SoilDatabase> = {
   onChildAdded: (path: string, cb: (val: Nullable<DataList>, key: string) => void) => VoidFunction;
   uid: string;
