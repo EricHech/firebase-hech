@@ -111,19 +111,30 @@ export const getOrderByExclusiveBetween = <T>(
 export const onChildAdded = <T, K extends string>(
   path: string,
   cb: (val: T, key: K) => void,
-  paginate?: {
-    limit?: { amount: number; direction: "limitToFirst" | "limitToLast" };
-    orderBy?: "value" | { path: string };
-  }
+  paginate?: { orderBy?: "key" | "value" | { path: string } } & (
+    | {
+        limit?: { amount: number; direction: "limitToFirst" | "limitToLast" };
+        exclusiveBetween?: undefined;
+      }
+    | {
+        exclusiveBetween?: { start: string | number; end: string | number };
+        limit?: undefined;
+      }
+  )
 ) => {
   const contraints: database.QueryConstraint[] = [];
   if (paginate?.orderBy) {
-    contraints.push(
-      paginate.orderBy === "value" ? database.orderByValue() : database.orderByChild(paginate.orderBy.path)
-    );
+    let order: database.QueryConstraint;
+    if (paginate.orderBy === "key") order = database.orderByKey();
+    else if (paginate.orderBy === "value") order = database.orderByValue();
+    else order = database.orderByChild(paginate.orderBy.path);
+    contraints.push(order);
   }
   if (paginate?.limit) {
     contraints.push(database[paginate.limit.direction](paginate.limit.amount));
+  } else if (paginate?.exclusiveBetween) {
+    const { start, end } = paginate.exclusiveBetween;
+    contraints.push(database.startAfter(start), database.endBefore(end));
   }
 
   return database.onChildAdded(
@@ -136,19 +147,30 @@ export const onChildAdded = <T, K extends string>(
 export const onChildChanged = <T, K extends string>(
   path: string,
   cb: (val: T, key: K) => void,
-  paginate?: {
-    limit?: { amount: number; direction: "limitToFirst" | "limitToLast" };
-    orderBy?: "value" | { path: string };
-  }
+  paginate?: { orderBy?: "key" | "value" | { path: string } } & (
+    | {
+        limit?: { amount: number; direction: "limitToFirst" | "limitToLast" };
+        exclusiveBetween?: undefined;
+      }
+    | {
+        exclusiveBetween?: { start: string | number; end: string | number };
+        limit?: undefined;
+      }
+  )
 ) => {
   const contraints: database.QueryConstraint[] = [];
   if (paginate?.orderBy) {
-    contraints.push(
-      paginate.orderBy === "value" ? database.orderByValue() : database.orderByChild(paginate.orderBy.path)
-    );
+    let order: database.QueryConstraint;
+    if (paginate.orderBy === "key") order = database.orderByKey();
+    else if (paginate.orderBy === "value") order = database.orderByValue();
+    else order = database.orderByChild(paginate.orderBy.path);
+    contraints.push(order);
   }
   if (paginate?.limit) {
     contraints.push(database[paginate.limit.direction](paginate.limit.amount));
+  } else if (paginate?.exclusiveBetween) {
+    const { start, end } = paginate.exclusiveBetween;
+    contraints.push(database.startAfter(start), database.endBefore(end));
   }
 
   return database.onChildChanged(
@@ -161,19 +183,30 @@ export const onChildChanged = <T, K extends string>(
 export const onChildRemoved = <K extends string>(
   path: string,
   cb: (key: K) => void,
-  paginate?: {
-    limit?: { amount: number; direction: "limitToFirst" | "limitToLast" };
-    orderBy?: "value" | { path: string };
-  }
+  paginate?: { orderBy?: "key" | "value" | { path: string } } & (
+    | {
+        limit?: { amount: number; direction: "limitToFirst" | "limitToLast" };
+        exclusiveBetween?: undefined;
+      }
+    | {
+        exclusiveBetween?: { start: string | number; end: string | number };
+        limit?: undefined;
+      }
+  )
 ) => {
   const contraints: database.QueryConstraint[] = [];
   if (paginate?.orderBy) {
-    contraints.push(
-      paginate.orderBy === "value" ? database.orderByValue() : database.orderByChild(paginate.orderBy.path)
-    );
+    let order: database.QueryConstraint;
+    if (paginate.orderBy === "key") order = database.orderByKey();
+    else if (paginate.orderBy === "value") order = database.orderByValue();
+    else order = database.orderByChild(paginate.orderBy.path);
+    contraints.push(order);
   }
   if (paginate?.limit) {
     contraints.push(database[paginate.limit.direction](paginate.limit.amount));
+  } else if (paginate?.exclusiveBetween) {
+    const { start, end } = paginate.exclusiveBetween;
+    contraints.push(database.startAfter(start), database.endBefore(end));
   }
 
   return database.onChildRemoved(
