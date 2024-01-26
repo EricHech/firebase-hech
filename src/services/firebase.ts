@@ -88,16 +88,36 @@ export const getOrderByChildWithLimit = <T>(
     .then((snap) => snap.val() as Nullable<T>)
     .catch(logAndThrow("getOrderByChildWithLimit", path));
 
+/**
+ * This is intended for pagination:
+ *
+ * If the direction is `limitToLast`, it is starting at the high end of the list.
+ * Therefore, it automatically sets the version to fetch everything leading up to the given key/value.
+ *
+ * If the direction is `limitToFirst`, it is starting at the low end of the list.
+ * Therefore, it automatically sets the version to fetch everything after the given key/value.
+ *
+ * While `exclusive` would be fine when filtering by key because all keys are unique,
+ * `inclusive` is necessary if filtering by value since some values can be identical.
+ */
+const getTerminationVersion = (
+  direction: "low" | "limitToFirst" | "limitToLast" | "high",
+  version: "exclusive" | "inclusive"
+) => {
+  if (direction === "limitToLast" || direction === "high") return version === "exclusive" ? "endBefore" : "endAt";
+  return version === "exclusive" ? "startAfter" : "startAt";
+};
+
 export const getOrderByWithLimit = <T>(
   path: string,
   orderBy: Extract<database.QueryConstraintType, "orderByValue" | "orderByKey">,
-  { amount, direction, exclusiveTermination }: Mandate<ListenerPaginationOptions, "limit">["limit"]
+  { amount, direction, termination }: Mandate<ListenerPaginationOptions, "limit">["limit"]
 ) => {
   const contraints = [database[orderBy](), database[direction](amount)];
 
-  if (exclusiveTermination !== undefined) {
-    const version = direction === "limitToLast" ? "endBefore" : "startAfter";
-    contraints.push(database[version](exclusiveTermination));
+  if (termination !== undefined) {
+    const version = getTerminationVersion(direction, termination.version);
+    contraints.push(database[version](termination.key));
   }
 
   return database
@@ -131,20 +151,22 @@ const getContraints = (paginate: Maybe<ListenerPaginationOptions>) => {
       contraints.push(order);
     }
 
-    if (paginate.exclusiveSide) {
-      const { direction, exclusiveTermination } = paginate.exclusiveSide;
-      const version = direction === "high" ? "startAfter" : "endBefore";
-      contraints.push(database[version](exclusiveTermination));
-    } else if (paginate.exclusiveBetween) {
-      const { start, end } = paginate.exclusiveBetween;
-      contraints.push(database.startAfter(start), database.endBefore(end));
+    if (paginate.edge) {
+      const { side, termination } = paginate.edge;
+      const version = getTerminationVersion(side, termination.version);
+      contraints.push(database[version](termination.key));
+    } else if (paginate.between) {
+      const { start, end, version } = paginate.between;
+      const startFunc = version === "exclusive" ? "startAfter" : "startAt";
+      const endFunc = version === "exclusive" ? "endBefore" : "endAt";
+      contraints.push(database[startFunc](start), database[endFunc](end));
     } else if (paginate.limit) {
-      const { direction, amount, exclusiveTermination } = paginate.limit;
+      const { direction, amount, termination } = paginate.limit;
       contraints.push(database[direction](amount));
 
-      if (exclusiveTermination !== undefined) {
-        const version = direction === "limitToLast" ? "endBefore" : "startAfter";
-        contraints.push(database[version](exclusiveTermination));
+      if (termination !== undefined) {
+        const version = getTerminationVersion(direction, termination.version);
+        contraints.push(database[version](termination.key));
       }
     }
   }
