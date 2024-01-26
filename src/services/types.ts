@@ -159,6 +159,11 @@ export type GetOwnersDataParams<T2 extends keyof SoilDatabase> = {
   dataKey: string;
 };
 
+/**
+ * `edge` returns the high or low end of a list
+ * `between` returns the values between two where `start` always represents the low end while `end` represents the high end
+ * `limit` returns an exact amount either from the end of a list or from a termination point
+ */
 export type ListenerPaginationOptions = { orderBy?: "orderByKey" | "orderByValue" | { path: string } } & (
   | {
       edge?: { side: "high" | "low"; termination: { key: string | number; version: "exclusive" | "inclusive" } };

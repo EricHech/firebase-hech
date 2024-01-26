@@ -176,6 +176,11 @@ const getContraints = (paginate: Maybe<ListenerPaginationOptions>) => {
 export const onChildAdded = <T, K extends string>(
   path: string,
   cb: (val: T, key: K) => void,
+  /**
+   * `edge` returns the high or low end of a list
+   * `between` returns the values between two where `start` always represents the low end while `end` represents the high end
+   * `limit` returns an exact amount either from the end of a list or from a termination point
+   */
   paginate?: ListenerPaginationOptions
 ) => {
   const contraints = getContraints(paginate);
@@ -190,6 +195,11 @@ export const onChildAdded = <T, K extends string>(
 export const onChildChanged = <T, K extends string>(
   path: string,
   cb: (val: T, key: K) => void,
+  /**
+   * `edge` returns the high or low end of a list
+   * `between` returns the values between two where `start` always represents the low end while `end` represents the high end
+   * `limit` returns an exact amount either from the end of a list or from a termination point
+   */
   paginate?: ListenerPaginationOptions
 ) => {
   const contraints = getContraints(paginate);
@@ -204,6 +214,11 @@ export const onChildChanged = <T, K extends string>(
 export const onChildRemoved = <K extends string>(
   path: string,
   cb: (key: K) => void,
+  /**
+   * `edge` returns the high or low end of a list
+   * `between` returns the values between two where `start` always represents the low end while `end` represents the high end
+   * `limit` returns an exact amount either from the end of a list or from a termination point
+   */
   paginate?: ListenerPaginationOptions
 ) => {
   const contraints = getContraints(paginate);
