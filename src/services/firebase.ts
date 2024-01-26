@@ -108,6 +108,13 @@ const getTerminationVersion = (
   return version === "exclusive" ? "startAfter" : "startAt";
 };
 
+const INVERT_TERMINATION_VERSION = {
+  endBefore: "startAfter",
+  endAt: "startAt",
+  startAfter: "endBefore",
+  startAt: "endAt",
+} as const;
+
 export const getOrderByWithLimit = <T>(
   path: string,
   orderBy: Extract<database.QueryConstraintType, "orderByValue" | "orderByKey">,
@@ -152,8 +159,10 @@ const getContraints = (paginate: Maybe<ListenerPaginationOptions>) => {
 
     if (paginate.edge) {
       const { side, termination } = paginate.edge;
+      // When listening to the edge, you want to grab the opposite side of the termination point compared to when paginating
       const version = getTerminationVersion(side, termination.version);
-      contraints.push(database[version](termination.key));
+      const inverted = INVERT_TERMINATION_VERSION[version];
+      contraints.push(database[inverted](termination.key));
     } else if (paginate.between) {
       const { start, end, version } = paginate.between;
       const startFunc = version === "exclusive" ? "startAfter" : "startAt";
