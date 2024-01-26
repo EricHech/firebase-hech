@@ -145,8 +145,7 @@ const getContraints = (paginate: Maybe<ListenerPaginationOptions>) => {
 
     if (orderBy) {
       let order: database.QueryConstraint;
-      if (orderBy === "key") order = database.orderByKey();
-      else if (orderBy === "value") order = database.orderByValue();
+      if (typeof orderBy === "string") order = database[orderBy]();
       else order = database.orderByChild(orderBy.path);
       contraints.push(order);
     }

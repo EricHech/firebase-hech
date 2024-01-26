@@ -159,7 +159,7 @@ export type GetOwnersDataParams<T2 extends keyof SoilDatabase> = {
   dataKey: string;
 };
 
-export type ListenerPaginationOptions = { orderBy?: "key" | "value" | { path: string } } & (
+export type ListenerPaginationOptions = { orderBy?: "orderByKey" | "orderByValue" | { path: string } } & (
   | {
       edge?: { side: "high" | "low"; termination: { key: string | number; version: "exclusive" | "inclusive" } };
       between?: undefined;
