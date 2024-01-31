@@ -105,7 +105,7 @@ await createData({
 });
 ```
 
-Here, we are saying that any `user` that is connected to the `manager` that owns this `project` also has access to read and write this `project`.
+Here, we are saying that any `user` that is connected to the `manager` that owns this `project` also has access to read and write this `project`. There is also an `ownershipAccess` option that works the same way, but with ownership rather than connection.
 
 ## Remote Request
 There is one other way to have read/write access to data. This is by setting `remoteRequestUid`. This is not intended to determine ownership. This value, once set, cannot be changed, and it can only be set to your own uid. It is meant for creating remote request objects: `data/remoteRequest/dataKey/{object}`.

@@ -116,6 +116,7 @@ export const createData = <T2 extends keyof SoilDatabase>({
   publicAccess,
   connections,
   connectionAccess,
+  ownershipAccess,
   now = Date.now(),
   imitateClientUpdate,
 }: Omit<CreateDataParams<T2>, "update"> & {
@@ -134,6 +135,7 @@ export const createData = <T2 extends keyof SoilDatabase>({
     publicAccess,
     connections,
     connectionAccess,
+    ownershipAccess,
     now,
   });
 
@@ -149,6 +151,7 @@ export const updateData = <T2 extends keyof SoilDatabase>({
   includeUpdatedAt,
   makeGetRequests,
   connectionAccess,
+  ownershipAccess,
   now,
   imitateClientUpdate,
 }: Omit<UpdateDataParams<T2>, "update" | "get"> & { imitateClientUpdate?: boolean }) =>
@@ -166,6 +169,7 @@ export const updateData = <T2 extends keyof SoilDatabase>({
     includeUpdatedAt,
     makeGetRequests,
     connectionAccess,
+    ownershipAccess,
     now,
   });
 
@@ -179,6 +183,7 @@ export const upsertData = <T2 extends keyof SoilDatabase>({
   publicAccess,
   connections,
   connectionAccess,
+  ownershipAccess,
   includeUpdatedAt,
   makeGetRequests,
   imitateClientUpdate,
@@ -196,6 +201,7 @@ export const upsertData = <T2 extends keyof SoilDatabase>({
     publicAccess,
     connections,
     connectionAccess,
+    ownershipAccess,
     includeUpdatedAt,
     makeGetRequests,
   });

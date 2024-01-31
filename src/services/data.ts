@@ -339,6 +339,7 @@ export const isoCreateData = async <T2 extends keyof SoilDatabase>({
   publicAccess = false,
   connections,
   connectionAccess,
+  ownershipAccess,
   now = Date.now(),
 }: CreateDataParams<T2>) => {
   /* eslint-disable no-param-reassign */
@@ -353,6 +354,7 @@ export const isoCreateData = async <T2 extends keyof SoilDatabase>({
     updatedAt: now,
     publicAccess,
     connectionAccess: connectionAccess || null,
+    ownershipAccess: ownershipAccess || null,
   };
 
   connections?.forEach(({ type, key }) => {
@@ -378,6 +380,7 @@ export const isoUpdateData = async <T2 extends keyof SoilDatabase>({
   connections,
   publicAccess,
   connectionAccess,
+  ownershipAccess,
   now = Date.now(),
   includeUpdatedAt = true,
   makeGetRequests = true,
@@ -391,6 +394,7 @@ export const isoUpdateData = async <T2 extends keyof SoilDatabase>({
 
   /* eslint-disable no-param-reassign */
   if (connectionAccess) updateObject[PATHS.dataKeyField(dataType, dataKey, "connectionAccess")] = connectionAccess;
+  if (ownershipAccess) updateObject[PATHS.dataKeyField(dataType, dataKey, "ownershipAccess")] = ownershipAccess;
   if (publicAccess !== undefined) updateObject[PATHS.dataKeyField(dataType, dataKey, "publicAccess")] = publicAccess;
 
   (Object.entries(newData) as [keyof NewData, ValueOf<NewData>][]).forEach(([childKey, childVal]) => {
@@ -446,6 +450,7 @@ export const isoUpsertData = async <T2 extends keyof SoilDatabase>({
   publicAccess,
   connections,
   connectionAccess,
+  ownershipAccess,
   includeUpdatedAt = true,
   makeGetRequests = true,
 }: CreateDataParams<T2> & UpdateDataParams<T2>) => {
@@ -469,6 +474,7 @@ export const isoUpsertData = async <T2 extends keyof SoilDatabase>({
       owners,
       connections,
       connectionAccess,
+      ownershipAccess,
       includeUpdatedAt,
       makeGetRequests,
     });
@@ -485,6 +491,7 @@ export const isoUpsertData = async <T2 extends keyof SoilDatabase>({
     publicAccess,
     connections,
     connectionAccess,
+    ownershipAccess,
   });
 };
 
@@ -724,7 +731,7 @@ export const isoChangeDataKey = async <T2 extends keyof SoilDatabase, T22 extend
   const existingData = await isoGetDataKeyValue(get, existingDataType, existingDataKey);
   if (!existingData) throw new Error(`No data found`);
 
-  const { connectionAccess, publicAccess, ...data } = existingData;
+  const { connectionAccess, ownershipAccess, publicAccess, ...data } = existingData;
 
   const existingOwners = Object.keys((await isoGetOwners(get, existingDataType, existingDataKey)) || []);
 
@@ -752,6 +759,7 @@ export const isoChangeDataKey = async <T2 extends keyof SoilDatabase, T22 extend
     publicAccess: publicAccess || undefined,
     connections,
     connectionAccess,
+    ownershipAccess,
   });
 
   await isoRemoveData({

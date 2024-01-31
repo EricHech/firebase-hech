@@ -39,26 +39,44 @@ const isExistingOwnedRemoteRequestUid = "data.child('remoteRequestUid').val() ==
 const isNewOrExistingOwnedRemoteRequestUid = `(${isNewOwnedRemoteRequestUid}) || (${isExistingOwnedRemoteRequestUid})`;
 // --------------------------------------------------------------------------------------------------------------------
 
+// ---- `ownershipAccess` ---------------------------------------------------------------------------------------------
+const ownershipAccessType = "data.child('ownershipAccess/dataType').val()";
+const rootDataOwnershipAccessType = (dataType, dataKey) =>
+  `${rootDataArgs(dataType, dataKey)}.child('ownershipAccess/dataType').val()`;
+const ownershipAccessKey = "data.child('ownershipAccess/dataKey').val()";
+const rootDataOwnershipAccessKey = (dataType, dataKey) =>
+  `${rootDataArgs(dataType, dataKey)}.child('ownershipAccess/dataKey').val()`;
+const readOwnershipAccessBoolean = "data.child('ownershipAccess/read').val() === true";
+const rootDataReadOwnershipAccessBoolean = (dataType, dataKey) =>
+  `${rootDataArgs(dataType, dataKey)}.child('ownershipAccess/read').val() === true`;
+const writeOwnershipAccessBoolean = "data.child('ownershipAccess/write').val() === true";
+const ownershipAccess = `root.child('owners').child(${ownershipAccessType}).child(${ownershipAccessKey}).child(auth.uid).exists()`;
+const ownershipAccessArgs = (accessType, accessKey) =>
+  `root.child('owners').child(${accessType}).child(${accessKey}).child(auth.uid).exists()`;
+const rootDataOwnershipAccess = (dataType, dataKey) =>
+  ownershipAccessArgs(
+    rootDataOwnershipAccessType(dataType, dataKey),
+    rootDataOwnershipAccessKey(dataType, dataKey) //
+  );
+const hasRootReadOwnershipAccess = (dataType, dataKey) =>
+  `${rootDataReadOwnershipAccessBoolean(dataType, dataKey)} && ${rootDataOwnershipAccess(dataType, dataKey)}`;
+// --------------------------------------------------------------------------------------------------------------------
+
 // ---- `connectionAccess` --------------------------------------------------------------------------------------------
 const connectionAccessType = "data.child('connectionAccess/connectionType').val()";
-const newConnectionAccessType = "newData.child('connectionAccess/connectionType').val()";
 const rootDataConnectionAccessType = (dataType, dataKey) =>
   `${rootDataArgs(dataType, dataKey)}.child('connectionAccess/connectionType').val()`;
 const connectionAccessKey = "data.child('connectionAccess/connectionKey').val()";
-const newConnectionAccessKey = "newData.child('connectionAccess/connectionKey').val()";
 const rootDataConnectionAccessKey = (dataType, dataKey) =>
   `${rootDataArgs(dataType, dataKey)}.child('connectionAccess/connectionKey').val()`;
 const uidDataType = "data.child('connectionAccess/uidDataType').val()";
-const newUidDataType = "newData.child('connectionAccess/uidDataType').val()";
 const rootDataUidDataType = (dataType, dataKey) =>
   `${rootDataArgs(dataType, dataKey)}.child('connectionAccess/uidDataType').val()`;
 const readConnectionAccessBoolean = "data.child('connectionAccess/read').val() === true";
 const rootDataReadConnectionAccessBoolean = (dataType, dataKey) =>
   `${rootDataArgs(dataType, dataKey)}.child('connectionAccess/read').val() === true`;
 const writeConnectionAccessBoolean = "data.child('connectionAccess/write').val() === true";
-const newWriteConnectionAccessBoolean = "newData.child('connectionAccess/write').val() === true";
 const connectionAccess = `root.child('connectionDataLists').child(${connectionAccessType}).child(${connectionAccessKey}).child(${uidDataType}).child(auth.uid).exists()`;
-const newConnectionAccess = `root.child('connectionDataLists').child(${newConnectionAccessType}).child(${newConnectionAccessKey}).child(${newUidDataType}).child(auth.uid).exists()`;
 const connectionAccessArgs = (accessType, accessKey, uidType) =>
   `root.child('connectionDataLists').child(${accessType}).child(${accessKey}).child(${uidType}).child(auth.uid).exists()`;
 const rootDataConnectionAccess = (dataType, dataKey) =>
@@ -69,14 +87,16 @@ const rootDataConnectionAccess = (dataType, dataKey) =>
   );
 const hasRootReadConnectionAccess = (dataType, dataKey) =>
   `${rootDataReadConnectionAccessBoolean(dataType, dataKey)} && ${rootDataConnectionAccess(dataType, dataKey)}`;
+// --------------------------------------------------------------------------------------------------------------------
 
 const oneHalfOfConnectionWriteAccess = (type, key) =>
   `(${rootDataPublicAccessArgs(type, key)}) || (${rootDataDoesNotExistArgs(type, key)}) || (${authIsDataOwnerArgs(
     type,
     key
-  )}) || (${isAppUserConnected(type, key)}) || (${hasRootReadConnectionAccess(type, key)})`;
-
-// --------------------------------------------------------------------------------------------------------------------
+  )}) || (${isAppUserConnected(type, key)}) || (${hasRootReadConnectionAccess(
+    type,
+    key
+  )}) || (${hasRootReadOwnershipAccess(type, key)})`;
 
 /**
  * ! Overview:
@@ -173,12 +193,13 @@ const rules = {
         )}) || (${isAppUserConnected(
           "$dataType",
           "$dataKey"
-        )}) || (${readConnectionAccessBoolean} && ${connectionAccess})`,
-        // You can write a data location if you own it, have connection write access, or have access via your remoteRequestUid
+        )}) || (${readConnectionAccessBoolean} && ${connectionAccess}) || (${readOwnershipAccessBoolean} && ${ownershipAccess})`,
+        // You can write a data location if it doesn't exist (so that you can create data that you might not want to own)
+        // You can also write a data location if you own it, have connection write access, ownership write access, or have access via your remoteRequestUid
         // Also, once set, disallow changing the `remoteRequestUid`
-        ".write": `(${safeRemoteRequestUid}) && ((${authIsDataOwner(
+        ".write": `!data.exists() || (${safeRemoteRequestUid}) && ((${authIsDataOwner(
           "$dataType"
-        )}) || (${isNewOrExistingOwnedRemoteRequestUid}) || (${writeConnectionAccessBoolean} && ${connectionAccess}) || (!data.exists() && ${newWriteConnectionAccessBoolean} && ${newConnectionAccess}))`,
+        )}) || (${isNewOrExistingOwnedRemoteRequestUid}) || (${writeConnectionAccessBoolean} && ${connectionAccess}) || (${writeOwnershipAccessBoolean} && ${ownershipAccess}))`,
       },
     },
   },
@@ -190,14 +211,14 @@ const rules = {
         // You can write the connections if you own the data or if you have connection write access
         ".write": authIsDataOwner("$dataType"),
         $connectionType: {
-          // But really, as long as you are logged in, you can read all the keys of a connection so that you can listen to the connection lists
+          // As long as you are logged in, you can read all the keys of a connection so that you can listen to the connection lists
           // ? Example: A user wanting to read connections between a product and a category, neither of which they own
           ".read": authNotNull,
           ".indexOn": ".value",
           $connectionKey: {
             // You can only write new connections if both ends follow the same rules.
             // This is because connections give you read access to data, and they are always two-way.
-            // You must be logged in, and each end must be either: public, non-existant, owned, connected, or have connection read access
+            // You must be logged in, and each end must be either: public, non-existant, owned, connected, have connection read access, or have ownership read access
             // The non-existant check is for when we create connections that are just reference points but data is not actually at the location
             // ? Example: A user wanting to create a connection between a cart (that they own or doesn't technically exist) and a product (for which they have connection read access)
             // For managing creating new connections, see: "! Notes regarding making connections and reading data structure"

@@ -43,6 +43,12 @@ export type StandardDataFields = {
     read: boolean;
     write: boolean;
   };
+  ownershipAccess?: {
+    dataType: keyof SoilDatabase;
+    dataKey: string;
+    read: boolean;
+    write: boolean;
+  };
 };
 
 export type User = StandardDataFields &
@@ -113,6 +119,7 @@ export type CreateDataParams<T2 extends keyof SoilDatabase> = CudDataParams<T2> 
   owners: string[];
   connections?: Connections;
   connectionAccess?: StandardDataFields["connectionAccess"];
+  ownershipAccess?: StandardDataFields["ownershipAccess"];
 };
 
 export type ChangeDataKey<T2 extends keyof SoilDatabase, T22 extends keyof SoilDatabase> = Pick<
@@ -132,6 +139,7 @@ export type UpdateDataParams<T2 extends keyof SoilDatabase> = CudDataParams<T2> 
   owners?: string[];
   connections?: Connections;
   connectionAccess?: StandardDataFields["connectionAccess"];
+  ownershipAccess?: StandardDataFields["ownershipAccess"];
   /** Pass `false` if all `connections` and `owners` are being provided to avoid unnecessary requests */
   makeGetRequests: boolean;
   makeConnectionsRequests?: boolean;

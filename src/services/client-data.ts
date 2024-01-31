@@ -118,6 +118,7 @@ export const createData = async <T2 extends keyof SoilDatabase>({
   publicAccess,
   connections,
   connectionAccess,
+  ownershipAccess,
   now,
 }: Omit<CreateDataParams<T2>, "update">) =>
   isoCreateData({
@@ -131,6 +132,7 @@ export const createData = async <T2 extends keyof SoilDatabase>({
     publicAccess,
     connections,
     connectionAccess,
+    ownershipAccess,
     now,
   });
 
@@ -145,6 +147,7 @@ export const updateData = async <T2 extends keyof SoilDatabase>({
   publicAccess,
   includeUpdatedAt,
   connectionAccess,
+  ownershipAccess,
   makeGetRequests,
   makeConnectionsRequests,
   makeOwnersRequests,
@@ -163,6 +166,7 @@ export const updateData = async <T2 extends keyof SoilDatabase>({
     publicAccess,
     includeUpdatedAt,
     connectionAccess,
+    ownershipAccess,
     makeGetRequests,
     makeConnectionsRequests,
     makeOwnersRequests,
@@ -180,6 +184,7 @@ export const upsertData = async <T2 extends keyof SoilDatabase>({
   connections,
   includeUpdatedAt,
   connectionAccess,
+  ownershipAccess,
   makeGetRequests,
   makeConnectionsRequests,
   makeOwnersRequests,
@@ -198,6 +203,7 @@ export const upsertData = async <T2 extends keyof SoilDatabase>({
     connections,
     includeUpdatedAt,
     connectionAccess,
+    ownershipAccess,
     makeGetRequests,
     makeConnectionsRequests,
     makeOwnersRequests,
