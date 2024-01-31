@@ -22,8 +22,8 @@
     "owners": {
       "$dataType": {
         "$dataKey": {
-          ".read": "data.child(auth.uid).exists()",
-          ".write": "(!root.child('data').child($dataType).child($dataKey).exists()) || data.child(auth.uid).exists()"
+          ".read": "data.child(auth.uid).exists() || (root.child('owners').child($dataType).child($dataKey).child(auth.uid).exists()) || (root.child('data').child($dataType).child($dataKey).child('ownershipAccess/read').val() === true && root.child('owners').child(root.child('data').child($dataType).child($dataKey).child('ownershipAccess/dataType').val()).child(root.child('data').child($dataType).child($dataKey).child('ownershipAccess/dataKey').val()).child(auth.uid).exists())",
+          ".write": "(!root.child('data').child($dataType).child($dataKey).exists()) || (root.child('owners').child($dataType).child($dataKey).child(auth.uid).exists()) || (root.child('data').child($dataType).child($dataKey).child('ownershipAccess/write').val() === true && root.child('owners').child(root.child('data').child($dataType).child($dataKey).child('ownershipAccess/dataType').val()).child(root.child('data').child($dataType).child($dataKey).child('ownershipAccess/dataKey').val()).child(auth.uid).exists())"
         }
       }
     },
@@ -34,8 +34,8 @@
         "$dataType": {
           ".indexOn": ".value",
           "$dataKey": {
-            ".read": "root.child('owners').child($dataType).child($dataKey).child(auth.uid).exists()",
-            ".write": "root.child('owners').child($dataType).child($dataKey).child(auth.uid).exists()",
+            ".read": "(root.child('owners').child($dataType).child($dataKey).child(auth.uid).exists()) || (root.child('data').child($dataType).child($dataKey).child('ownershipAccess/read').val() === true && root.child('owners').child(root.child('data').child($dataType).child($dataKey).child('ownershipAccess/dataType').val()).child(root.child('data').child($dataType).child($dataKey).child('ownershipAccess/dataKey').val()).child(auth.uid).exists())",
+            ".write": "(root.child('owners').child($dataType).child($dataKey).child(auth.uid).exists()) || (root.child('data').child($dataType).child($dataKey).child('ownershipAccess/write').val() === true && root.child('owners').child(root.child('data').child($dataType).child($dataKey).child('ownershipAccess/dataType').val()).child(root.child('data').child($dataType).child($dataKey).child('ownershipAccess/dataKey').val()).child(auth.uid).exists())",
             ".validate": "newData.isNumber()"
           }
         }
@@ -46,7 +46,7 @@
         ".read": true,
         ".indexOn": ".value",
         "$dataKey": {
-          ".write": "root.child('owners').child($dataType).child($dataKey).child(auth.uid).exists()",
+          ".write": "(!root.child('data').child($dataType).child($dataKey).exists()) || ((root.child('owners').child($dataType).child($dataKey).child(auth.uid).exists()) || (root.child('data').child($dataType).child($dataKey).child('ownershipAccess/write').val() === true && root.child('owners').child(root.child('data').child($dataType).child($dataKey).child('ownershipAccess/dataType').val()).child(root.child('data').child($dataType).child($dataKey).child('ownershipAccess/dataKey').val()).child(auth.uid).exists()))",
           ".validate": "newData.isNumber()"
         }
       }
@@ -62,8 +62,8 @@
     "connectionDataLists": {
       "$dataType": {
         "$dataKey": {
-          ".read": "(root.child('data').child($dataType).child($dataKey).child('publicAccess').val() === true) || (root.child('owners').child($dataType).child($dataKey).child(auth.uid).exists())",
-          ".write": "root.child('owners').child($dataType).child($dataKey).child(auth.uid).exists()",
+          ".read": "(root.child('data').child($dataType).child($dataKey).child('publicAccess').val() === true) || ((root.child('owners').child($dataType).child($dataKey).child(auth.uid).exists()) || (root.child('data').child($dataType).child($dataKey).child('ownershipAccess/read').val() === true && root.child('owners').child(root.child('data').child($dataType).child($dataKey).child('ownershipAccess/dataType').val()).child(root.child('data').child($dataType).child($dataKey).child('ownershipAccess/dataKey').val()).child(auth.uid).exists()))",
+          ".write": "(root.child('owners').child($dataType).child($dataKey).child(auth.uid).exists()) || (root.child('data').child($dataType).child($dataKey).child('ownershipAccess/write').val() === true && root.child('owners').child(root.child('data').child($dataType).child($dataKey).child('ownershipAccess/dataType').val()).child(root.child('data').child($dataType).child($dataKey).child('ownershipAccess/dataKey').val()).child(auth.uid).exists())",
           "$connectionType": {
             ".read": "auth !== null",
             ".indexOn": ".value",

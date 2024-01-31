@@ -49,6 +49,8 @@ const rootDataOwnershipAccessKey = (dataType, dataKey) =>
 const readOwnershipAccessBoolean = "data.child('ownershipAccess/read').val() === true";
 const rootDataReadOwnershipAccessBoolean = (dataType, dataKey) =>
   `${rootDataArgs(dataType, dataKey)}.child('ownershipAccess/read').val() === true`;
+const rootDataWriteOwnershipAccessBoolean = (dataType, dataKey) =>
+  `${rootDataArgs(dataType, dataKey)}.child('ownershipAccess/write').val() === true`;
 const writeOwnershipAccessBoolean = "data.child('ownershipAccess/write').val() === true";
 const ownershipAccess = `root.child('owners').child(${ownershipAccessType}).child(${ownershipAccessKey}).child(auth.uid).exists()`;
 const ownershipAccessArgs = (accessType, accessKey) =>
@@ -60,6 +62,8 @@ const rootDataOwnershipAccess = (dataType, dataKey) =>
   );
 const hasRootReadOwnershipAccess = (dataType, dataKey) =>
   `${rootDataReadOwnershipAccessBoolean(dataType, dataKey)} && ${rootDataOwnershipAccess(dataType, dataKey)}`;
+const hasRootWriteOwnershipAccess = (dataType, dataKey) =>
+  `${rootDataWriteOwnershipAccessBoolean(dataType, dataKey)} && ${rootDataOwnershipAccess(dataType, dataKey)}`;
 // --------------------------------------------------------------------------------------------------------------------
 
 // ---- `connectionAccess` --------------------------------------------------------------------------------------------
@@ -97,6 +101,11 @@ const oneHalfOfConnectionWriteAccess = (type, key) =>
     type,
     key
   )}) || (${hasRootReadOwnershipAccess(type, key)})`;
+
+const readAsOwnerOrReadOwnershipAccess = (dataType, dataKey) =>
+  `(${authIsDataOwner(dataType)}) || (${hasRootReadOwnershipAccess(dataType, dataKey)})`;
+const writeAsOwnerOrWriteOwnershipAccess = (dataType, dataKey) =>
+  `(${authIsDataOwner(dataType)}) || (${hasRootWriteOwnershipAccess(dataType, dataKey)})`;
 
 /**
  * ! Overview:
@@ -147,11 +156,11 @@ const rules = {
   owners: {
     $dataType: {
       $dataKey: {
-        // You can only read your own ownership keys
-        ".read": "data.child(auth.uid).exists()",
+        // You can only read your own ownership keys or check the owners of a data type if you have ownership read access
+        ".read": `data.child(auth.uid).exists() || ${readAsOwnerOrReadOwnershipAccess("$dataType", "$dataKey")}`,
         // You can write ownership for a location if the data does not yet exist so that you can prepare to create the data
-        // You can also write new ownership for others if you yourself are an owner
-        ".write": `(${rootDataDoesNotExist}) || data.child(auth.uid).exists()`,
+        // You can also write new ownership for others if you yourself are an owner or have ownership write acces
+        ".write": `(${rootDataDoesNotExist}) || ${writeAsOwnerOrWriteOwnershipAccess("$dataType", "$dataKey")}`,
       },
     },
   },
@@ -163,9 +172,10 @@ const rules = {
       $dataType: {
         ".indexOn": ".value",
         // If you own the data, you can also make other people owners of the data and therefore add to their ownership lists
+        // You can also do read and write this location if you have the appropriate ownership access
         $dataKey: {
-          ".read": authIsDataOwner("$dataType"),
-          ".write": authIsDataOwner("$dataType"),
+          ".read": readAsOwnerOrReadOwnershipAccess("$dataType", "$dataKey"),
+          ".write": writeAsOwnerOrWriteOwnershipAccess("$dataType", "$dataKey"),
           ".validate": isNumber,
         },
       },
@@ -178,7 +188,7 @@ const rules = {
       ".indexOn": ".value",
       $dataKey: {
         // ...but they can only be written to by their owners
-        ".write": authIsDataOwner("$dataType"),
+        ".write": `(${rootDataDoesNotExist}) || (${writeAsOwnerOrWriteOwnershipAccess("$dataType", "$dataKey")})`,
         ".validate": isNumber,
       },
     },
@@ -207,9 +217,9 @@ const rules = {
     $dataType: {
       $dataKey: {
         // You can read the connections if the data is public or you own this end of the data
-        ".read": `(${rootDataPublicAccess}) || (${authIsDataOwner("$dataType")})`,
+        ".read": `(${rootDataPublicAccess}) || (${readAsOwnerOrReadOwnershipAccess("$dataType", "$dataKey")})`,
         // You can write the connections if you own the data or if you have connection write access
-        ".write": authIsDataOwner("$dataType"),
+        ".write": writeAsOwnerOrWriteOwnershipAccess("$dataType", "$dataKey"),
         $connectionType: {
           // As long as you are logged in, you can read all the keys of a connection so that you can listen to the connection lists
           // ? Example: A user wanting to read connections between a product and a category, neither of which they own

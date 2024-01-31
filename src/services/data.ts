@@ -294,6 +294,7 @@ export const isoRemoveOwners = <T2 extends keyof SoilDatabase>({
 ╚═════╝ ╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝
 */
 const ownersPrefix = `${PATHS.OWNERS}/`;
+const publicDataListPrefix = `${PATHS.PUBLIC_DATA_LISTS}/`;
 const dataPrefix = `${PATHS.DATA}/`;
 export const isoSoilUpdate = async (
   soil: {
@@ -307,19 +308,23 @@ export const isoSoilUpdate = async (
 ) => {
   if (path === "/" && allowRootQuery) {
     const ownersUpdates = {} as Record<string, unknown>;
+    const publicDataListUpdates = {} as Record<string, unknown>;
     const dataUpdates = {} as Record<string, unknown>;
     const allOtherUpdates = {} as Record<string, unknown>;
     Object.entries(data).forEach(([p, d]) => {
       if (p.startsWith(ownersPrefix)) ownersUpdates[p] = d;
+      else if (p.startsWith(publicDataListPrefix)) publicDataListUpdates[p] = d;
       else if (p.startsWith(dataPrefix)) dataUpdates[p] = d;
       else allOtherUpdates[p] = d;
     });
     if (isDelete) {
       await Promise.all(Object.entries(allOtherUpdates).map(([key, val]) => soil.set(key, val)));
       await Promise.all(Object.entries(dataUpdates).map(([key, val]) => soil.set(key, val)));
+      await Promise.all(Object.entries(publicDataListUpdates).map(([key, val]) => soil.set(key, val)));
       await Promise.all(Object.entries(ownersUpdates).map(([key, val]) => soil.set(key, val)));
     } else {
       await Promise.all(Object.entries(ownersUpdates).map(([key, val]) => soil.set(key, val)));
+      await Promise.all(Object.entries(publicDataListUpdates).map(([key, val]) => soil.set(key, val)));
       await Promise.all(Object.entries(dataUpdates).map(([key, val]) => soil.set(key, val)));
       await Promise.all(Object.entries(allOtherUpdates).map(([key, val]) => soil.set(key, val)));
     }
