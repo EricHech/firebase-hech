@@ -57,8 +57,11 @@ export type User = StandardDataFields &
     email?: string;
     phoneNumber?: string;
     emailVerified?: boolean;
-    photoUrl?: string;
+    photoURL?: string;
+    displayName?: string;
   }>;
+
+export type FirebaseProfile = Partial<{ displayName: Nullable<string>; photoURL: Nullable<string> }>;
 
 export type Data<T2 extends keyof SoilDatabase> = StandardDataFields & {
   key?: string;
