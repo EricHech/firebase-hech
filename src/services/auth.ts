@@ -13,6 +13,7 @@ import {
   signInWithPopup,
   updateProfile,
   User as FirebaseUser,
+  GoogleAuthProvider,
 } from "firebase/auth";
 import { createUser, getUsername, updateUser } from "./client-data";
 import { AppUser, User, FirebaseProfile } from "./types";
@@ -114,6 +115,12 @@ export const signUpWithProvider = async (
     })
     .catch((e) => setError(getFriendlyAuthError(e.message)));
 };
+
+export const signUpWithGoogle = async (
+  appUser: AppUser,
+  setError: (error: string) => void,
+  customParameters?: Record<string, string>
+) => signUpWithProvider(appUser, new GoogleAuthProvider().providerId, setError, ["profile", "email"], customParameters);
 
 export const signIn = (email: string, password: string, setError: (error: string) => void) => {
   const auth = getAuth();
