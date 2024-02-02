@@ -88,14 +88,21 @@ export const signUp = async (
     .catch((e) => setError(getFriendlyAuthError(e.message)));
 };
 
+/**
+ * If using Google:
+ * 1. Pass in `new GoogleAuthProvider().providerId;`
+ * 2. Pass in `scopes: ["profile", "email"]`
+ */
 export const signUpWithProvider = async (
   appUser: AppUser,
   providerId: string,
   setError: (error: string) => void,
+  scopes?: string[],
   customParameters?: Record<string, string>
 ) => {
   const provider = new OAuthProvider(providerId);
 
+  scopes?.forEach((scope) => provider.addScope(scope));
   if (customParameters) provider.setCustomParameters(customParameters);
 
   return signInWithPopup(getAuth(), provider)
