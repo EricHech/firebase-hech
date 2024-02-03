@@ -136,7 +136,7 @@ export const signInAnon = () => {
   const now = Date.now();
 
   return signInAnonymously(getAuth()).then(({ user }) =>
-    updateUser({
+    updateUser(user.uid, {
       uid: user.uid,
       createdAt: now,
       updatedAt: now,

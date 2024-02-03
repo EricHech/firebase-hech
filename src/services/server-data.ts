@@ -51,7 +51,7 @@ export const createUser = ({
   appUser: AppUser;
 }) => isoCreateUser({ update, user, appUser, updateObject, skipUpdate, now });
 
-export const updateUser = (u: Mandate<User, "uid">) => isoUpdateUser(update, u);
+export const updateUser = (uid: string, u: Partial<User>) => isoUpdateUser(update, uid, u);
 
 export const getUser = (uid: string) => isoGetUser(get, uid);
 
@@ -154,7 +154,9 @@ export const updateData = <T2 extends keyof SoilDatabase>({
   ownershipAccess,
   now,
   imitateClientUpdate,
-}: Omit<UpdateDataParams<T2>, "update" | "get"> & { imitateClientUpdate?: boolean }) =>
+}: Omit<UpdateDataParams<T2>, "update" | "get"> & {
+  imitateClientUpdate?: boolean;
+}) =>
   isoUpdateData({
     update: imitateClientUpdate ? soilUpdate : update,
     get,
@@ -188,7 +190,9 @@ export const upsertData = <T2 extends keyof SoilDatabase>({
   makeGetRequests,
   imitateClientUpdate,
 }: Omit<CreateDataParams<T2>, "update"> &
-  Omit<UpdateDataParams<T2>, "update" | "get"> & { imitateClientUpdate?: boolean }) =>
+  Omit<UpdateDataParams<T2>, "update" | "get"> & {
+    imitateClientUpdate?: boolean;
+  }) =>
   isoUpsertData({
     update: imitateClientUpdate ? soilUpdate : update,
     get,
@@ -269,7 +273,9 @@ export const removeData = <T2 extends keyof SoilDatabase>({
   dataType,
   dataKey,
   imitateClientUpdate,
-}: Omit<RemoveDataKeyParams<T2>, "update" | "get" | "publicAccess" | "now"> & { imitateClientUpdate?: boolean }) =>
+}: Omit<RemoveDataKeyParams<T2>, "update" | "get" | "publicAccess" | "now"> & {
+  imitateClientUpdate?: boolean;
+}) =>
   isoRemoveData({
     update: imitateClientUpdate ? soilUpdate : update,
     get,
@@ -318,7 +324,14 @@ export const removeOwners = async <T2 extends keyof SoilDatabase>({
   skipUpdate,
   owners,
 }: Pick<CreateDataParams<T2>, "dataType" | "dataKey" | "owners" | "updateObject" | "skipUpdate">) =>
-  isoRemoveOwners({ update, dataType, dataKey, updateObject, skipUpdate, owners });
+  isoRemoveOwners({
+    update,
+    dataType,
+    dataKey,
+    updateObject,
+    skipUpdate,
+    owners,
+  });
 
 export const createConnection = async <T2 extends keyof SoilDatabase>({
   updateObject,
@@ -326,7 +339,9 @@ export const createConnection = async <T2 extends keyof SoilDatabase>({
   now = Date.now(),
   connections,
   imitateClientUpdate,
-}: Omit<ModifyConnectionsType<T2>, "update"> & { imitateClientUpdate?: boolean }) =>
+}: Omit<ModifyConnectionsType<T2>, "update"> & {
+  imitateClientUpdate?: boolean;
+}) =>
   isoCreateConnections({
     update: imitateClientUpdate ? soilUpdate : update,
     updateObject,

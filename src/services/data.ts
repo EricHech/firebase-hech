@@ -71,8 +71,9 @@ export const isoCreateUser = ({
 
 export const isoUpdateUser = (
   update: <T extends object>(path: string, data: T) => Promise<void>,
-  u: Mandate<User, "uid">
-) => update(PATHS.user(u.uid), u);
+  uid: string,
+  u: Partial<User>
+) => update(PATHS.user(uid), u);
 
 export const isoGetUser = (get: GetFunction, uid: string) => get<User>(PATHS.user(uid));
 
