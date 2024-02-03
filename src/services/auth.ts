@@ -85,7 +85,13 @@ export const signUp = async (
       ? linkWithCredential(auth.currentUser, EmailAuthProvider.credential(email, password))
       : createEmailUser(email, password)
   )
-    .then(async ({ user }) => handleCreateUser(user, profile, appUser))
+    .then(async ({ user }) =>
+      // await sendEmailVerification(user);
+      // await signUserOut();
+      // ...
+      // await applyActionCode(getAuth(), code);
+      handleCreateUser(user, profile, appUser)
+    )
     .catch((e) => setError(getFriendlyAuthError(e.message)));
 };
 
