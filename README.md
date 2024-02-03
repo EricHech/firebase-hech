@@ -80,7 +80,19 @@ For example, if you have all of your users under the `user` data type but want t
 ## User Data Lists (UDL)
 User data lists are similar to connection data lists, but they are less flexible and specifically connect a user to a piece of data (rather than a piece of data to another piece of data). This exists to tie into the security system. Just like you can set `connections`, you can also set `owners`, and the owner of a piece of data has priviledges to modify that data.
 
-NOTE: User data lists may end up being deprecated. If so, you would rely on `connections`.
+## A Warning Regarding CDL/UDL
+
+When creating connections it is important to consider their impact when making updates. If something is connected to a lot of data, like a `chat` to 100k `message`s, then an update to the `chat` (e.g. changing `chat.name`) would require fetching and updating 100k nodes on the CDL. This is not good.
+
+There are two possible solutions. In this instance, you should create an empty connection object like in the above example that references `favorite`. In this case, create something called `chatContent`. This allows you to make an update to `chat` without ever triggering the CDL because all of the `message`s are connected to the empty `chatContent` node as opposed to the `chat` node. The downside is that updates to a `message` won't signal the `chat`. But in this case, we would never care about that relationship, so this is exactly what we want.
+
+Another way to prevent triggering the CDL on a per update basis is to pass in `makeGetRequests: false` to `updateData`. This has the same effect of preventing the fetching and consequently updating of 100k `message`s. This is a less ideal solution in this scenario but could be more relevant in other case.
+
+All this being said, anyone listening directly do the data itself via `useDataKeyValue` will always get updates regardless of the `CDL/UDL`. If a user is listening directly to the `chat`, for example, even without updating the CLD, the user will still get the update.
+
+Imagine you are displaying a list of chats and want to always get their updates without relying on the CDL: You can fetch of the CDL list (`getConnectionType` as opposed to `useConnections`) and then iterate over that list, rendering a new component for each one. That component in turn has within it a `useDataKeyValue`. In this way, you fetch the full list and then listen directly to the data.
+
+With the above approach, you won't get additions/removals to the full CDL - it isn't updating anyway - but you will get all updates to the data itself.
 
 ## Security Access
 In order to read data:
