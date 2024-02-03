@@ -20,6 +20,9 @@ const rootDataPublicAccess = `${rootData}.child('publicAccess').val() === true`;
 const rootDataPublicAccessArgs = (dataType, dataKey) =>
   `${rootDataArgs(dataType, dataKey)}.child('publicAccess').val() === true`;
 
+// TODO: Add `.emailVerified` check to all rules (this will affect sign-up, you will have to wait until after verification to create any data)
+// TODO: ie. const authUidIsValid = "auth.uid === $uid && root.child('users').child(auth.uid).child('emailVerified').val() === true";
+
 /**
  * This makes `appUser` a necessary part of soil - it must be connected to everything that they want
  * to read that is not public and that they do not own or have `connectionAccess/read` permissions.

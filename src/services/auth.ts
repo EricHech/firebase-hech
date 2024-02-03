@@ -37,7 +37,7 @@ const getFriendlyAuthError = (errorMessage: string) => {
 export const getCurrentUser = () => getAuth().currentUser;
 
 export const createEmailUser = (email: string, password: string) =>
-  createUserWithEmailAndPassword(getAuth(), email, password);
+  createUserWithEmailAndPassword(getAuth(), email.toLowerCase(), password);
 
 export const firebaseUseDeviceLanguage = () => getAuth().useDeviceLanguage();
 
@@ -70,6 +70,8 @@ export const signUp = async (
   setError: (error: string) => void,
   profile?: FirebaseProfile
 ) => {
+  const lowercasedEmail = email.toLowerCase();
+
   if (password !== confirmPassword) {
     throw new Error("Password does not match the confirmation password");
   }
@@ -82,8 +84,8 @@ export const signUp = async (
   const auth = getAuth();
   return (
     auth.currentUser?.isAnonymous
-      ? linkWithCredential(auth.currentUser, EmailAuthProvider.credential(email, password))
-      : createEmailUser(email, password)
+      ? linkWithCredential(auth.currentUser, EmailAuthProvider.credential(lowercasedEmail, password))
+      : createEmailUser(lowercasedEmail, password)
   )
     .then(async ({ user }) =>
       // https://firebase.google.com/docs/auth/web/manage-users#send_a_user_a_verification_email
@@ -130,12 +132,13 @@ export const signUpWithGoogle = async (
 ) => signUpWithProvider(appUser, new GoogleAuthProvider().providerId, setError, ["profile", "email"], customParameters);
 
 export const signIn = (email: string, password: string, setError: (error: string) => void) => {
+  const lowercasedEmail = email.toLowerCase();
   const auth = getAuth();
 
   return (
     auth.currentUser?.isAnonymous
-      ? linkWithCredential(auth.currentUser, EmailAuthProvider.credential(email, password))
-      : signInWithEmailAndPassword(auth, email, password)
+      ? linkWithCredential(auth.currentUser, EmailAuthProvider.credential(lowercasedEmail, password))
+      : signInWithEmailAndPassword(auth, lowercasedEmail, password)
   ).catch((e) => setError(getFriendlyAuthError(e.message)));
 };
 
@@ -151,13 +154,13 @@ export const signInAnon = () => {
   );
 };
 
-export const forgotPassword = (email: string) => sendPasswordResetEmail(getAuth(), email);
+export const forgotPassword = (email: string) => sendPasswordResetEmail(getAuth(), email.toLowerCase());
 
 export const signUserOut = () => signOut(getAuth());
 
 export const updateUserEmail = (email: string) => {
   const cu = getCurrentUser();
-  if (cu) updateEmail(cu, email);
+  if (cu) updateEmail(cu, email.toLowerCase());
   else throw new Error("You must be signed in to update your email.");
 };
 
