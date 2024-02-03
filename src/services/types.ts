@@ -11,8 +11,6 @@ export interface SoilDatabase {
   /** Soil reserved name: Must be `publicAccess === true`. */
   appUser: AppUser;
   /** Soil reserved name. */
-  soilUserSettings: { value: string };
-  /** Soil reserved name. */
   soilFile: { downloadUrl: string; metadata?: Record<string, string> };
   /** Soil reserved name. See README. */
   remoteRequest: RemoteRequest;
