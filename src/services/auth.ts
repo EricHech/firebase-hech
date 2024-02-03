@@ -86,6 +86,7 @@ export const signUp = async (
       : createEmailUser(email, password)
   )
     .then(async ({ user }) =>
+      // https://firebase.google.com/docs/auth/web/manage-users#send_a_user_a_verification_email
       // await sendEmailVerification(user);
       // await signUserOut();
       // ...
