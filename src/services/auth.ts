@@ -15,6 +15,7 @@ import {
   User as FirebaseUser,
   GoogleAuthProvider,
   sendEmailVerification,
+  applyActionCode,
 } from "firebase/auth";
 import { createUser, getUsername, updateUser } from "./client-data";
 import { AppUser, User, FirebaseProfile } from "./types";
@@ -39,6 +40,8 @@ export const getCurrentUser = () => getAuth().currentUser;
 
 export const createEmailUser = (email: string, password: string) =>
   createUserWithEmailAndPassword(getAuth(), email.toLowerCase(), password);
+
+export const applyVerificationCode = (code: string) => applyActionCode(getAuth(), code);
 
 export const firebaseUseDeviceLanguage = () => getAuth().useDeviceLanguage();
 
