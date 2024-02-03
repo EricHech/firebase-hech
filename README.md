@@ -86,7 +86,7 @@ When creating connections it is important to consider their impact when making u
 
 There are two possible solutions. In this instance, you should create an empty connection object like in the above example that references `favorite`. In this case, create something called `chatContent`. This allows you to make an update to `chat` without ever triggering the CDL because all of the `message`s are connected to the empty `chatContent` node as opposed to the `chat` node. The downside is that updates to a `message` won't signal the `chat`. But in this case, we would never care about that relationship, so this is exactly what we want.
 
-Another way to prevent triggering the CDL on a per update basis is to pass in `makeGetRequests: false` to `updateData`. This has the same effect of preventing the fetching and consequently updating of 100k `message`s. This is a less ideal solution in this scenario but could be more relevant in other case.
+Another way to prevent triggering the CDL on a per update basis is to pass in `makeGetRequests: false` to `updateData`. This has the same effect of preventing the fetching and consequently updating of 100k `message` CDL nodes. This is a less ideal solution in this scenario but could be more relevant in another case.
 
 All this being said, anyone listening directly do the data itself via `useDataKeyValue` will always get updates regardless of the `CDL/UDL`. If a user is listening directly to the `chat`, for example, even without updating the CLD, the user will still get the update.
 
