@@ -49,25 +49,36 @@ export const isoCreateUser = ({
   updateObject = {},
   skipUpdate,
   now = Date.now(),
+  createUnverifiedUser,
 }: Pick<CreateDataParams<keyof SoilDatabase>, "update" | "updateObject" | "skipUpdate" | "now"> & {
   user: Mandate<User, "uid">;
   appUser: AppUser;
+  createUnverifiedUser: boolean;
 }) => {
-  updateObject[PATHS.user(user.uid)] = user;
-  if (appUser.username) updateObject[PATHS.username(appUser.username)] = user.uid;
+  if (createUnverifiedUser) {
+    updateObject[PATHS.unverifiedUsers(user.uid)] = { user, appUser };
 
-  return isoCreateData({
-    update,
-    dataType: "appUser",
-    dataKey: user.uid,
-    data: appUser,
-    owners: [user.uid],
-    publicAccess: true,
-    updateObject,
-    skipUpdate,
-    now,
-  });
+    return skipUpdate ? updateObject : update("/", updateObject, true).then(() => updateObject);
+  } else {
+    updateObject[PATHS.user(user.uid)] = user;
+    if (appUser.username) updateObject[PATHS.username(appUser.username)] = user.uid;
+
+    return isoCreateData({
+      update,
+      dataType: "appUser",
+      dataKey: user.uid,
+      data: appUser,
+      owners: [user.uid],
+      publicAccess: true,
+      updateObject,
+      skipUpdate,
+      now,
+    });
+  }
 };
+
+export const isoGetUnverifiedUser = async (uid: string, get: GetFunction) =>
+  get<{ user: Mandate<User, "uid">; appUser: AppUser }>(PATHS.unverifiedUsers(uid));
 
 export const isoUpdateUser = (
   update: <T extends object>(path: string, data: T) => Promise<void>,

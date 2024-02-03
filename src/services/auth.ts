@@ -14,6 +14,7 @@ import {
   updateProfile,
   User as FirebaseUser,
   GoogleAuthProvider,
+  sendEmailVerification,
 } from "firebase/auth";
 import { createUser, getUsername, updateUser } from "./client-data";
 import { AppUser, User, FirebaseProfile } from "./types";
@@ -41,23 +42,28 @@ export const createEmailUser = (email: string, password: string) =>
 
 export const firebaseUseDeviceLanguage = () => getAuth().useDeviceLanguage();
 
-const handleCreateUser = async (fbUser: FirebaseUser, profile: Maybe<FirebaseProfile>, appUser: AppUser) => {
-  if (profile) await updateProfile(fbUser, profile);
+const handleCreateUser = async (
+  firebaseUser: FirebaseUser,
+  profile: Maybe<FirebaseProfile>,
+  appUser: AppUser,
+  { createUnverifiedUser }: { createUnverifiedUser: boolean }
+) => {
+  if (profile) await updateProfile(firebaseUser, profile);
 
   const now = Date.now();
 
   const user: Mutable<User> = {
-    uid: fbUser.uid,
+    uid: firebaseUser.uid,
     createdAt: now,
     updatedAt: now,
-    emailVerified: fbUser.emailVerified,
+    emailVerified: firebaseUser.emailVerified,
   };
 
-  if (fbUser.email) user.email = fbUser.email;
+  if (firebaseUser.email) user.email = firebaseUser.email;
   if (profile?.displayName) user.displayName = profile.displayName;
   if (profile?.photoURL) user.photoURL = profile.photoURL;
 
-  await createUser({ user, appUser });
+  await createUser({ user, appUser, createUnverifiedUser });
 
   return user;
 };
@@ -68,7 +74,7 @@ export const signUp = async (
   password: string,
   confirmPassword: string,
   setError: (error: string) => void,
-  profile?: FirebaseProfile
+  { firebaseProfile, createUnverifiedUser }: { firebaseProfile?: FirebaseProfile; createUnverifiedUser: boolean }
 ) => {
   const lowercasedEmail = email.toLowerCase();
 
@@ -82,19 +88,17 @@ export const signUp = async (
   }
 
   const auth = getAuth();
-  return (
-    auth.currentUser?.isAnonymous
-      ? linkWithCredential(auth.currentUser, EmailAuthProvider.credential(lowercasedEmail, password))
-      : createEmailUser(lowercasedEmail, password)
-  )
-    .then(async ({ user }) =>
+  const userCredentialPromise = auth.currentUser?.isAnonymous
+    ? linkWithCredential(auth.currentUser, EmailAuthProvider.credential(lowercasedEmail, password))
+    : createEmailUser(lowercasedEmail, password);
+
+  return userCredentialPromise
+    .then(async ({ user: firebaseUser }) => {
       // https://firebase.google.com/docs/auth/web/manage-users#send_a_user_a_verification_email
-      // await sendEmailVerification(user);
-      // await signUserOut();
-      // ...
-      // await applyActionCode(getAuth(), code);
-      handleCreateUser(user, profile, appUser)
-    )
+      await sendEmailVerification(firebaseUser);
+
+      return handleCreateUser(firebaseUser, firebaseProfile, appUser, { createUnverifiedUser });
+    })
     .catch((e) => setError(getFriendlyAuthError(e.message)));
 };
 
@@ -120,7 +124,7 @@ export const signUpWithProvider = async (
       const displayName = user.providerData.find(({ displayName }) => displayName)?.displayName;
       const photoURL = user.providerData.find(({ photoURL }) => photoURL)?.photoURL;
 
-      return handleCreateUser(user, { displayName, photoURL }, appUser);
+      return handleCreateUser(user, { displayName, photoURL }, appUser, { createUnverifiedUser: false });
     })
     .catch((e) => setError(getFriendlyAuthError(e.message)));
 };

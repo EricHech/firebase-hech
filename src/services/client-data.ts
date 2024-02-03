@@ -29,6 +29,7 @@ import {
   isoSoilTransactionWithCb,
   isoSoilIncrement,
   isoGetUserDataType,
+  isoGetUnverifiedUser,
 } from "./data";
 import { get, update, soilUpdate, onChildAdded, onValue, push, transactionWithCb } from "./firebase";
 
@@ -57,10 +58,14 @@ export const createUser = ({
   updateObject = {},
   skipUpdate,
   now,
+  createUnverifiedUser,
 }: Pick<CreateDataParams<keyof SoilDatabase>, "updateObject" | "skipUpdate" | "now"> & {
   user: Mandate<User, "uid">;
   appUser: AppUser;
-}) => isoCreateUser({ update, user, appUser, updateObject, skipUpdate, now });
+  createUnverifiedUser: boolean;
+}) => isoCreateUser({ update, user, appUser, updateObject, skipUpdate, now, createUnverifiedUser });
+
+export const getUnverifiedUser = (uid: string) => isoGetUnverifiedUser(uid, get);
 
 export const updateUser = (uid: string, u: Partial<User>) => isoUpdateUser(update, uid, u);
 

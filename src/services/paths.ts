@@ -9,6 +9,9 @@ export const PATHS = {
   USERS: "users",
   user: (uid: string) => `${PATHS.USERS}/${uid}`,
 
+  UNVERIFIED_USERS: "unverifiedUsers",
+  unverifiedUsers: (uid: string) => `${PATHS.UNVERIFIED_USERS}/${uid}`,
+
   USERNAMES: "usernames",
   username: (username: string) => `${PATHS.USERNAMES}/${username}`,
 

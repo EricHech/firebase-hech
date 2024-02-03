@@ -143,6 +143,13 @@ const rules = {
       ".write": "newData.val() === auth.uid && (!data.exists() || data.val() === auth.uid)",
     },
   },
+  unverifiedUsers: {
+    // Users have full read/write permissions on themselves
+    $uid: {
+      ".read": authUidIsUid,
+      ".write": authUidIsUid,
+    },
+  },
   users: {
     // Users have full read/write permissions on themselves
     $uid: {
