@@ -56,7 +56,7 @@ export const isoCreateUser = ({
   createUnverifiedUser: boolean;
 }) => {
   if (createUnverifiedUser) {
-    updateObject[PATHS.unverifiedUsers(user.uid)] = { user, appUser };
+    updateObject[PATHS.unverifiedUsers(user.uid)] = { user, appUser, createdAt: now, updatedAt: now };
 
     return skipUpdate ? updateObject : update("/", updateObject, true).then(() => updateObject);
   } else {

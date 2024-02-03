@@ -1,6 +1,6 @@
 {
   "name": "firebase-soil",
-  "version": "1.4.61",
+  "version": "1.4.62",
   "description": "A a strongly-typed opinionated wrapper around Firebase's Real-Time Database meant to supercharge Firebase and allow for better relational management and out-of-the-box security rules.",
   "exports": {
     ".": {
