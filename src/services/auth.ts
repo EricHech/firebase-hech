@@ -97,10 +97,13 @@ export const signUp = async (
 
   return userCredentialPromise
     .then(async ({ user: firebaseUser }) => {
+      // First create the user, updating their Firebase Profile `displayName` which is used in their verification email
+      const newUser = await handleCreateUser(firebaseUser, firebaseProfile, appUser, { createUnverifiedUser });
+
       // https://firebase.google.com/docs/auth/web/manage-users#send_a_user_a_verification_email
       await sendEmailVerification(firebaseUser);
 
-      return handleCreateUser(firebaseUser, firebaseProfile, appUser, { createUnverifiedUser });
+      return newUser;
     })
     .catch((e) => setError(getFriendlyAuthError(e.message)));
 };
