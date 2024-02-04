@@ -1,5 +1,12 @@
 import { initializeApp, FirebaseOptions, getApp, FirebaseApp } from "firebase/app";
-import { User as FirebaseUser, initializeAuth, indexedDBLocalPersistence, getAuth, Auth, connectAuthEmulator } from "firebase/auth";
+import {
+  User as FirebaseUser,
+  initializeAuth,
+  indexedDBLocalPersistence,
+  getAuth,
+  Auth,
+  connectAuthEmulator,
+} from "firebase/auth";
 import { signInAnon } from "./auth";
 import { connectDatabaseEmulator, getDatabase } from "firebase/database";
 import { connectStorageEmulator, getStorage } from "firebase/storage";
@@ -18,7 +25,7 @@ type TProps = {
   anonymousSignIn?: boolean;
   isNativePlatform?: boolean;
   emulatorOptions?: EmulatorOptions;
-}
+};
 
 export const initializeFirebase = (
   firebaseOptions: FirebaseOptions,
@@ -62,5 +69,5 @@ export const initializeFirebase = (
 
   if (anonymousSignIn) signInAnon();
 
-  return auth.onAuthStateChanged(cb);
+  return auth.onIdTokenChanged(cb);
 };
