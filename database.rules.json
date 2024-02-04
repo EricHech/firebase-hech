@@ -8,6 +8,12 @@
         ".write": "newData.val() === auth.uid && (!data.exists() || data.val() === auth.uid)"
       }
     },
+    "unverifiedUsers": {
+      "$uid": {
+        ".read": "auth.uid === $uid",
+        ".write": "auth.uid === $uid"
+      }
+    },
     "users": {
       "$uid": {
         ".read": "auth.uid === $uid",
