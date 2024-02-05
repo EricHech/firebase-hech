@@ -148,6 +148,7 @@ const rules = {
     $uid: {
       ".read": authUidIsUid,
       ".write": authUidIsUid,
+      ".indexOn": ["createdAt"], // so that you can clear out stale `unverifiedUsers`
     },
   },
   users: {
