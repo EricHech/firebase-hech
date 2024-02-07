@@ -149,7 +149,7 @@ export type UpdateDataParams<T2 extends keyof SoilDatabase> = CudDataParams<T2> 
   includeUpdatedAt?: boolean;
 };
 
-export type RemoveDataKeyParams<T2 extends keyof SoilDatabase> = CudDataParams<T2> & {
+export type RemoveDataKeyParams<T2 extends keyof SoilDatabase> = Omit<CudDataParams<T2>, "publicAccess" | "now"> & {
   get: GetFunction;
   existingOwners?: Nullable<string[]>;
   existingConnections?: DataList;

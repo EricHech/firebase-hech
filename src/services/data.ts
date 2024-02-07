@@ -1,10 +1,4 @@
-import type {
-  AfterCollisionFreeUpdateHandler,
-  AppUser,
-  SoilDatabase,
-  SoilIncrement,
-  SoilTransactionWithCbParams,
-} from "./types";
+import { increment } from "firebase/database";
 
 // Helpers
 import { createGetUpdateObjectFunction, sleep } from "../utils";
@@ -32,7 +26,14 @@ import type {
   ChangeDataKey,
   UpdateObject,
 } from "./types";
-import { increment } from "firebase/database";
+import type {
+  AfterCollisionFreeUpdateHandler,
+  AppUser,
+  SoilDatabase,
+  SoilIncrement,
+  SoilTransactionWithCbParams,
+} from "./types";
+import { firebaseStorageDelete } from "./firebase";
 
 /*
  █████╗ ██╗   ██╗████████╗██╗  ██╗
@@ -635,7 +636,7 @@ export const isoRemoveData = async <T2 extends keyof SoilDatabase>({
   dataKey,
   existingOwners,
   existingConnections,
-}: Omit<RemoveDataKeyParams<T2>, "publicAccess" | "now">) => {
+}: RemoveDataKeyParams<T2>) => {
   /* eslint-disable no-param-reassign */
   (
     Object.entries(existingConnections || (await isoGetAllConnections(get, dataType, dataKey)) || {}) as [
@@ -659,6 +660,8 @@ export const isoRemoveData = async <T2 extends keyof SoilDatabase>({
   });
   /* eslint-enable no-param-reassign */
 
+  if (dataType === "soilFile") await firebaseStorageDelete(PATHS.dataKey("soilFile", dataKey));
+
   return skipUpdate ? updateObject : update("/", updateObject, true, true).then(() => updateObject);
 };
 
@@ -667,7 +670,7 @@ export const isoRemoveDataType = async <T2 extends keyof SoilDatabase>({
   update,
   get,
   dataType,
-}: Omit<RemoveDataKeyParams<T2>, "publicAccess" | "now" | "dataKey" | "skipUpdate" | "updateObject">) => {
+}: Omit<RemoveDataKeyParams<T2>, "dataKey" | "skipUpdate" | "updateObject">) => {
   const { updateObjects, getUpdateObject } = createGetUpdateObjectFunction<T2>();
   /* eslint-disable no-param-reassign */
   const connections = await isoGetAllConnectionsByType(get, dataType);

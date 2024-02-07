@@ -362,7 +362,7 @@ export const removeData = async <T2 extends keyof SoilDatabase>({
   skipUpdate,
   dataType,
   dataKey,
-}: Omit<RemoveDataKeyParams<T2>, "update" | "get" | "now" | "publicAccess">) =>
+}: Omit<RemoveDataKeyParams<T2>, "update" | "get">) =>
   isoRemoveData({
     update: soilUpdate,
     get,

@@ -278,7 +278,7 @@ export const removeData = <T2 extends keyof SoilDatabase>({
   dataType,
   dataKey,
   imitateClientUpdate,
-}: Omit<RemoveDataKeyParams<T2>, "update" | "get" | "publicAccess" | "now"> & {
+}: Omit<RemoveDataKeyParams<T2>, "update" | "get"> & {
   imitateClientUpdate?: boolean;
 }) =>
   isoRemoveData({
