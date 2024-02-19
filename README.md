@@ -182,20 +182,65 @@ The optional argument `initialChildEqualTo` (unused in the example) in the `useM
 There are a few components that we have provided, they can be found in:
 - `firebase-soil-ui/components`
 
-The one which helps with infinite scroll is the `DataInViewItem`. There is another component, pending entry into Soil, which makes this truly powerful and easy to use. It is called the `ConnectionsObserverHOC` and is used like so:
+The one which helps with infinite scroll is the `DataInViewItem`. There is another component which makes this truly powerful and easy to use. It is called the `ConnectionsObserverHOC` and is used like so:
 ```tsx
 <ConnectionsObserverHOC
-  listItemMinHeight="80px"
-  listItemMinWidth="80px"
-  className={styles.productList}
+  className={styles.messages}
+  listItemMinHeight="35px"
+  listItemMinWidth="100px"
   version="connectionDataList"
-  parentDataType="manager"
-  parentDataKey={managerKey}
-  dataType="user"
+  parentDataType="chatContent"
+  parentDataKey={chatKey}
+  dataType="chatMessage"
   sort="created newest"
-  ItemComponent={UserInView}
-  EmptyComponent={NoUsers}
+  managePagination={PAGINATION}
+  ignoreNonStartingEdgeAdditions
+  grouping="day"
+  GroupingComponent={Grouping}
+  ItemComponent={ChatInView}
+  EmptyComponent={NoMessages}
 />
+```
+
+Where the `ChatInView` is like so:
+
+```tsx
+import { ItemComponentProps, useCacheHook } from "firebase-soil-ui";
+
+export function ChatInView({
+  data: message, // (1) This is the data itself which is automatically hydrated when scrolled into view
+  dataKey,
+  observed,
+  getCache,
+  idx,
+  list,
+  top,
+  bottom,
+  // ...etc.
+}: ItemComponentProps<"chatMessage", "chatContent">) {
+  const { user } = useSoilContext();
+  const userUid = user?.uid;
+
+  const authorUid = "authorUid"; // ...get the author uid somehow
+
+  // (2) But you can also fetch data yourself based on the `observed` variable. In this example, we also use the cache:
+
+  // Cache the data that you want to fetch but that
+  // you know will be repeated throughout the infinite scroll
+  const author = useCacheHook("appUser", authorUid, getCache, {
+    fetchIfNull: false,
+    initialized: observed, // Wait until the component has scrolled into view (`observed`) before fetching
+  });
+
+  if (!userUid) return null;
+
+  return (
+    <div>
+      <div>{message.content}</div>
+      <div>By {author.name}</div>
+    </div>
+  );
+}
 ```
 
 ## Impactful Conventions
