@@ -27,12 +27,12 @@ export const get = <T>(path: string) =>
 
 export const onChildAdded = <T>(
   path: string,
-  cb: (val: Nullable<T>, key: string, previousOrderingName?: Nullable<string>) => void,
+  cb: (val: Nullable<T>, key: string, previousOrderingKey?: Nullable<string>) => void,
   limit?: { amount: number; direction: keyof Pick<Query, "limitToFirst" | "limitToLast"> }
 ) => {
   const query = limit ? getRef(path)[limit.direction](limit.amount) : getRef(path);
 
-  return query.on("child_added", (snap, previousOrderingName) => cb(snap.val(), snap.key!, previousOrderingName));
+  return query.on("child_added", (snap, previousOrderingKey) => cb(snap.val(), snap.key!, previousOrderingKey));
 };
 
 export const push = <T>(path: string, data: T) => getRef(path).push(data);

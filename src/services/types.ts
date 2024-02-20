@@ -198,11 +198,11 @@ export type ListenerPaginationOptions = { orderBy?: "orderByKey" | "orderByValue
 export type OnUserDataTypeListChildAddedParams<T2 extends keyof SoilDatabase> = {
   onChildAdded: (
     path: string,
-    cb: (val: Nullable<DataList>, key: string, previousOrderingName?: Nullable<string>) => void
+    cb: (val: Nullable<DataList>, key: string, previousOrderingKey?: Nullable<string>) => void
   ) => VoidFunction;
   uid: string;
   dataType: T2;
-  cb: (userData: Nullable<DataList>, key: string, previousOrderingName?: Nullable<string>) => void;
+  cb: (userData: Nullable<DataList>, key: string, previousOrderingKey?: Nullable<string>) => void;
 };
 
 export type OnDataValueParams<T2 extends keyof SoilDatabase> = {
@@ -215,7 +215,7 @@ export type OnDataValueParams<T2 extends keyof SoilDatabase> = {
 export type OnConnectionTypeChildAddedParams<T2 extends keyof SoilDatabase> = {
   onChildAdded: (
     path: string,
-    cb: (val: Nullable<SoilDatabase[T2]>, key: string, previousOrderingName?: Nullable<string>) => void
+    cb: (val: Nullable<SoilDatabase[T2]>, key: string, previousOrderingKey?: Nullable<string>) => void
   ) => VoidFunction;
   dataType: T2;
   dataKey: string;
