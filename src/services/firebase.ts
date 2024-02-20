@@ -184,7 +184,7 @@ const getContraints = (paginate: Maybe<ListenerPaginationOptions>) => {
 
 export const onChildAdded = <T, K extends string>(
   path: string,
-  cb: (val: T, key: K) => void,
+  cb: (val: T, key: K, previousOrderingName?: Nullable<string>) => void,
   /**
    * `edge` returns the high or low end of a list
    * `between` returns the values between two where `start` always represents the low end while `end` represents the high end
@@ -196,14 +196,14 @@ export const onChildAdded = <T, K extends string>(
 
   return database.onChildAdded(
     contraints.length ? database.query(getRef(path), ...contraints) : getRef(path),
-    (snap) => cb(snap.val(), snap.key! as K),
+    (snap, previousOrderingName) => cb(snap.val(), snap.key! as K, previousOrderingName),
     logAndThrow("onChildAdded", path, paginate ? { data: { paginate } } : undefined)
   );
 };
 
 export const onChildChanged = <T, K extends string>(
   path: string,
-  cb: (val: T, key: K) => void,
+  cb: (val: T, key: K, previousOrderingName?: Nullable<string>) => void,
   /**
    * `edge` returns the high or low end of a list
    * `between` returns the values between two where `start` always represents the low end while `end` represents the high end
@@ -215,7 +215,7 @@ export const onChildChanged = <T, K extends string>(
 
   return database.onChildChanged(
     contraints.length ? database.query(getRef(path), ...contraints) : getRef(path),
-    (snap) => cb(snap.val(), snap.key! as K),
+    (snap, previousOrderingName) => cb(snap.val(), snap.key! as K, previousOrderingName),
     logAndThrow("onChildChanged", path, paginate ? { data: { paginate } } : undefined)
   );
 };
