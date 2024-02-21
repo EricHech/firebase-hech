@@ -106,21 +106,11 @@ export const onDataKeyValue = <T2 extends keyof SoilDatabase>({
   cb,
 }: Omit<OnDataValueParams<T2>, "onValue">) => isoOnDataKeyValue({ onValue, dataType, dataKey, cb });
 
-export const getUserDataType = <T2 extends keyof SoilDatabase, T22 extends keyof SoilDatabase>({
-  dataType,
-  uid,
-}: {
-  dataType: T2;
-  uid: string;
-}) => isoGetUserDataType({ get, dataType, uid });
+export const getUserDataType = <T2 extends keyof SoilDatabase>({ dataType, uid }: { dataType: T2; uid: string }) =>
+  isoGetUserDataType({ get, dataType, uid });
 
-export const getUserDataTypeData = <T2 extends keyof SoilDatabase, T22 extends keyof SoilDatabase>({
-  dataType,
-  uid,
-}: {
-  dataType: T2;
-  uid: string;
-}) => isoGetUserDataTypeData({ get, dataType, uid });
+export const getUserDataTypeData = <T2 extends keyof SoilDatabase>({ dataType, uid }: { dataType: T2; uid: string }) =>
+  isoGetUserDataTypeData({ get, dataType, uid });
 
 export const createData = async <T2 extends keyof SoilDatabase>({
   updateObject,
