@@ -215,6 +215,23 @@ export const isoGetUserDataType = <T2 extends keyof SoilDatabase, T22 extends ke
   uid: string;
 }) => get<DataList[T22]>(PATHS.userDataTypeList(uid, dataType));
 
+export const isoGetUserDataTypeData = <T2 extends keyof SoilDatabase, T22 extends keyof SoilDatabase>({
+  get,
+  dataType,
+  uid,
+}: {
+  get: GetFunction;
+  dataType: T2;
+  uid: string;
+}) =>
+  get<DataList[T22]>(PATHS.userDataTypeList(uid, dataType)).then((dataList) =>
+    Promise.all(
+      Object.keys(dataList || {}).map((key) =>
+        get<Data<T22> & { key: string }>(PATHS.dataKey(dataType, key)).then((d) => (d ? { ...d, key } : null))
+      )
+    )
+  );
+
 export const isoGetDataKeyFieldValue = <T2 extends keyof SoilDatabase, T3 extends keyof Data<T2>>({
   get,
   dataType,

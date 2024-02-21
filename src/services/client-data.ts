@@ -30,6 +30,7 @@ import {
   isoSoilIncrement,
   isoGetUserDataType,
   isoGetUnverifiedUser,
+  isoGetUserDataTypeData,
 } from "./data";
 import { get, update, soilUpdate, onChildAdded, onValue, push, transactionWithCb } from "./firebase";
 
@@ -112,6 +113,14 @@ export const getUserDataType = <T2 extends keyof SoilDatabase, T22 extends keyof
   dataType: T2;
   uid: string;
 }) => isoGetUserDataType({ get, dataType, uid });
+
+export const getUserDataTypeData = <T2 extends keyof SoilDatabase, T22 extends keyof SoilDatabase>({
+  dataType,
+  uid,
+}: {
+  dataType: T2;
+  uid: string;
+}) => isoGetUserDataTypeData({ get, dataType, uid });
 
 export const createData = async <T2 extends keyof SoilDatabase>({
   updateObject,
