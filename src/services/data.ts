@@ -205,7 +205,7 @@ export const isoGetConnectionTypeConnections = <T2 extends keyof SoilDatabase, T
     )
   );
 
-export const isoGetUserDataType = <T2 extends keyof SoilDatabase, T22 extends keyof SoilDatabase>({
+export const isoGetUserDataType = <T2 extends keyof SoilDatabase>({
   get,
   dataType,
   uid,
@@ -213,9 +213,9 @@ export const isoGetUserDataType = <T2 extends keyof SoilDatabase, T22 extends ke
   get: GetFunction;
   dataType: T2;
   uid: string;
-}) => get<DataList[T22]>(PATHS.userDataTypeList(uid, dataType));
+}) => get<DataList[T2]>(PATHS.userDataTypeList(uid, dataType));
 
-export const isoGetUserDataTypeData = <T2 extends keyof SoilDatabase, T22 extends keyof SoilDatabase>({
+export const isoGetUserDataTypeData = <T2 extends keyof SoilDatabase>({
   get,
   dataType,
   uid,
@@ -224,10 +224,10 @@ export const isoGetUserDataTypeData = <T2 extends keyof SoilDatabase, T22 extend
   dataType: T2;
   uid: string;
 }) =>
-  get<DataList[T22]>(PATHS.userDataTypeList(uid, dataType)).then((dataList) =>
+  get<DataList[T2]>(PATHS.userDataTypeList(uid, dataType)).then((dataList) =>
     Promise.all(
       Object.keys(dataList || {}).map((key) =>
-        get<Data<T22> & { key: string }>(PATHS.dataKey(dataType, key)).then((d) => (d ? { ...d, key } : null))
+        get<Data<T2> & { key: string }>(PATHS.dataKey(dataType, key)).then((d) => (d ? { ...d, key } : null))
       )
     )
   );
