@@ -68,7 +68,7 @@ const handleCreateUser = async (
 
   await createUser({ user, appUser, createUnverifiedUser });
 
-  return user;
+  return user as User;
 };
 
 export const signUp = async (
