@@ -15,9 +15,7 @@ import type {
   CreateDataParams,
   UpdateDataParams,
   GetFunction,
-  OnConnectionTypeChildAddedParams,
   OnDataValueParams,
-  OnUserDataTypeListChildAddedParams,
   GetOwnerDataParams,
   QueryDataParams,
   ModifyConnectionsType,
@@ -105,34 +103,12 @@ export const isoOnUserValue = (
   cb: (user: Nullable<Mandate<User, "uid">>) => void
 ) => onValue(PATHS.user(uid), (user) => cb(user ? { ...user, uid } : null));
 
-export const isoOnUserDataListValue = (
-  onValue: (path: string, cb: (val: Nullable<DataList>) => void) => VoidFunction,
-  uid: string,
-  cb: (userData: Nullable<DataList>) => void
-) => onValue(PATHS.userDataList(uid), cb);
-
-export const isoOnUserDataTypeListChildAdded = <T2 extends keyof SoilDatabase>({
-  onChildAdded,
-  uid,
-  dataType,
-  cb,
-}: OnUserDataTypeListChildAddedParams<T2>) => onChildAdded(PATHS.userDataTypeList(uid, dataType), cb);
-
 export const isoOnDataKeyValue = <T2 extends keyof SoilDatabase>({
   onValue,
   dataType,
   dataKey,
   cb,
 }: OnDataValueParams<T2>) => onValue(PATHS.dataKey(dataType, dataKey), cb);
-
-export const isoOnToGetTypeChildAdded = <T2 extends keyof SoilDatabase>({
-  onChildAdded,
-  dataType,
-  dataKey,
-  connectionType,
-  cb,
-}: OnConnectionTypeChildAddedParams<T2>) =>
-  onChildAdded(PATHS.connectionDataListConnectionType(dataType, dataKey, connectionType), cb);
 
 /*
  ██████╗ ███████╗████████╗
@@ -151,61 +127,62 @@ export const isoGetDataKeyValue = <T2 extends keyof SoilDatabase>(get: GetFuncti
 export const isoGetDataTypeValue = <T2 extends keyof SoilDatabase>(get: GetFunction, dataType: T2) =>
   get<Record<string, Data<T2>>>(PATHS.dataType(dataType));
 
-export const isoGetAllConnections = <T2 extends keyof SoilDatabase>(get: GetFunction, dataType: T2, dataKey: string) =>
-  get<DataList>(PATHS.connectionDataListKey(dataType, dataKey));
+export const isoGetAllConnectionTypesKeys = <T2 extends keyof SoilDatabase>(
+  get: GetFunction,
+  parentType: T2,
+  parentKey: string
+) => get<DataList>(PATHS.connectionDataListKey(parentType, parentKey));
 
-export const isoGetAllConnectionsByType = <T2 extends keyof SoilDatabase>(get: GetFunction, dataType: T2) =>
-  get<Record<string, DataList>>(PATHS.connectionDataListType(dataType));
+export const isoGetAllConnectionTypes = <T2 extends keyof SoilDatabase>(get: GetFunction, parentType: T2) =>
+  get<Record<string, DataList>>(PATHS.connectionDataListType(parentType));
 
-export const isoGetConnectionType = <T2 extends keyof SoilDatabase, T22 extends keyof SoilDatabase>({
+export const isoGetConnectionTypeKeys = <T2 extends keyof SoilDatabase, T22 extends keyof SoilDatabase>({
   get,
+  parentType,
+  parentKey,
   dataType,
-  dataKey,
-  connectionType,
 }: {
   get: GetFunction;
-  dataType: T2;
-  dataKey: string;
-  connectionType: T22;
-}) => get<DataList[T22]>(PATHS.connectionDataListConnectionType(dataType, dataKey, connectionType));
+  parentType: T2;
+  parentKey: string;
+  dataType: T22;
+}) => get<DataList[T22]>(PATHS.connectionDataListConnectionType(parentType, parentKey, dataType));
 
 export const isoGetConnectionTypeData = <T2 extends keyof SoilDatabase, T22 extends keyof SoilDatabase>({
   get,
+  parentType,
+  parentKey,
   dataType,
-  dataKey,
-  connectionType,
 }: {
   get: GetFunction;
-  dataType: T2;
-  dataKey: string;
-  connectionType: T22;
+  parentType: T2;
+  parentKey: string;
+  dataType: T22;
 }) =>
-  isoGetConnectionType({ get, dataType, dataKey, connectionType }).then((dataList) =>
+  isoGetConnectionTypeKeys({ get, parentType, parentKey, dataType }).then((dataList) =>
     Promise.all(
       Object.keys(dataList || {}).map((key) =>
-        get<Data<T22> & { key: string }>(PATHS.dataKey(connectionType, key)).then((d) => (d ? { ...d, key } : null))
+        get<Data<T22> & { key: string }>(PATHS.dataKey(dataType, key)).then((d) => (d ? { ...d, key } : null))
       )
     )
   );
 
-export const isoGetConnectionTypeConnections = <T2 extends keyof SoilDatabase, T22 extends keyof SoilDatabase>({
+export const isoGetConnectionTypeConnectionsKeys = <T2 extends keyof SoilDatabase, T22 extends keyof SoilDatabase>({
   get,
+  parentType,
+  parentKey,
   dataType,
-  dataKey,
-  connectionType,
 }: {
   get: GetFunction;
-  dataType: T2;
-  dataKey: string;
-  connectionType: T22;
+  parentType: T2;
+  parentKey: string;
+  dataType: T22;
 }) =>
-  isoGetConnectionType({ get, dataType, dataKey, connectionType }).then((dataList) =>
-    Promise.all(
-      Object.keys(dataList || {}).map((key) => get<DataList>(PATHS.connectionDataListKey(connectionType, key)))
-    )
+  isoGetConnectionTypeKeys({ get, parentType, parentKey, dataType }).then((dataList) =>
+    Promise.all(Object.keys(dataList || {}).map((key) => isoGetAllConnectionTypesKeys(get, dataType, key)))
   );
 
-export const isoGetUserDataType = <T2 extends keyof SoilDatabase>({
+export const isoGetUserTypeKeys = <T2 extends keyof SoilDatabase>({
   get,
   dataType,
   uid,
@@ -215,7 +192,7 @@ export const isoGetUserDataType = <T2 extends keyof SoilDatabase>({
   uid: string;
 }) => get<DataList[T2]>(PATHS.userDataTypeList(uid, dataType));
 
-export const isoGetUserDataTypeData = <T2 extends keyof SoilDatabase>({
+export const isoGetUserTypeData = <T2 extends keyof SoilDatabase>({
   get,
   dataType,
   uid,
@@ -450,7 +427,7 @@ export const isoUpdateData = async <T2 extends keyof SoilDatabase>({
   if (publicAccess) updateObject[PATHS.publicDataKeyList(dataType, dataKey)] = now;
 
   if (makeGetRequests && makeConnectionsRequests) {
-    const existingConnections = await isoGetAllConnections(get, dataType, dataKey);
+    const existingConnections = await isoGetAllConnectionTypesKeys(get, dataType, dataKey);
     if (existingConnections) {
       const existingConnectionEntries = Object.entries(existingConnections) as [
         keyof typeof existingConnections,
@@ -551,7 +528,7 @@ const isoAfterCollisionFreeUpdateHandler = async <T2 extends keyof SoilDatabase,
   }
 
   if (makeGetRequests && makeConnectionsRequests) {
-    const existingConnections = await isoGetAllConnections(get, dataType, dataKey);
+    const existingConnections = await isoGetAllConnectionTypesKeys(get, dataType, dataKey);
     if (existingConnections) {
       const existingConnectionEntries = Object.entries(existingConnections) as [
         keyof typeof existingConnections,
@@ -656,7 +633,7 @@ export const isoRemoveData = async <T2 extends keyof SoilDatabase>({
 }: RemoveDataKeyParams<T2>) => {
   /* eslint-disable no-param-reassign */
   (
-    Object.entries(existingConnections || (await isoGetAllConnections(get, dataType, dataKey)) || {}) as [
+    Object.entries(existingConnections || (await isoGetAllConnectionTypesKeys(get, dataType, dataKey)) || {}) as [
       keyof typeof existingConnections,
       ValueOf<DataList>
     ][]
@@ -690,7 +667,7 @@ export const isoRemoveDataType = async <T2 extends keyof SoilDatabase>({
 }: Omit<RemoveDataKeyParams<T2>, "dataKey" | "skipUpdate" | "updateObject">) => {
   const { updateObjects, getUpdateObject } = createGetUpdateObjectFunction<T2>();
   /* eslint-disable no-param-reassign */
-  const connections = await isoGetAllConnectionsByType(get, dataType);
+  const connections = await isoGetAllConnectionTypes(get, dataType);
   if (connections) {
     Object.entries(connections).forEach(([dKey, dataList]) =>
       Object.entries(dataList).forEach(([dType, dKeys]) =>
@@ -772,7 +749,8 @@ export const isoChangeDataKey = async <T2 extends keyof SoilDatabase, T22 extend
 
   const existingOwners = Object.keys((await isoGetOwners(get, existingDataType, existingDataKey)) || []);
 
-  const existingConnections = (await isoGetAllConnections(get, existingDataType, existingDataKey)) || ({} as DataList);
+  const existingConnections =
+    (await isoGetAllConnectionTypesKeys(get, existingDataType, existingDataKey)) || ({} as DataList);
 
   const connections = (Object.entries(existingConnections) as [keyof SoilDatabase, Record<string, number>][]).reduce(
     (prev, [type, dataList]) => {

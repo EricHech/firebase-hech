@@ -9,17 +9,16 @@ import {
   isoOnDataKeyValue,
   isoGetAdminValue,
   isoOnUserValue,
-  isoOnUserDataTypeListChildAdded,
   isoCreateConnections,
   isoUpdateUser,
   isoGetDataTypeValue,
   isoGetConnectionTypeData,
-  isoGetAllConnections,
+  isoGetAllConnectionTypesKeys,
   isoGetDataKeyFieldValue,
-  isoGetConnectionTypeConnections,
+  isoGetConnectionTypeConnectionsKeys,
   isoRemoveConnections,
   isoChangeDataKey,
-  isoGetConnectionType,
+  isoGetConnectionTypeKeys,
   isoCreateUser,
   isoTrackEvent,
   isoGetUser,
@@ -28,9 +27,9 @@ import {
   isoGetUsername,
   isoSoilTransactionWithCb,
   isoSoilIncrement,
-  isoGetUserDataType,
+  isoGetUserTypeKeys,
   isoGetUnverifiedUser,
-  isoGetUserDataTypeData,
+  isoGetUserTypeData,
 } from "./data";
 import { get, update, soilUpdate, onChildAdded, onValue, push, transactionWithCb } from "./firebase";
 
@@ -41,7 +40,6 @@ import type {
   GetDataKeyValueParams,
   UpdateDataParams,
   RemoveDataKeyParams,
-  OnUserDataTypeListChildAddedParams,
   OnDataValueParams,
   GetOwnerDataParams,
   ModifyConnectionsType,
@@ -74,13 +72,6 @@ export const getUser = (uid: string) => isoGetUser(get, uid);
 
 export const getUsername = (username: string) => isoGetUsername(get, username);
 
-export const onUserDataTypeListChildAdded = <T2 extends keyof SoilDatabase>({
-  dataType,
-  uid,
-  cb,
-}: Omit<OnUserDataTypeListChildAddedParams<T2>, "onChildAdded">) =>
-  isoOnUserDataTypeListChildAdded({ onChildAdded, dataType, uid, cb });
-
 export const getDataKeyValue = <T2 extends keyof SoilDatabase>({
   dataType,
   dataKey,
@@ -106,11 +97,11 @@ export const onDataKeyValue = <T2 extends keyof SoilDatabase>({
   cb,
 }: Omit<OnDataValueParams<T2>, "onValue">) => isoOnDataKeyValue({ onValue, dataType, dataKey, cb });
 
-export const getUserDataType = <T2 extends keyof SoilDatabase>({ dataType, uid }: { dataType: T2; uid: string }) =>
-  isoGetUserDataType({ get, dataType, uid });
+export const getUserTypeKeys = <T2 extends keyof SoilDatabase>({ dataType, uid }: { dataType: T2; uid: string }) =>
+  isoGetUserTypeKeys({ get, dataType, uid });
 
-export const getUserDataTypeData = <T2 extends keyof SoilDatabase>({ dataType, uid }: { dataType: T2; uid: string }) =>
-  isoGetUserDataTypeData({ get, dataType, uid });
+export const getUserTypeData = <T2 extends keyof SoilDatabase>({ dataType, uid }: { dataType: T2; uid: string }) =>
+  isoGetUserTypeData({ get, dataType, uid });
 
 export const createData = async <T2 extends keyof SoilDatabase>({
   updateObject,
@@ -262,55 +253,55 @@ export const createConnection = async <T2 extends keyof SoilDatabase>({
     now,
   });
 
-export const getAllConnections = <T2 extends keyof SoilDatabase>(dataType: T2, dataKey: string) =>
-  isoGetAllConnections(get, dataType, dataKey);
+export const getAllConnectionTypesKeys = <T2 extends keyof SoilDatabase>(dataType: T2, dataKey: string) =>
+  isoGetAllConnectionTypesKeys(get, dataType, dataKey);
 
-export const getConnectionType = <T2 extends keyof SoilDatabase, T22 extends keyof SoilDatabase>({
+export const getConnectionTypeKeys = <T2 extends keyof SoilDatabase, T22 extends keyof SoilDatabase>({
+  parentType,
+  parentKey,
   dataType,
-  dataKey,
-  connectionType,
 }: {
-  dataType: T2;
-  dataKey: string;
-  connectionType: T22;
+  parentType: T2;
+  parentKey: string;
+  dataType: T22;
 }) =>
-  isoGetConnectionType({
+  isoGetConnectionTypeKeys({
     get,
+    parentType,
+    parentKey,
     dataType,
-    dataKey,
-    connectionType,
   });
 
 export const getConnectionTypeData = <T2 extends keyof SoilDatabase, T22 extends keyof SoilDatabase>({
+  parentType,
+  parentKey,
   dataType,
-  dataKey,
-  connectionType,
 }: {
-  dataType: T2;
-  dataKey: string;
-  connectionType: T22;
+  parentType: T2;
+  parentKey: string;
+  dataType: T22;
 }) =>
   isoGetConnectionTypeData({
     get,
+    parentType,
+    parentKey,
     dataType,
-    dataKey,
-    connectionType,
   });
 
-export const getConnectionTypeConnections = <T2 extends keyof SoilDatabase, T22 extends keyof SoilDatabase>({
+export const getConnectionTypeConnectionsKeys = <T2 extends keyof SoilDatabase, T22 extends keyof SoilDatabase>({
+  parentType,
+  parentKey,
   dataType,
-  dataKey,
-  connectionType,
 }: {
-  dataType: T2;
-  dataKey: string;
-  connectionType: T22;
+  parentType: T2;
+  parentKey: string;
+  dataType: T22;
 }) =>
-  isoGetConnectionTypeConnections({
+  isoGetConnectionTypeConnectionsKeys({
     get,
+    parentType,
+    parentKey,
     dataType,
-    dataKey,
-    connectionType,
   });
 
 export const soilIncrement = <T2 extends keyof SoilDatabase, T3 extends keyof Data<T2>>({
