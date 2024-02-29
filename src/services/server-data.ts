@@ -63,13 +63,24 @@ export const getUser = (uid: string) => isoGetUser(get, uid);
 
 export const getUsername = (username: string) => isoGetUsername(get, username);
 
-export const getDataKeyValue = <T2 extends keyof SoilDatabase>(dataType: T2, dataKey: string) =>
-  isoGetDataKeyValue<T2>(get, dataType, dataKey);
+export const getDataKeyValue = <T2 extends keyof SoilDatabase>({
+  dataType,
+  dataKey,
+}: {
+  dataType: T2;
+  dataKey: string;
+}) => isoGetDataKeyValue<T2>(get, dataType, dataKey);
 
-export const getDataTypeValue = <T2 extends keyof SoilDatabase>(dataType: T2) => isoGetDataTypeValue<T2>(get, dataType);
+export const getDataTypeValue = <T2 extends keyof SoilDatabase>({ dataType }: { dataType: T2 }) =>
+  isoGetDataTypeValue<T2>(get, dataType);
 
-export const getAllConnectionTypesKeys = <T2 extends keyof SoilDatabase>(dataType: T2, dataKey: string) =>
-  isoGetAllConnectionTypesKeys(get, dataType, dataKey);
+export const getAllConnectionTypesKeys = <T2 extends keyof SoilDatabase>({
+  dataType,
+  dataKey,
+}: {
+  dataType: T2;
+  dataKey: string;
+}) => isoGetAllConnectionTypesKeys(get, dataType, dataKey);
 
 export const getConnectionTypeKeys = <T2 extends keyof SoilDatabase, T22 extends keyof SoilDatabase>({
   parentType,

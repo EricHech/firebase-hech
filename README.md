@@ -134,9 +134,9 @@ We have mostly extended this terminlogy, but we sometimes use (1) `get` instead 
 ## CRUD Operations
 There are too many helper functions to mention here. It suffices to say that if there is a `createData` and an `updateData`, there is also a `removeData`. If there is a `createConnection`, there is a `removeConnection`. IDE auto-complete and common sense are your allies in this regard.
 
-When you want to fetch a piece of data, you can call `getDataKeyValue`. If you want to subscribe to a piece of data, you can call `useDataKeyValue`. The reason we use the terminology `use` here instead of `once` is because this is a custom hook. In order for the subscription to work, it needs a `useEffect` and a `useState`.
+When you want to fetch a piece of data, you can call `getDataKeyValue`. If you want to do it statefully, you can call the hook `useGetDataKeyValue`. If you want to subscribe to it, you can call the hook `useOnDataKeyValue`.
 
-Nonetheless, all of this is obsfucated away from the developer who can simply reach for the data as they need it. Just be sure to check what is happening under-the-hood to make sure you aren't doing something otherwise silly, like calling a custom hook within a `useEffect`.
+All of this is obsfucated away from the developer who can simply reach for the data as they need it. Just be sure to check what is happening under-the-hood to make sure you aren't doing something otherwise silly, like calling a custom hook within a `useEffect`.
 
 ### Helper Functions & Hooks
 Take a moment to skim these two files in order to understand the underlying functions for working with a Soil Database:
@@ -144,9 +144,9 @@ Take a moment to skim these two files in order to understand the underlying func
 - `firebase-soil/services/server-data.ts`
 
 Feel free to look at `firebase-soil-ui/hooks`, but you will probably mainly use the following to start:
-- `useDataKeyValue`
+- `useOnDataKeyValue`
 - `useGetDataKeyValue`
-- `useConnectionsTypeData`
+- `useOnConnectionsTypeData`
 
 ### Context Generators
 One of the neatest features that Soil provides is a way to quickly build out your global state using context generaters. See:
@@ -154,7 +154,7 @@ One of the neatest features that Soil provides is a way to quickly build out you
 
 There are two likely to be used the most:
 - `createConnectionsTypeDataContext`
-- `createConnectionsTypeConnectionsContext`
+- `createUserTypeDataContext`
 
 Below is the example usage of `createConnectionsTypeDataContext`:
 ```tsx
@@ -176,8 +176,6 @@ export { useManagerUsersContext, ManagerUsersContextProviderComponent };
 const { dataArray: usersConnectedToTheManager } = useManagerUsersContext("{managerUid}")
 ```
 
-The optional argument `initialChildEqualTo` (unused in the example) in the `useManagerUsersContext` call is meant to speed up the initial fetch with a Firebase Query. See the relevant `createConnectionsTypeDataContext` code and Firebase query documentation for more details.
-
 ### Components
 There are a few components that we have provided, they can be found in:
 - `firebase-soil-ui/components`
@@ -186,8 +184,9 @@ The one which helps with infinite scroll is the `DataInViewItem`. There is anoth
 ```tsx
 <ConnectionsObserverHOC
   className={styles.messages}
-  listItemMinHeight="35px"
-  listItemMinWidth="100px"
+  listItemMinHeightPx={35}
+  listItemMinWidthPx={100}
+  hydrationBufferAmount={10}
   version="connectionDataList"
   parentDataType="chatContent"
   parentDataKey={chatKey}
@@ -247,7 +246,7 @@ export function ChatInView({
 There are a few conventions we employ that have real consequences in using Soil.
 
 ### Initialization and Falsey Keys in Helpers
-When using a helper function like `useDataKeyValue`, if the `dataKey` is falsey (an empty string), the fetch will not be made at all. This is very useful. For example, if you are hydrating data on load, it will not bother to fetch the manager's users until the manager has been logged in and we have retrieved the manager's data key. Furthermore, you can control this directly with a third boolean argument: `initialized`.
+When using a helper function like `useOnDataKeyValue`, if the `dataKey` is falsey (an empty string), the fetch will not be made at all. This is very useful. For example, if you are hydrating data on load, it will not bother to fetch the manager's users until the manager has been logged in and we have retrieved the manager's data key. Furthermore, you can control this directly with a third boolean argument: `initialized`.
 
 ### Null vs Undefined
 Note, passing `undefined` to Firebase at any time will break. Firebase only allows `null`, which will delete the data at that location. Therefore, your types won't perfectly reflect the reality that: Firebase may return `undefined` to you when nothing is at a target database location but will break if you pass `undefined` to a database location. Similarly, you may pass `null` to a database location to delete that data, but if you fetch that location, you will get `undefined` rather than `null`. This is a Firebase quirk to be aware of. Also note, when deleting data key values (an instance of a data type, ie. a user), do not use `null`, use the given Soil function: `removeData`.
