@@ -209,6 +209,21 @@ export const isoGetUserTypeData = <T2 extends keyof SoilDatabase>({
     )
   );
 
+export const isoGetPublicTypeData = <T2 extends keyof SoilDatabase>({
+  get,
+  dataType,
+}: {
+  get: GetFunction;
+  dataType: T2;
+}) =>
+  get<DataList[T2]>(PATHS.publicDataTypeList(dataType)).then((dataList) =>
+    Promise.all(
+      Object.keys(dataList || {}).map((key) =>
+        get<Data<T2> & { key: string }>(PATHS.dataKey(dataType, key)).then((d) => (d ? { ...d, key } : null))
+      )
+    )
+  );
+
 export const isoGetDataKeyFieldValue = <T2 extends keyof SoilDatabase, T3 extends keyof Data<T2>>({
   get,
   dataType,

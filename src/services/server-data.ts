@@ -28,6 +28,7 @@ import {
   isoSoilIncrement,
   isoGetUnverifiedUser,
   isoGetUserTypeData,
+  isoGetPublicTypeData,
 } from "./data";
 import { get, push, queryOrderByChildEqualTo, soilUpdate, update, transactionWithCb } from "./admin";
 import type {
@@ -108,21 +109,14 @@ export const getConnectionTypeData = <T2 extends keyof SoilDatabase, T22 extends
     dataType,
   });
 
-export const getUserTypeKeys = <T2 extends keyof SoilDatabase, T22 extends keyof SoilDatabase>({
-  dataType,
-  uid,
-}: {
-  dataType: T2;
-  uid: string;
-}) => isoGetUserTypeKeys({ get, dataType, uid });
+export const getUserTypeKeys = <T2 extends keyof SoilDatabase>({ dataType, uid }: { dataType: T2; uid: string }) =>
+  isoGetUserTypeKeys({ get, dataType, uid });
 
-export const getUserTypeData = <T2 extends keyof SoilDatabase, T22 extends keyof SoilDatabase>({
-  dataType,
-  uid,
-}: {
-  dataType: T2;
-  uid: string;
-}) => isoGetUserTypeData({ get, dataType, uid });
+export const getUserTypeData = <T2 extends keyof SoilDatabase>({ dataType, uid }: { dataType: T2; uid: string }) =>
+  isoGetUserTypeData({ get, dataType, uid });
+
+export const getPublicTypeData = <T2 extends keyof SoilDatabase>({ dataType }: { dataType: T2 }) =>
+  isoGetPublicTypeData({ get, dataType });
 
 export const getDataKeyFieldValue = <T2 extends keyof SoilDatabase, T3 extends keyof Data<T2>>({
   dataType,
