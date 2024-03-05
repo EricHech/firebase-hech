@@ -87,7 +87,7 @@ export const isoUpdateUser = (
 
 export const isoGetUser = (get: GetFunction, uid: string) => get<User>(PATHS.user(uid));
 
-export const isoGetUsername = (get: GetFunction, username: string) => get<string>(PATHS.username(username));
+export const isoGetUidFromUsername = (get: GetFunction, username: string) => get<string>(PATHS.username(username));
 
 /*
  ██████╗ ███╗   ██╗    ██╗ ██████╗ ███████╗███████╗    ██╗   ██╗ █████╗ ██╗     ██╗   ██╗███████╗

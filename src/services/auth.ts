@@ -17,7 +17,7 @@ import {
   sendEmailVerification,
   applyActionCode,
 } from "firebase/auth";
-import { createUser, getUsername, updateUser } from "./client-data";
+import { createUser, getUidFromUsername, updateUser } from "./client-data";
 import { AppUser, User, FirebaseProfile } from "./types";
 
 const getFriendlyAuthError = (errorMessage: string) => {
@@ -86,7 +86,7 @@ export const signUp = async (
   }
 
   if (appUser.username) {
-    const existingUserUid = await getUsername(appUser.username);
+    const existingUserUid = await getUidFromUsername(appUser.username);
     if (existingUserUid) throw new Error("This username is already in use.");
   }
 

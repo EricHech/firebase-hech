@@ -24,7 +24,7 @@ import {
   isoGetUser,
   isoAddOwners,
   isoRemoveOwners,
-  isoGetUsername,
+  isoGetUidFromUsername,
   isoSoilTransactionWithCb,
   isoSoilIncrement,
   isoGetUserTypeKeys,
@@ -71,7 +71,7 @@ export const updateUser = (uid: string, u: Partial<User>) => isoUpdateUser(updat
 
 export const getUser = (uid: string) => isoGetUser(get, uid);
 
-export const getUsername = (username: string) => isoGetUsername(get, username);
+export const getUidFromUsername = (username: string) => isoGetUidFromUsername(get, username);
 
 export const getDataKeyValue = <T2 extends keyof SoilDatabase>({
   dataType,
