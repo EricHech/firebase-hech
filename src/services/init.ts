@@ -6,6 +6,7 @@ import {
   getAuth,
   Auth,
   connectAuthEmulator,
+  Persistence,
 } from "firebase/auth";
 import { signInAnon } from "./auth";
 import { connectDatabaseEmulator, getDatabase } from "firebase/database";
@@ -23,14 +24,22 @@ import { EmulatorOptions } from "./types";
 
 type TProps = {
   anonymousSignIn?: boolean;
-  isNativePlatform?: boolean;
   emulatorOptions?: EmulatorOptions;
-};
+} & (
+  | {
+      isNativePlatform?: true;
+      webPersistance?: undefined;
+    }
+  | {
+      isNativePlatform?: undefined;
+      webPersistance?: Persistence;
+    }
+);
 
 export const initializeFirebase = (
   firebaseOptions: FirebaseOptions,
   cb: (userData: Nullable<FirebaseUser>) => void,
-  { anonymousSignIn, isNativePlatform, emulatorOptions }: TProps = {}
+  { anonymousSignIn, emulatorOptions, ...props }: TProps = {}
 ) => {
   let app: FirebaseApp;
   try {
@@ -52,7 +61,7 @@ export const initializeFirebase = (
   }
 
   let auth: Auth;
-  if (isNativePlatform) {
+  if (props.isNativePlatform) {
     try {
       auth = initializeAuth(app, { persistence: indexedDBLocalPersistence });
     } catch (e) {
@@ -65,7 +74,9 @@ export const initializeFirebase = (
   if (emulatorOptions?.auth) {
     connectAuthEmulator(auth, emulatorOptions.auth.url);
   }
+
   auth.useDeviceLanguage();
+  if (props.webPersistance) auth.setPersistence(props.webPersistance);
 
   if (anonymousSignIn) signInAnon();
 
