@@ -11,7 +11,10 @@
     "unverifiedUsers": {
       "$uid": {
         ".read": "auth.uid === $uid",
-        ".write": "auth.uid === $uid"
+        ".write": "auth.uid === $uid",
+        ".indexOn": [
+          "createdAt"
+        ]
       }
     },
     "users": {
