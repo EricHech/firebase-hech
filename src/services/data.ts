@@ -655,9 +655,9 @@ export const isoRemoveData = async <T2 extends keyof SoilDatabase>({
   ).forEach(([dType, dKeys]) =>
     Object.keys(dKeys).forEach((dKey) => {
       updateObject[PATHS.connectionDataListConnectionKey(dType, dKey, dataType, dataKey)] = null;
-      updateObject[PATHS.connectionDataListConnectionKey(dataType, dataKey, dType, dKey)] = null;
     })
   );
+
   updateObject[PATHS.connectionDataListKey(dataType, dataKey)] = null;
 
   updateObject[PATHS.dataKey(dataType, dataKey)] = null;
