@@ -1,4 +1,10 @@
-import type { AppUser, SoilDatabase, SoilIncrement, SoilTransactionWithCbParams } from "../services/types";
+import type {
+  AppUser,
+  GetOwnerDataParams,
+  SoilDatabase,
+  SoilIncrement,
+  SoilTransactionWithCbParams,
+} from "../services/types";
 import {
   isoCreateData,
   isoUpdateData,
@@ -29,6 +35,7 @@ import {
   isoGetUnverifiedUser,
   isoGetUserTypeData,
   isoGetPublicTypeData,
+  isoGetOwner,
 } from "./data";
 import { get, push, queryOrderByChildEqualTo, soilUpdate, update, transactionWithCb } from "./admin";
 import type {
@@ -314,6 +321,12 @@ export const removeDataType = <T2 extends keyof SoilDatabase>(dataType: T2) =>
 
 export const getOwners = <T2 extends keyof SoilDatabase>(dataType: T2, dataKey: string) =>
   isoGetOwners(get, dataType, dataKey);
+
+export const getOwner = <T2 extends keyof SoilDatabase>({
+  dataType,
+  dataKey,
+  uid,
+}: Omit<GetOwnerDataParams<T2>, "get">) => isoGetOwner({ get, dataType, dataKey, uid });
 
 export const addOwners = async <T2 extends keyof SoilDatabase>({
   dataType,
