@@ -259,7 +259,7 @@ export const isoQueryData = <T2 extends keyof SoilDatabase, T3 extends keyof Dat
  ╚═════╝  ╚══╝╚══╝ ╚═╝  ╚═══╝╚══════╝╚═╝  ╚═╝╚══════╝
 */
 export const isoGetOwner = <T2 extends keyof SoilDatabase>({ get, dataType, dataKey, uid }: GetOwnerDataParams<T2>) =>
-  get<boolean>(PATHS.ownerDataKeyUid(dataType, dataKey, uid));
+  get<number>(PATHS.ownerDataKeyUid(dataType, dataKey, uid));
 
 export const isoGetOwners = (get: GetFunction, dataType: keyof SoilDatabase, dataKey: string) =>
   get<Record<string, number>>(PATHS.ownerDataKey(dataType, dataKey));
