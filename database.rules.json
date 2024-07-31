@@ -24,8 +24,10 @@
       }
     },
     "tracking": {
-      "$trackingKey": {
-        ".write": "!data.exists() && auth !== null && newData.child('uid').val() === auth.uid"
+      "$eventName": {
+        "$trackingKey": {
+          ".write": "!data.exists() && auth !== null && newData.child('uid').val() === auth.uid"
+        }
       }
     },
     "owners": {

@@ -159,9 +159,11 @@ const rules = {
     },
   },
   tracking: {
-    $trackingKey: {
-      // You can track only new instances (no updates), you must be logged in, and the included uid must be your own
-      ".write": `!data.exists() && ${authNotNull} && newData.child('uid').val() === auth.uid`,
+    $eventName: {
+      $trackingKey: {
+        // You can track only new instances (no updates), you must be logged in, and the included uid must be your own
+        ".write": `!data.exists() && ${authNotNull} && newData.child('uid').val() === auth.uid`,
+      },
     },
   },
   owners: {
