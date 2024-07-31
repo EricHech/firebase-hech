@@ -387,8 +387,8 @@ export const removeConnection = <T2 extends keyof SoilDatabase>({
 }: Pick<ModifyConnectionsType<T2>, "skipUpdate" | "updateObject" | "connections">) =>
   isoRemoveConnections({ update, connections, skipUpdate, updateObject });
 
-export const trackEvent = (eventName: string, metadata?: object) =>
-  isoTrackEvent(push, eventName, "firebase-admin", metadata);
+export const trackEvent = (eventName: string, nonAdminUid: Maybe<string>, metadata?: object) =>
+  isoTrackEvent(push, eventName, nonAdminUid || "firebase-admin", metadata);
 
 export const changeDataKey = async <T2 extends keyof SoilDatabase, T22 extends keyof SoilDatabase>({
   existingDataType,
