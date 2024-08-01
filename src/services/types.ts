@@ -66,6 +66,8 @@ export type Data<T2 extends keyof SoilDatabase> = StandardDataFields & {
   publicAccess: Nullable<boolean>;
 } & SoilDatabase[T2];
 
+export type KeyedData<T extends keyof SoilDatabase> = Mandate<Data<T>, "key">;
+
 export type StatefulData<T2 extends keyof SoilDatabase> = Maybe<Nullable<Data<T2>>>;
 
 export type DataList = Record<keyof SoilDatabase, Record<string, number>>;
