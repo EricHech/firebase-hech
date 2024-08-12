@@ -32,7 +32,7 @@ import {
   isoGetUserTypeData,
   isoGetPublicTypeData,
 } from "./data";
-import { get, update, soilUpdate, onChildAdded, onValue, push, transactionWithCb } from "./firebase";
+import { get, update, soilUpdate, onValue, push, transactionWithCb } from "./firebase";
 
 // Types
 import type {
