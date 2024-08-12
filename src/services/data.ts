@@ -331,14 +331,16 @@ export const isoSoilUpdate = async (
   if (path === "/" && allowRootQuery) {
     const ownersUpdates = {} as Record<string, unknown>;
     const publicDataListUpdates = {} as Record<string, unknown>;
-    const dataUpdates = {} as Record<string, unknown>;
+    const dataUpdates = {} as Record<string, Nullable<object>>;
     const allOtherUpdates = {} as Record<string, unknown>;
+
     Object.entries(data).forEach(([p, d]) => {
       if (p.startsWith(ownersPrefix)) ownersUpdates[p] = d;
       else if (p.startsWith(publicDataListPrefix)) publicDataListUpdates[p] = d;
       else if (p.startsWith(dataPrefix)) dataUpdates[p] = d;
       else allOtherUpdates[p] = d;
     });
+
     if (isDelete) {
       await Promise.all(Object.entries(allOtherUpdates).map(([key, val]) => soil.set(key, val)));
       await Promise.all(Object.entries(dataUpdates).map(([key, val]) => soil.set(key, val)));
@@ -347,7 +349,7 @@ export const isoSoilUpdate = async (
     } else {
       await Promise.all(Object.entries(ownersUpdates).map(([key, val]) => soil.set(key, val)));
       await Promise.all(Object.entries(publicDataListUpdates).map(([key, val]) => soil.set(key, val)));
-      await Promise.all(Object.entries(dataUpdates).map(([key, val]) => soil.set(key, val)));
+      await Promise.all(Object.entries(dataUpdates).map(([key, val]) => soil.update(key, val as object)));
       await Promise.all(Object.entries(allOtherUpdates).map(([key, val]) => soil.set(key, val)));
     }
   } else {
@@ -414,19 +416,14 @@ export const isoUpdateData = async <T2 extends keyof SoilDatabase>({
   makeConnectionsRequests = true,
   makeOwnersRequests = true,
 }: UpdateDataParams<T2>) => {
-  type NewData = typeof data & { updatedAt?: number };
-
-  const newData = { ...data } as NewData;
-  if (includeUpdatedAt) newData.updatedAt = now;
+  const updatedData = { ...data } as Data<T2>;
+  if (includeUpdatedAt) updatedData.updatedAt = now;
+  if (connectionAccess) updatedData.connectionAccess = connectionAccess;
+  if (ownershipAccess) updatedData.ownershipAccess = ownershipAccess;
+  if (publicAccess) updatedData.publicAccess = publicAccess;
 
   /* eslint-disable no-param-reassign */
-  if (connectionAccess) updateObject[PATHS.dataKeyField(dataType, dataKey, "connectionAccess")] = connectionAccess;
-  if (ownershipAccess) updateObject[PATHS.dataKeyField(dataType, dataKey, "ownershipAccess")] = ownershipAccess;
-  if (publicAccess !== undefined) updateObject[PATHS.dataKeyField(dataType, dataKey, "publicAccess")] = publicAccess;
-
-  (Object.entries(newData) as [keyof NewData, ValueOf<NewData>][]).forEach(([childKey, childVal]) => {
-    if (childVal !== undefined) updateObject[PATHS.dataKeyField(dataType, dataKey, childKey)] = childVal;
-  });
+  updateObject[PATHS.dataKey(dataType, dataKey)] = updatedData;
 
   if (makeGetRequests && makeOwnersRequests) {
     const existingOwners = await isoGetOwners(get, dataType, dataKey);
