@@ -43,7 +43,11 @@ export const set = <T>(path: string, data: T) => getRef(path).set(data);
 
 export const update = async <T extends object>(path: string, data: T, allowRootQuery: boolean = false) => {
   if (path === "/" && allowRootQuery) {
-    await Promise.all(Object.entries(data).map(([key, val]) => getRef(key, allowRootQuery).update(val)));
+    await Promise.all(
+      Object.entries(data).map(([key, val]) =>
+        getRef(key, allowRootQuery)[typeof val === "object" && val !== null ? "update" : "set"](val)
+      )
+    );
   } else {
     await getRef(path, allowRootQuery).update(data);
   }

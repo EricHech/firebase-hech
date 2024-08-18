@@ -262,7 +262,11 @@ export const soilUpdate = async (
 
 export const update = async <T extends object>(path: string, data: T, allowRootQuery: boolean = false) => {
   if (path === "/" && allowRootQuery) {
-    await Promise.all(Object.entries(data).map(([key, val]) => database.update(getRef(key, allowRootQuery), val)));
+    await Promise.all(
+      Object.entries(data).map(([key, val]) =>
+        database[typeof val === "object" && val !== null ? "update" : "set"](getRef(key, allowRootQuery), val)
+      )
+    );
   } else {
     await database.update(getRef(path, allowRootQuery), data).catch(logAndThrow("update", path, { data }));
   }
