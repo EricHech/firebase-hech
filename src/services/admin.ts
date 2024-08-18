@@ -41,8 +41,13 @@ export const pushKey = (path: string) => cleanPushKey(getRef(path).push().key!);
 
 export const set = <T>(path: string, data: T) => getRef(path).set(data);
 
-export const update = <T extends object>(path: string, data: T, allowRootQuery: boolean = false) =>
-  getRef(path, allowRootQuery).update(data);
+export const update = async <T extends object>(path: string, data: T, allowRootQuery: boolean = false) => {
+  if (path === "/" && allowRootQuery) {
+    await Promise.all(Object.entries(data).map(([key, val]) => getRef(key, allowRootQuery).update(val)));
+  } else {
+    await getRef(path, allowRootQuery).update(data);
+  }
+};
 
 /** This is for mimicking the front end if using `initializeAdminRemoteRequestApp` on the server */
 export const soilUpdate = async (
