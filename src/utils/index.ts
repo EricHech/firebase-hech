@@ -1,8 +1,8 @@
-import { SoilDatabase, UpdateObject } from "../services/types";
+import { FirebaseWrapperDatabase, UpdateObject } from "../services/types";
 
 const FIREBASE_MAX_UPDATE_LIMIT = 999;
 
-export const createGetUpdateObjectFunction = <T2 extends keyof SoilDatabase>() => {
+export const createGetUpdateObjectFunction = <T2 extends keyof FirebaseWrapperDatabase>() => {
   let updateCount = 0;
   const updateObjects: UpdateObject<T2>[] = [];
 

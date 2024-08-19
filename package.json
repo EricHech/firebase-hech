@@ -1,6 +1,6 @@
 {
-  "name": "firebase-soil",
-  "version": "1.4.84",
+  "name": "firebase-wrapper",
+  "version": "1.0.0",
   "description": "A a strongly-typed opinionated wrapper around Firebase's Real-Time Database meant to supercharge Firebase and allow for better relational management and out-of-the-box security rules.",
   "exports": {
     ".": {
@@ -35,7 +35,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/EricHech/firebase-soil"
+    "url": "https://github.com/EricHech/firebase-wrapper"
   },
   "author": "Eric Hechavarria",
   "license": "ISC",

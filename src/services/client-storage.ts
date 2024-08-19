@@ -12,7 +12,7 @@ import { PATHS } from "./paths";
 import type { CreateDataParams } from "./types";
 
 type UploadFileParams = Pick<
-  CreateDataParams<"soilFile">,
+  CreateDataParams<"firebaseWrapperFile">,
   "owners" | "publicAccess" | "connections" | "connectionAccess" | "ownershipAccess"
 > & {
   dataKey?: string;
@@ -26,12 +26,12 @@ export const uploadFile = async ({
   connectionAccess,
   ownershipAccess,
   file,
-  dataKey = pushKey(PATHS.dataType("soilFile")),
+  dataKey = pushKey(PATHS.dataType("firebaseWrapperFile")),
 }: UploadFileParams) => {
-  const downloadUrl = await firebaseStoragePut(PATHS.dataKey("soilFile", dataKey), file);
+  const downloadUrl = await firebaseStoragePut(PATHS.dataKey("firebaseWrapperFile", dataKey), file);
 
   await upsertData({
-    dataType: "soilFile",
+    dataType: "firebaseWrapperFile",
     dataKey,
     data: { downloadUrl },
     owners,
@@ -52,15 +52,15 @@ export const uploadFileResumable = ({
   connectionAccess,
   ownershipAccess,
   file,
-  dataKey = pushKey(PATHS.dataType("soilFile")),
+  dataKey = pushKey(PATHS.dataType("firebaseWrapperFile")),
 }: UploadFileParams) => {
-  const task = firebaseStoragePutResumable(PATHS.dataKey("soilFile", dataKey), file);
+  const task = firebaseStoragePutResumable(PATHS.dataKey("firebaseWrapperFile", dataKey), file);
 
   const triggerUpsertData = async () => {
     const downloadUrl = await getDownloadURL((await task).ref);
 
     await upsertData({
-      dataType: "soilFile",
+      dataType: "firebaseWrapperFile",
       dataKey,
       data: { downloadUrl },
       owners,

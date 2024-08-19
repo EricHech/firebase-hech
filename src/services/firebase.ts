@@ -2,7 +2,7 @@ import * as database from "firebase/database";
 import * as storage from "firebase/storage";
 import { getDownloadURL, UploadTaskSnapshot as FirebaseUploadTaskSnapshot } from "firebase/storage";
 import { cleanPushKey } from "./paths";
-import { isoSoilUpdate } from "./data";
+import { isoFirebaseWrapperUpdate } from "./data";
 import { ListenerPaginationOptions } from "./types";
 
 const getRef = (path: string, allowRootQuery: boolean = false) => {
@@ -253,12 +253,12 @@ export const pushKey = (path: string) => cleanPushKey(database.push(getRef(path)
 export const set = <T>(path: string, data: T) =>
   database.set(getRef(path), data).catch(logAndThrow("set", path, { data }));
 
-export const soilUpdate = async (
+export const firebaseWrapperUpdate = async (
   path: string,
   data: object,
   allowRootQuery: boolean = false,
   isDelete: boolean = false
-) => isoSoilUpdate({ update, set }, path, data, allowRootQuery, isDelete);
+) => isoFirebaseWrapperUpdate({ update, set }, path, data, allowRootQuery, isDelete);
 
 export const update = async <T extends object>(path: string, data: T, allowRootQuery: boolean = false) => {
   if (path === "/" && allowRootQuery) {

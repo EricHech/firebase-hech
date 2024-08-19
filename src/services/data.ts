@@ -27,9 +27,9 @@ import type {
 import type {
   AfterCollisionFreeUpdateHandler,
   AppUser,
-  SoilDatabase,
-  SoilIncrement,
-  SoilTransactionWithCbParams,
+  FirebaseWrapperDatabase,
+  FirebaseWrapperIncrement,
+  FirebaseWrapperTransactionWithCbParams,
 } from "./types";
 import { firebaseStorageDelete } from "./firebase";
 
@@ -49,7 +49,7 @@ export const isoCreateUser = ({
   skipUpdate,
   now = Date.now(),
   createUnverifiedUser,
-}: Pick<CreateDataParams<keyof SoilDatabase>, "update" | "updateObject" | "skipUpdate" | "now"> & {
+}: Pick<CreateDataParams<keyof FirebaseWrapperDatabase>, "update" | "updateObject" | "skipUpdate" | "now"> & {
   user: Mandate<User, "uid">;
   appUser: AppUser;
   createUnverifiedUser: boolean;
@@ -103,7 +103,7 @@ export const isoOnUserValue = (
   cb: (user: Nullable<Mandate<User, "uid">>) => void
 ) => onValue(PATHS.user(uid), (user) => cb(user ? { ...user, uid } : null));
 
-export const isoOnDataKeyValue = <T2 extends keyof SoilDatabase>({
+export const isoOnDataKeyValue = <T2 extends keyof FirebaseWrapperDatabase>({
   onValue,
   dataType,
   dataKey,
@@ -121,22 +121,28 @@ export const isoOnDataKeyValue = <T2 extends keyof SoilDatabase>({
 /** DO NOT USE outside of strongly typed services */
 export const isoGetAdminValue = (get: (path: string) => Promise<boolean | null>, uid: string) => get(PATHS.admin(uid));
 
-export const isoGetDataKeyValue = <T2 extends keyof SoilDatabase>(get: GetFunction, dataType: T2, dataKey: string) =>
-  get<Data<T2>>(PATHS.dataKey(dataType, dataKey));
+export const isoGetDataKeyValue = <T2 extends keyof FirebaseWrapperDatabase>(
+  get: GetFunction,
+  dataType: T2,
+  dataKey: string
+) => get<Data<T2>>(PATHS.dataKey(dataType, dataKey));
 
-export const isoGetDataTypeValue = <T2 extends keyof SoilDatabase>(get: GetFunction, dataType: T2) =>
+export const isoGetDataTypeValue = <T2 extends keyof FirebaseWrapperDatabase>(get: GetFunction, dataType: T2) =>
   get<Record<string, Data<T2>>>(PATHS.dataType(dataType));
 
-export const isoGetAllConnectionTypesKeys = <T2 extends keyof SoilDatabase>(
+export const isoGetAllConnectionTypesKeys = <T2 extends keyof FirebaseWrapperDatabase>(
   get: GetFunction,
   parentType: T2,
   parentKey: string
 ) => get<DataList>(PATHS.connectionDataListKey(parentType, parentKey));
 
-export const isoGetAllConnectionTypes = <T2 extends keyof SoilDatabase>(get: GetFunction, parentType: T2) =>
+export const isoGetAllConnectionTypes = <T2 extends keyof FirebaseWrapperDatabase>(get: GetFunction, parentType: T2) =>
   get<Record<string, DataList>>(PATHS.connectionDataListType(parentType));
 
-export const isoGetConnectionTypeKeys = <T2 extends keyof SoilDatabase, T22 extends keyof SoilDatabase>({
+export const isoGetConnectionTypeKeys = <
+  T2 extends keyof FirebaseWrapperDatabase,
+  T22 extends keyof FirebaseWrapperDatabase
+>({
   get,
   parentType,
   parentKey,
@@ -148,7 +154,10 @@ export const isoGetConnectionTypeKeys = <T2 extends keyof SoilDatabase, T22 exte
   dataType: T22;
 }) => get<DataList[T22]>(PATHS.connectionDataListConnectionType(parentType, parentKey, dataType));
 
-export const isoGetConnectionTypeData = <T2 extends keyof SoilDatabase, T22 extends keyof SoilDatabase>({
+export const isoGetConnectionTypeData = <
+  T2 extends keyof FirebaseWrapperDatabase,
+  T22 extends keyof FirebaseWrapperDatabase
+>({
   get,
   parentType,
   parentKey,
@@ -167,7 +176,10 @@ export const isoGetConnectionTypeData = <T2 extends keyof SoilDatabase, T22 exte
     )
   );
 
-export const isoGetConnectionTypeConnectionsKeys = <T2 extends keyof SoilDatabase, T22 extends keyof SoilDatabase>({
+export const isoGetConnectionTypeConnectionsKeys = <
+  T2 extends keyof FirebaseWrapperDatabase,
+  T22 extends keyof FirebaseWrapperDatabase
+>({
   get,
   parentType,
   parentKey,
@@ -182,7 +194,7 @@ export const isoGetConnectionTypeConnectionsKeys = <T2 extends keyof SoilDatabas
     Promise.all(Object.keys(dataList || {}).map((key) => isoGetAllConnectionTypesKeys(get, dataType, key)))
   );
 
-export const isoGetUserTypeKeys = <T2 extends keyof SoilDatabase>({
+export const isoGetUserTypeKeys = <T2 extends keyof FirebaseWrapperDatabase>({
   get,
   dataType,
   uid,
@@ -192,7 +204,7 @@ export const isoGetUserTypeKeys = <T2 extends keyof SoilDatabase>({
   uid: string;
 }) => get<DataList[T2]>(PATHS.userDataTypeList(uid, dataType));
 
-export const isoGetUserTypeData = <T2 extends keyof SoilDatabase>({
+export const isoGetUserTypeData = <T2 extends keyof FirebaseWrapperDatabase>({
   get,
   dataType,
   uid,
@@ -209,7 +221,7 @@ export const isoGetUserTypeData = <T2 extends keyof SoilDatabase>({
     )
   );
 
-export const isoGetPublicTypeData = <T2 extends keyof SoilDatabase>({
+export const isoGetPublicTypeData = <T2 extends keyof FirebaseWrapperDatabase>({
   get,
   dataType,
 }: {
@@ -224,7 +236,7 @@ export const isoGetPublicTypeData = <T2 extends keyof SoilDatabase>({
     )
   );
 
-export const isoGetDataKeyFieldValue = <T2 extends keyof SoilDatabase, T3 extends keyof Data<T2>>({
+export const isoGetDataKeyFieldValue = <T2 extends keyof FirebaseWrapperDatabase, T3 extends keyof Data<T2>>({
   get,
   dataType,
   dataKey,
@@ -236,7 +248,7 @@ export const isoGetDataKeyFieldValue = <T2 extends keyof SoilDatabase, T3 extend
   field: T3;
 }) => get<Data<T2>[T3]>(PATHS.dataKeyField(dataType, dataKey, field));
 
-export const isoQueryData = <T2 extends keyof SoilDatabase, T3 extends keyof Data<T2>>({
+export const isoQueryData = <T2 extends keyof FirebaseWrapperDatabase, T3 extends keyof Data<T2>>({
   queryOrderByChildEqualTo,
   dataType,
   childKey,
@@ -258,16 +270,20 @@ export const isoQueryData = <T2 extends keyof SoilDatabase, T3 extends keyof Dat
 ╚██████╔╝╚███╔███╔╝██║ ╚████║███████╗██║  ██║███████║
  ╚═════╝  ╚══╝╚══╝ ╚═╝  ╚═══╝╚══════╝╚═╝  ╚═╝╚══════╝
 */
-export const isoGetOwner = <T2 extends keyof SoilDatabase>({ get, dataType, dataKey, uid }: GetOwnerDataParams<T2>) =>
-  get<number>(PATHS.ownerDataKeyUid(dataType, dataKey, uid));
+export const isoGetOwner = <T2 extends keyof FirebaseWrapperDatabase>({
+  get,
+  dataType,
+  dataKey,
+  uid,
+}: GetOwnerDataParams<T2>) => get<number>(PATHS.ownerDataKeyUid(dataType, dataKey, uid));
 
-export const isoGetOwners = (get: GetFunction, dataType: keyof SoilDatabase, dataKey: string) =>
+export const isoGetOwners = (get: GetFunction, dataType: keyof FirebaseWrapperDatabase, dataKey: string) =>
   get<Record<string, number>>(PATHS.ownerDataKey(dataType, dataKey));
 
-export const isoGetOwnersByType = (get: GetFunction, dataType: keyof SoilDatabase) =>
+export const isoGetOwnersByType = (get: GetFunction, dataType: keyof FirebaseWrapperDatabase) =>
   get<Record<string, Record<string, number>>>(PATHS.ownerDataType(dataType));
 
-export const isoAddOwners = <T2 extends keyof SoilDatabase>({
+export const isoAddOwners = <T2 extends keyof FirebaseWrapperDatabase>({
   update,
   updateObject = {},
   skipUpdate,
@@ -289,7 +305,7 @@ export const isoAddOwners = <T2 extends keyof SoilDatabase>({
   return skipUpdate ? updateObject : update("/", updateObject, true).then(() => updateObject);
 };
 
-export const isoRemoveOwners = <T2 extends keyof SoilDatabase>({
+export const isoRemoveOwners = <T2 extends keyof FirebaseWrapperDatabase>({
   update,
   updateObject = {},
   skipUpdate,
@@ -318,8 +334,8 @@ export const isoRemoveOwners = <T2 extends keyof SoilDatabase>({
 const ownersPrefix = `${PATHS.OWNERS}/`;
 const publicDataListPrefix = `${PATHS.PUBLIC_DATA_LISTS}/`;
 const dataPrefix = `${PATHS.DATA}/`;
-export const isoSoilUpdate = async (
-  soil: {
+export const isoFirebaseWrapperUpdate = async (
+  firebaseWrapper: {
     update: (path: string, d: object, allowRootQuery?: boolean, isDelete?: boolean) => Promise<void>;
     set: <T>(path: string, data: T) => Promise<void>;
   },
@@ -342,22 +358,22 @@ export const isoSoilUpdate = async (
     });
 
     if (isDelete) {
-      await Promise.all(Object.entries(allOtherUpdates).map(([key, val]) => soil.set(key, val)));
-      await Promise.all(Object.entries(dataUpdates).map(([key, val]) => soil.set(key, val)));
-      await Promise.all(Object.entries(publicDataListUpdates).map(([key, val]) => soil.set(key, val)));
-      await Promise.all(Object.entries(ownersUpdates).map(([key, val]) => soil.set(key, val)));
+      await Promise.all(Object.entries(allOtherUpdates).map(([key, val]) => firebaseWrapper.set(key, val)));
+      await Promise.all(Object.entries(dataUpdates).map(([key, val]) => firebaseWrapper.set(key, val)));
+      await Promise.all(Object.entries(publicDataListUpdates).map(([key, val]) => firebaseWrapper.set(key, val)));
+      await Promise.all(Object.entries(ownersUpdates).map(([key, val]) => firebaseWrapper.set(key, val)));
     } else {
-      await Promise.all(Object.entries(ownersUpdates).map(([key, val]) => soil.set(key, val)));
-      await Promise.all(Object.entries(publicDataListUpdates).map(([key, val]) => soil.set(key, val)));
-      await Promise.all(Object.entries(dataUpdates).map(([key, val]) => soil.update(key, val as object)));
-      await Promise.all(Object.entries(allOtherUpdates).map(([key, val]) => soil.set(key, val)));
+      await Promise.all(Object.entries(ownersUpdates).map(([key, val]) => firebaseWrapper.set(key, val)));
+      await Promise.all(Object.entries(publicDataListUpdates).map(([key, val]) => firebaseWrapper.set(key, val)));
+      await Promise.all(Object.entries(dataUpdates).map(([key, val]) => firebaseWrapper.update(key, val as object)));
+      await Promise.all(Object.entries(allOtherUpdates).map(([key, val]) => firebaseWrapper.set(key, val)));
     }
   } else {
-    await soil.update(path, data, allowRootQuery);
+    await firebaseWrapper.update(path, data, allowRootQuery);
   }
 };
 
-export const isoCreateData = async <T2 extends keyof SoilDatabase>({
+export const isoCreateData = async <T2 extends keyof FirebaseWrapperDatabase>({
   update,
   updateObject = {},
   skipUpdate,
@@ -397,7 +413,7 @@ export const isoCreateData = async <T2 extends keyof SoilDatabase>({
   return skipUpdate ? updateObject : update("/", updateObject, true).then(() => updateObject);
 };
 
-export const isoUpdateData = async <T2 extends keyof SoilDatabase>({
+export const isoUpdateData = async <T2 extends keyof FirebaseWrapperDatabase>({
   update,
   get,
   updateObject = {},
@@ -462,7 +478,7 @@ export const isoUpdateData = async <T2 extends keyof SoilDatabase>({
   return skipUpdate ? updateObject : update("/", updateObject, true).then(() => updateObject);
 };
 
-export const isoUpsertData = async <T2 extends keyof SoilDatabase>({
+export const isoUpsertData = async <T2 extends keyof FirebaseWrapperDatabase>({
   update,
   get,
   updateObject,
@@ -519,7 +535,7 @@ export const isoUpsertData = async <T2 extends keyof SoilDatabase>({
   });
 };
 
-const isoAfterCollisionFreeUpdateHandler = async <T2 extends keyof SoilDatabase, T3 extends keyof Data<T2>>({
+const isoAfterCollisionFreeUpdateHandler = async <T2 extends keyof FirebaseWrapperDatabase, T3 extends keyof Data<T2>>({
   get,
   update,
   dataType,
@@ -559,7 +575,7 @@ const isoAfterCollisionFreeUpdateHandler = async <T2 extends keyof SoilDatabase,
   return update("/", updateObject, true);
 };
 
-export const isoSoilIncrement = async <T2 extends keyof SoilDatabase, T3 extends keyof Data<T2>>({
+export const isoFirebaseWrapperIncrement = async <T2 extends keyof FirebaseWrapperDatabase, T3 extends keyof Data<T2>>({
   get,
   update,
   delta,
@@ -569,7 +585,7 @@ export const isoSoilIncrement = async <T2 extends keyof SoilDatabase, T3 extends
   makeGetRequests = true,
   makeConnectionsRequests = true,
   makeOwnersRequests = true,
-}: SoilIncrement<T2, T3>) => {
+}: FirebaseWrapperIncrement<T2, T3>) => {
   await update(PATHS.dataKey(dataType, dataKey), { [field]: increment(delta) });
 
   await isoAfterCollisionFreeUpdateHandler({
@@ -583,7 +599,10 @@ export const isoSoilIncrement = async <T2 extends keyof SoilDatabase, T3 extends
   });
 };
 
-export const isoSoilTransactionWithCb = async <T2 extends keyof SoilDatabase, T3 extends keyof Data<T2>>({
+export const isoFirebaseWrapperTransactionWithCb = async <
+  T2 extends keyof FirebaseWrapperDatabase,
+  T3 extends keyof Data<T2>
+>({
   get,
   update,
   transactionWithCb,
@@ -594,7 +613,7 @@ export const isoSoilTransactionWithCb = async <T2 extends keyof SoilDatabase, T3
   makeGetRequests = true,
   makeConnectionsRequests = true,
   makeOwnersRequests = true,
-}: SoilTransactionWithCbParams<T2, T3>) => {
+}: FirebaseWrapperTransactionWithCbParams<T2, T3>) => {
   await transactionWithCb(PATHS.dataKeyField(dataType, dataKey, field), cb);
 
   await isoAfterCollisionFreeUpdateHandler({
@@ -608,7 +627,7 @@ export const isoSoilTransactionWithCb = async <T2 extends keyof SoilDatabase, T3
   });
 };
 
-export const isoCreateConnections = <T2 extends keyof SoilDatabase>({
+export const isoCreateConnections = <T2 extends keyof FirebaseWrapperDatabase>({
   update,
   updateObject = {},
   skipUpdate,
@@ -633,7 +652,7 @@ export const isoCreateConnections = <T2 extends keyof SoilDatabase>({
 ██║  ██║███████╗██║ ╚═╝ ██║╚██████╔╝ ╚████╔╝ ███████╗
 ╚═╝  ╚═╝╚══════╝╚═╝     ╚═╝ ╚═════╝   ╚═══╝  ╚══════╝
 */
-export const isoRemoveData = async <T2 extends keyof SoilDatabase>({
+export const isoRemoveData = async <T2 extends keyof FirebaseWrapperDatabase>({
   update,
   get,
   updateObject = {},
@@ -667,13 +686,13 @@ export const isoRemoveData = async <T2 extends keyof SoilDatabase>({
   });
   /* eslint-enable no-param-reassign */
 
-  if (dataType === "soilFile") await firebaseStorageDelete(PATHS.dataKey("soilFile", dataKey));
+  if (dataType === "firebaseWrapperFile") await firebaseStorageDelete(PATHS.dataKey("firebaseWrapperFile", dataKey));
 
   return skipUpdate ? updateObject : update("/", updateObject, true, true).then(() => updateObject);
 };
 
 /** ! CAREFUL */
-export const isoRemoveDataType = async <T2 extends keyof SoilDatabase>({
+export const isoRemoveDataType = async <T2 extends keyof FirebaseWrapperDatabase>({
   update,
   get,
   dataType,
@@ -686,8 +705,9 @@ export const isoRemoveDataType = async <T2 extends keyof SoilDatabase>({
       Object.entries(dataList).forEach(([dType, dKeys]) =>
         Object.keys(dKeys).forEach((dk) => {
           if (dType !== dataType) {
-            getUpdateObject()[PATHS.connectionDataListConnectionKey(dType as keyof SoilDatabase, dk, dataType, dKey)] =
-              null;
+            getUpdateObject()[
+              PATHS.connectionDataListConnectionKey(dType as keyof FirebaseWrapperDatabase, dk, dataType, dKey)
+            ] = null;
           }
         })
       )
@@ -719,7 +739,7 @@ export const isoRemoveDataType = async <T2 extends keyof SoilDatabase>({
   }
 };
 
-export const isoRemoveConnections = <T2 extends keyof SoilDatabase>({
+export const isoRemoveConnections = <T2 extends keyof FirebaseWrapperDatabase>({
   update,
   updateObject = {},
   skipUpdate,
@@ -747,7 +767,10 @@ export const isoTrackEvent = (
     metadata: metadata || null,
   });
 
-export const isoChangeDataKey = async <T2 extends keyof SoilDatabase, T22 extends keyof SoilDatabase>({
+export const isoChangeDataKey = async <
+  T2 extends keyof FirebaseWrapperDatabase,
+  T22 extends keyof FirebaseWrapperDatabase
+>({
   update,
   get,
   existingDataType,
@@ -765,14 +788,13 @@ export const isoChangeDataKey = async <T2 extends keyof SoilDatabase, T22 extend
   const existingConnections =
     (await isoGetAllConnectionTypesKeys(get, existingDataType, existingDataKey)) || ({} as DataList);
 
-  const connections = (Object.entries(existingConnections) as [keyof SoilDatabase, Record<string, number>][]).reduce(
-    (prev, [type, dataList]) => {
-      prev.push(...Object.keys(dataList).map((key) => ({ type, key })));
+  const connections = (
+    Object.entries(existingConnections) as [keyof FirebaseWrapperDatabase, Record<string, number>][]
+  ).reduce((prev, [type, dataList]) => {
+    prev.push(...Object.keys(dataList).map((key) => ({ type, key })));
 
-      return prev;
-    },
-    [] as Connections
-  );
+    return prev;
+  }, [] as Connections);
 
   const updateObject: UpdateObject<T2> = {};
 
@@ -780,7 +802,7 @@ export const isoChangeDataKey = async <T2 extends keyof SoilDatabase, T22 extend
     update,
     updateObject,
     skipUpdate: true,
-    data: data as unknown as SoilDatabase[T2],
+    data: data as unknown as FirebaseWrapperDatabase[T2],
     dataType: (newDataType || existingDataType) as unknown as typeof existingDataType,
     dataKey: newDataKey,
     owners: existingOwners,

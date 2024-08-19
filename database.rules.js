@@ -24,7 +24,7 @@ const rootDataPublicAccessArgs = (dataType, dataKey) =>
 // TODO: ie. const authUidIsValid = "auth.uid === $uid && root.child('users').child(auth.uid).child('emailVerified').val() === true";
 
 /**
- * This makes `appUser` a necessary part of soil - it must be connected to everything that they want
+ * This makes `appUser` a necessary part of Firebase Wrapper - it must be connected to everything that they want
  * to read that is not public and that they do not own or have `connectionAccess/read` permissions.
  */
 const isAppUserConnected = (type, key) =>
@@ -120,7 +120,7 @@ const writeAsOwnerOrWriteOwnershipAccess = (dataType, dataKey) =>
  *
  * ! Notes regarding making connections and reading data structure:
  * * `appUser`:
- * This is now a Soil reserved name like `user` and must be public so that connections can be created between a user and
+ * This is now a Firebase Wrapper reserved name like `user` and must be public so that connections can be created between a user and
  * a piece of data that someone owns (private user information can go elsewhere). This is how you can give access to someone.
  * ? Example: A manager wants to add a user to a project that the manager owns when the manager does not own the user.
  *

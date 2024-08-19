@@ -1,4 +1,4 @@
-import type { Data, SoilDatabase } from "./types";
+import type { Data, FirebaseWrapperDatabase } from "./types";
 
 type DataKey = string;
 
@@ -19,44 +19,52 @@ export const PATHS = {
   trackingKey: (trackingKey: string) => `${PATHS.TRACKING}/${trackingKey}`,
 
   DATA: "data",
-  dataType: <T2 extends keyof SoilDatabase>(dataType: T2) => `${PATHS.DATA}/${dataType}`,
-  dataKey: <T2 extends keyof SoilDatabase>(dataType: T2, dataKey: DataKey) =>
+  dataType: <T2 extends keyof FirebaseWrapperDatabase>(dataType: T2) => `${PATHS.DATA}/${dataType}`,
+  dataKey: <T2 extends keyof FirebaseWrapperDatabase>(dataType: T2, dataKey: DataKey) =>
     `${PATHS.DATA}/${dataType}/${String(dataKey)}`,
-  dataKeyField: <T2 extends keyof SoilDatabase, T3 extends keyof Data<T2>>(
+  dataKeyField: <T2 extends keyof FirebaseWrapperDatabase, T3 extends keyof Data<T2>>(
     dataType: T2,
     dataKey: DataKey,
     dataField: T3
   ) => `${PATHS.DATA}/${dataType}/${String(dataKey)}/${String(dataField)}`,
 
   OWNERS: "owners",
-  ownerDataType: <T2 extends keyof SoilDatabase>(dataType: T2) => `${PATHS.OWNERS}/${dataType}`,
-  ownerDataKey: <T2 extends keyof SoilDatabase>(dataType: T2, dataKey: DataKey) =>
+  ownerDataType: <T2 extends keyof FirebaseWrapperDatabase>(dataType: T2) => `${PATHS.OWNERS}/${dataType}`,
+  ownerDataKey: <T2 extends keyof FirebaseWrapperDatabase>(dataType: T2, dataKey: DataKey) =>
     `${PATHS.OWNERS}/${dataType}/${String(dataKey)}`,
-  ownerDataKeyUid: <T2 extends keyof SoilDatabase>(dataType: T2, dataKey: DataKey, uid: string) =>
+  ownerDataKeyUid: <T2 extends keyof FirebaseWrapperDatabase>(dataType: T2, dataKey: DataKey, uid: string) =>
     `${PATHS.OWNERS}/${dataType}/${String(dataKey)}/${uid}`,
 
   USER_DATA_LISTS: "userDataLists",
   userDataList: (uid: string) => `${PATHS.USER_DATA_LISTS}/${uid}`,
-  userDataTypeList: <T2 extends keyof SoilDatabase>(uid: string, dataType: T2) =>
+  userDataTypeList: <T2 extends keyof FirebaseWrapperDatabase>(uid: string, dataType: T2) =>
     `${PATHS.USER_DATA_LISTS}/${uid}/${dataType}`,
-  userDataKeyList: <T2 extends keyof SoilDatabase>(uid: string, dataType: T2, dataKey: DataKey) =>
+  userDataKeyList: <T2 extends keyof FirebaseWrapperDatabase>(uid: string, dataType: T2, dataKey: DataKey) =>
     `${PATHS.USER_DATA_LISTS}/${uid}/${dataType}/${String(dataKey)}`,
 
   PUBLIC_DATA_LISTS: "publicDataLists",
-  publicDataTypeList: <T2 extends keyof SoilDatabase>(dataType: T2) => `${PATHS.PUBLIC_DATA_LISTS}/${dataType}`,
-  publicDataKeyList: <T2 extends keyof SoilDatabase>(dataType: T2, dataKey: DataKey) =>
+  publicDataTypeList: <T2 extends keyof FirebaseWrapperDatabase>(dataType: T2) =>
+    `${PATHS.PUBLIC_DATA_LISTS}/${dataType}`,
+  publicDataKeyList: <T2 extends keyof FirebaseWrapperDatabase>(dataType: T2, dataKey: DataKey) =>
     `${PATHS.PUBLIC_DATA_LISTS}/${dataType}/${String(dataKey)}`,
 
   CONNECTION_DATA_LISTS: "connectionDataLists",
-  connectionDataListType: <T2 extends keyof SoilDatabase>(dataType: T2) => `${PATHS.CONNECTION_DATA_LISTS}/${dataType}`,
-  connectionDataListKey: <T2 extends keyof SoilDatabase>(dataType: T2, dataKey: DataKey) =>
+  connectionDataListType: <T2 extends keyof FirebaseWrapperDatabase>(dataType: T2) =>
+    `${PATHS.CONNECTION_DATA_LISTS}/${dataType}`,
+  connectionDataListKey: <T2 extends keyof FirebaseWrapperDatabase>(dataType: T2, dataKey: DataKey) =>
     `${PATHS.CONNECTION_DATA_LISTS}/${dataType}/${String(dataKey)}`,
-  connectionDataListConnectionType: <T2 extends keyof SoilDatabase, T22 extends keyof SoilDatabase>(
+  connectionDataListConnectionType: <
+    T2 extends keyof FirebaseWrapperDatabase,
+    T22 extends keyof FirebaseWrapperDatabase
+  >(
     dataType: T2,
     dataKey: DataKey,
     connectionType: T22
   ) => `${PATHS.CONNECTION_DATA_LISTS}/${dataType}/${String(dataKey)}/${connectionType}`,
-  connectionDataListConnectionKey: <T2 extends keyof SoilDatabase, T22 extends keyof SoilDatabase>(
+  connectionDataListConnectionKey: <
+    T2 extends keyof FirebaseWrapperDatabase,
+    T22 extends keyof FirebaseWrapperDatabase
+  >(
     dataType: T2,
     dataKey: DataKey,
     connectionType: T22,
