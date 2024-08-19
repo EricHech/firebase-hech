@@ -21,7 +21,7 @@ export default defineConfig({
         client: resolve(__dirname, "src/client.ts"),
         server: resolve(__dirname, "src/server.ts"),
       },
-      name: "firebase-wrapper",
+      name: "firebase-hech",
       // the proper extensions will be added
       fileName: (format, name) => `${name}.${format === "es" ? "m" : "c"}js`,
       //   fileName: (format, entryName) => {

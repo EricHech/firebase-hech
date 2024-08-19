@@ -3,7 +3,7 @@ import { getDatabase } from "firebase-admin/database";
 import { CreateRequest, getAuth, UpdateRequest } from "firebase-admin/auth";
 
 // Helpers
-import { isoFirebaseWrapperUpdate } from "./data";
+import { isoFirebaseHechUpdate } from "./data";
 import { getDataKeyValue } from "./server-data";
 import { cleanPushKey } from "./paths";
 
@@ -54,12 +54,12 @@ export const update = async <T extends object>(path: string, data: T, allowRootQ
 };
 
 /** This is for mimicking the front end if using `initializeAdminRemoteRequestApp` on the server */
-export const firebaseWrapperUpdate = async (
+export const firebaseHechUpdate = async (
   path: string,
   data: object,
   allowRootQuery: boolean = false,
   isDelete: boolean = false
-) => isoFirebaseWrapperUpdate({ update, set }, path, data, allowRootQuery, isDelete);
+) => isoFirebaseHechUpdate({ update, set }, path, data, allowRootQuery, isDelete);
 
 export const onValue = <T>(path: string, cb: (val: Nullable<T>) => void) =>
   getRef(path).on("value", (snap) => cb(snap.val()));

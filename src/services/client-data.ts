@@ -25,14 +25,14 @@ import {
   isoAddOwners,
   isoRemoveOwners,
   isoGetUidFromUsername,
-  isoFirebaseWrapperTransactionWithCb,
-  isoFirebaseWrapperIncrement,
+  isoFirebaseHechTransactionWithCb,
+  isoFirebaseHechIncrement,
   isoGetUserTypeKeys,
   isoGetUnverifiedUser,
   isoGetUserTypeData,
   isoGetPublicTypeData,
 } from "./data";
-import { get, update, firebaseWrapperUpdate, onValue, push, transactionWithCb } from "./firebase";
+import { get, update, firebaseHechUpdate, onValue, push, transactionWithCb } from "./firebase";
 
 // Types
 import type {
@@ -46,11 +46,11 @@ import type {
   ModifyConnectionsType,
   ChangeDataKey,
   AppUser,
-  FirebaseWrapperTransactionWithCbParams,
+  FirebaseHechTransactionWithCbParams,
   Data,
-  FirebaseWrapperIncrement,
+  FirebaseHechIncrement,
 } from "./types";
-import type { FirebaseWrapperDatabase } from "..";
+import type { FirebaseHechDatabase } from "..";
 
 export const createUser = ({
   user,
@@ -59,7 +59,7 @@ export const createUser = ({
   skipUpdate,
   now,
   createUnverifiedUser,
-}: Pick<CreateDataParams<keyof FirebaseWrapperDatabase>, "updateObject" | "skipUpdate" | "now"> & {
+}: Pick<CreateDataParams<keyof FirebaseHechDatabase>, "updateObject" | "skipUpdate" | "now"> & {
   user: Mandate<User, "uid">;
   appUser: AppUser;
   createUnverifiedUser: boolean;
@@ -73,15 +73,12 @@ export const getUser = (uid: string) => isoGetUser(get, uid);
 
 export const getUidFromUsername = (username: string) => isoGetUidFromUsername(get, username);
 
-export const getDataKeyValue = <T2 extends keyof FirebaseWrapperDatabase>({
+export const getDataKeyValue = <T2 extends keyof FirebaseHechDatabase>({
   dataType,
   dataKey,
 }: Omit<GetDataKeyValueParams<T2>, "get">) => isoGetDataKeyValue(get, dataType, dataKey);
 
-export const getDataKeyFieldValue = <
-  T2 extends keyof FirebaseWrapperDatabase,
-  T3 extends keyof FirebaseWrapperDatabase[T2]
->({
+export const getDataKeyFieldValue = <T2 extends keyof FirebaseHechDatabase, T3 extends keyof FirebaseHechDatabase[T2]>({
   dataType,
   dataKey,
   field,
@@ -91,17 +88,17 @@ export const getDataKeyFieldValue = <
   field: T3;
 }) => isoGetDataKeyFieldValue({ get, dataType, dataKey, field });
 
-export const getDataTypeValue = <T2 extends keyof FirebaseWrapperDatabase>({
+export const getDataTypeValue = <T2 extends keyof FirebaseHechDatabase>({
   dataType,
 }: Omit<GetDataKeyValueParams<T2>, "get" | "dataKey">) => isoGetDataTypeValue(get, dataType);
 
-export const onDataKeyValue = <T2 extends keyof FirebaseWrapperDatabase>({
+export const onDataKeyValue = <T2 extends keyof FirebaseHechDatabase>({
   dataType,
   dataKey,
   cb,
 }: Omit<OnDataValueParams<T2>, "onValue">) => isoOnDataKeyValue({ onValue, dataType, dataKey, cb });
 
-export const getUserTypeKeys = <T2 extends keyof FirebaseWrapperDatabase>({
+export const getUserTypeKeys = <T2 extends keyof FirebaseHechDatabase>({
   dataType,
   uid,
 }: {
@@ -109,7 +106,7 @@ export const getUserTypeKeys = <T2 extends keyof FirebaseWrapperDatabase>({
   uid: string;
 }) => isoGetUserTypeKeys({ get, dataType, uid });
 
-export const getUserTypeData = <T2 extends keyof FirebaseWrapperDatabase>({
+export const getUserTypeData = <T2 extends keyof FirebaseHechDatabase>({
   dataType,
   uid,
 }: {
@@ -117,10 +114,10 @@ export const getUserTypeData = <T2 extends keyof FirebaseWrapperDatabase>({
   uid: string;
 }) => isoGetUserTypeData({ get, dataType, uid });
 
-export const getPublicTypeData = <T2 extends keyof FirebaseWrapperDatabase>({ dataType }: { dataType: T2 }) =>
+export const getPublicTypeData = <T2 extends keyof FirebaseHechDatabase>({ dataType }: { dataType: T2 }) =>
   isoGetPublicTypeData({ get, dataType });
 
-export const createData = async <T2 extends keyof FirebaseWrapperDatabase>({
+export const createData = async <T2 extends keyof FirebaseHechDatabase>({
   updateObject,
   skipUpdate,
   dataType,
@@ -134,7 +131,7 @@ export const createData = async <T2 extends keyof FirebaseWrapperDatabase>({
   now,
 }: Omit<CreateDataParams<T2>, "update">) =>
   isoCreateData({
-    update: firebaseWrapperUpdate,
+    update: firebaseHechUpdate,
     updateObject,
     skipUpdate,
     dataType,
@@ -148,7 +145,7 @@ export const createData = async <T2 extends keyof FirebaseWrapperDatabase>({
     now,
   });
 
-export const updateData = async <T2 extends keyof FirebaseWrapperDatabase>({
+export const updateData = async <T2 extends keyof FirebaseHechDatabase>({
   updateObject,
   skipUpdate,
   dataType,
@@ -166,7 +163,7 @@ export const updateData = async <T2 extends keyof FirebaseWrapperDatabase>({
   now,
 }: Omit<UpdateDataParams<T2>, "update" | "get" | "updateDataHandler" | "updateListHandler">) =>
   isoUpdateData({
-    update: firebaseWrapperUpdate,
+    update: firebaseHechUpdate,
     get,
     updateObject,
     skipUpdate,
@@ -185,7 +182,7 @@ export const updateData = async <T2 extends keyof FirebaseWrapperDatabase>({
     now,
   });
 
-export const upsertData = async <T2 extends keyof FirebaseWrapperDatabase>({
+export const upsertData = async <T2 extends keyof FirebaseHechDatabase>({
   updateObject,
   skipUpdate,
   dataType,
@@ -203,7 +200,7 @@ export const upsertData = async <T2 extends keyof FirebaseWrapperDatabase>({
   now,
 }: Omit<CreateDataParams<T2> & UpdateDataParams<T2>, "update" | "get">) =>
   isoUpsertData({
-    update: firebaseWrapperUpdate,
+    update: firebaseHechUpdate,
     get,
     updateObject,
     skipUpdate,
@@ -222,7 +219,7 @@ export const upsertData = async <T2 extends keyof FirebaseWrapperDatabase>({
     now,
   });
 
-export const addOwners = async <T2 extends keyof FirebaseWrapperDatabase>({
+export const addOwners = async <T2 extends keyof FirebaseHechDatabase>({
   dataType,
   dataKey,
   updateObject,
@@ -231,7 +228,7 @@ export const addOwners = async <T2 extends keyof FirebaseWrapperDatabase>({
   owners,
 }: Pick<CreateDataParams<T2>, "dataType" | "dataKey" | "owners" | "updateObject" | "skipUpdate" | "now">) =>
   isoAddOwners({
-    update: firebaseWrapperUpdate,
+    update: firebaseHechUpdate,
     dataType,
     dataKey,
     updateObject,
@@ -240,7 +237,7 @@ export const addOwners = async <T2 extends keyof FirebaseWrapperDatabase>({
     now,
   });
 
-export const removeOwners = async <T2 extends keyof FirebaseWrapperDatabase>({
+export const removeOwners = async <T2 extends keyof FirebaseHechDatabase>({
   dataType,
   dataKey,
   updateObject,
@@ -248,7 +245,7 @@ export const removeOwners = async <T2 extends keyof FirebaseWrapperDatabase>({
   owners,
 }: Pick<CreateDataParams<T2>, "dataType" | "dataKey" | "owners" | "updateObject" | "skipUpdate">) =>
   isoRemoveOwners({
-    update: firebaseWrapperUpdate,
+    update: firebaseHechUpdate,
     dataType,
     dataKey,
     updateObject,
@@ -256,27 +253,24 @@ export const removeOwners = async <T2 extends keyof FirebaseWrapperDatabase>({
     owners,
   });
 
-export const createConnection = async <T2 extends keyof FirebaseWrapperDatabase>({
+export const createConnection = async <T2 extends keyof FirebaseHechDatabase>({
   updateObject,
   skipUpdate,
   now = Date.now(),
   connections,
 }: Omit<ModifyConnectionsType<T2>, "update">) =>
   isoCreateConnections({
-    update: firebaseWrapperUpdate,
+    update: firebaseHechUpdate,
     updateObject,
     skipUpdate,
     connections,
     now,
   });
 
-export const getAllConnectionTypesKeys = <T2 extends keyof FirebaseWrapperDatabase>(dataType: T2, dataKey: string) =>
+export const getAllConnectionTypesKeys = <T2 extends keyof FirebaseHechDatabase>(dataType: T2, dataKey: string) =>
   isoGetAllConnectionTypesKeys(get, dataType, dataKey);
 
-export const getConnectionTypeKeys = <
-  T2 extends keyof FirebaseWrapperDatabase,
-  T22 extends keyof FirebaseWrapperDatabase
->({
+export const getConnectionTypeKeys = <T2 extends keyof FirebaseHechDatabase, T22 extends keyof FirebaseHechDatabase>({
   parentType,
   parentKey,
   dataType,
@@ -292,10 +286,7 @@ export const getConnectionTypeKeys = <
     dataType,
   });
 
-export const getConnectionTypeData = <
-  T2 extends keyof FirebaseWrapperDatabase,
-  T22 extends keyof FirebaseWrapperDatabase
->({
+export const getConnectionTypeData = <T2 extends keyof FirebaseHechDatabase, T22 extends keyof FirebaseHechDatabase>({
   parentType,
   parentKey,
   dataType,
@@ -312,8 +303,8 @@ export const getConnectionTypeData = <
   });
 
 export const getConnectionTypeConnectionsKeys = <
-  T2 extends keyof FirebaseWrapperDatabase,
-  T22 extends keyof FirebaseWrapperDatabase
+  T2 extends keyof FirebaseHechDatabase,
+  T22 extends keyof FirebaseHechDatabase
 >({
   parentType,
   parentKey,
@@ -330,7 +321,7 @@ export const getConnectionTypeConnectionsKeys = <
     dataType,
   });
 
-export const firebaseWrapperIncrement = <T2 extends keyof FirebaseWrapperDatabase, T3 extends keyof Data<T2>>({
+export const firebaseHechIncrement = <T2 extends keyof FirebaseHechDatabase, T3 extends keyof Data<T2>>({
   dataType,
   dataKey,
   field,
@@ -338,8 +329,8 @@ export const firebaseWrapperIncrement = <T2 extends keyof FirebaseWrapperDatabas
   makeGetRequests,
   makeConnectionsRequests,
   makeOwnersRequests,
-}: Omit<FirebaseWrapperIncrement<T2, T3>, "get" | "update">) =>
-  isoFirebaseWrapperIncrement({
+}: Omit<FirebaseHechIncrement<T2, T3>, "get" | "update">) =>
+  isoFirebaseHechIncrement({
     get,
     update,
     dataType,
@@ -351,7 +342,7 @@ export const firebaseWrapperIncrement = <T2 extends keyof FirebaseWrapperDatabas
     makeOwnersRequests,
   });
 
-export const firebaseWrapperTransactionWithCb = <T2 extends keyof FirebaseWrapperDatabase, T3 extends keyof Data<T2>>({
+export const firebaseHechTransactionWithCb = <T2 extends keyof FirebaseHechDatabase, T3 extends keyof Data<T2>>({
   cb,
   dataType,
   dataKey,
@@ -359,8 +350,8 @@ export const firebaseWrapperTransactionWithCb = <T2 extends keyof FirebaseWrappe
   makeGetRequests,
   makeConnectionsRequests,
   makeOwnersRequests,
-}: Omit<FirebaseWrapperTransactionWithCbParams<T2, T3>, "get" | "update" | "transactionWithCb">) =>
-  isoFirebaseWrapperTransactionWithCb({
+}: Omit<FirebaseHechTransactionWithCbParams<T2, T3>, "get" | "update" | "transactionWithCb">) =>
+  isoFirebaseHechTransactionWithCb({
     get,
     update,
     transactionWithCb,
@@ -373,14 +364,14 @@ export const firebaseWrapperTransactionWithCb = <T2 extends keyof FirebaseWrappe
     makeOwnersRequests,
   });
 
-export const removeData = async <T2 extends keyof FirebaseWrapperDatabase>({
+export const removeData = async <T2 extends keyof FirebaseHechDatabase>({
   updateObject,
   skipUpdate,
   dataType,
   dataKey,
 }: Omit<RemoveDataKeyParams<T2>, "update" | "get">) =>
   isoRemoveData({
-    update: firebaseWrapperUpdate,
+    update: firebaseHechUpdate,
     get,
     updateObject,
     skipUpdate,
@@ -388,10 +379,10 @@ export const removeData = async <T2 extends keyof FirebaseWrapperDatabase>({
     dataKey,
   });
 
-export const getOwners = <T2 extends keyof FirebaseWrapperDatabase>(dataType: T2, dataKey: string) =>
+export const getOwners = <T2 extends keyof FirebaseHechDatabase>(dataType: T2, dataKey: string) =>
   isoGetOwners(get, dataType, dataKey);
 
-export const getOwner = <T2 extends keyof FirebaseWrapperDatabase>({
+export const getOwner = <T2 extends keyof FirebaseHechDatabase>({
   dataType,
   dataKey,
   uid,
@@ -402,7 +393,7 @@ export const getAdminValue = (uid: string) => isoGetAdminValue(get, uid);
 export const onUserValue = (uid: string, cb: (user: Nullable<Mandate<User, "uid">>) => void) =>
   isoOnUserValue(onValue, uid, cb);
 
-export const removeConnection = <T2 extends keyof FirebaseWrapperDatabase>({
+export const removeConnection = <T2 extends keyof FirebaseHechDatabase>({
   connections,
   skipUpdate,
   updateObject,
@@ -412,10 +403,7 @@ export const removeConnection = <T2 extends keyof FirebaseWrapperDatabase>({
 export const trackEvent = (eventName: string, nonAdminUid: Maybe<string>, metadata?: object) =>
   isoTrackEvent(push, eventName, nonAdminUid || "firebase-admin", metadata);
 
-export const changeDataKey = async <
-  T2 extends keyof FirebaseWrapperDatabase,
-  T22 extends keyof FirebaseWrapperDatabase
->({
+export const changeDataKey = async <T2 extends keyof FirebaseHechDatabase, T22 extends keyof FirebaseHechDatabase>({
   existingDataType,
   existingDataKey,
   newDataType,

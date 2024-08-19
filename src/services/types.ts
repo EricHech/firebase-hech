@@ -7,12 +7,12 @@ export interface RemoteRequest {
   remoteRequestUid: string;
 }
 
-export interface FirebaseWrapperDatabase {
-  /** Firebase Wrapper reserved name: Must be `publicAccess === true`. */
+export interface FirebaseHechDatabase {
+  /** Firebase Hech reserved name: Must be `publicAccess === true`. */
   appUser: AppUser;
-  /** Firebase Wrapper reserved name. */
-  firebaseWrapperFile: { downloadUrl: string; metadata?: Record<string, string> };
-  /** Firebase Wrapper reserved name. See README. */
+  /** Firebase Hech reserved name. */
+  firebaseHechFile: { downloadUrl: string; metadata?: Record<string, string> };
+  /** Firebase Hech reserved name. See README. */
   remoteRequest: RemoteRequest;
 }
 
@@ -35,14 +35,14 @@ export type StandardDataFields = {
   updatedAt: number;
   deletedAt?: number;
   connectionAccess?: {
-    connectionType: keyof FirebaseWrapperDatabase;
+    connectionType: keyof FirebaseHechDatabase;
     connectionKey: string;
-    uidDataType: keyof FirebaseWrapperDatabase;
+    uidDataType: keyof FirebaseHechDatabase;
     read: boolean;
     write: boolean;
   };
   ownershipAccess?: {
-    dataType: keyof FirebaseWrapperDatabase;
+    dataType: keyof FirebaseHechDatabase;
     dataKey: string;
     read: boolean;
     write: boolean;
@@ -61,23 +61,23 @@ export type User = StandardDataFields &
 
 export type FirebaseProfile = Partial<{ displayName: Nullable<string>; photoURL: Nullable<string> }>;
 
-export type Data<T2 extends keyof FirebaseWrapperDatabase> = StandardDataFields & {
+export type Data<T2 extends keyof FirebaseHechDatabase> = StandardDataFields & {
   key?: string;
   publicAccess: Nullable<boolean>;
-} & FirebaseWrapperDatabase[T2];
+} & FirebaseHechDatabase[T2];
 
-export type KeyedData<T extends keyof FirebaseWrapperDatabase> = Mandate<Data<T>, "key">;
+export type KeyedData<T extends keyof FirebaseHechDatabase> = Mandate<Data<T>, "key">;
 
-export type StatefulData<T2 extends keyof FirebaseWrapperDatabase> = Maybe<Nullable<Data<T2>>>;
+export type StatefulData<T2 extends keyof FirebaseHechDatabase> = Maybe<Nullable<Data<T2>>>;
 
-export type DataList = Record<keyof FirebaseWrapperDatabase, Record<string, number>>;
+export type DataList = Record<keyof FirebaseHechDatabase, Record<string, number>>;
 
-export type UpdateObject<T2 extends keyof FirebaseWrapperDatabase = keyof FirebaseWrapperDatabase> = Record<
+export type UpdateObject<T2 extends keyof FirebaseHechDatabase = keyof FirebaseHechDatabase> = Record<
   string,
-  FirebaseWrapperDatabase[T2] | null | boolean | number | string | object
+  FirebaseHechDatabase[T2] | null | boolean | number | string | object
 >;
 
-export type StatefulDataType<T2 extends keyof FirebaseWrapperDatabase> = Record<string, Nullable<StatefulData<T2>>>;
+export type StatefulDataType<T2 extends keyof FirebaseHechDatabase> = Record<string, Nullable<StatefulData<T2>>>;
 
 export type TrackingData = {
   createdAt: number;
@@ -91,18 +91,18 @@ export type TriggerFunctionRequest = {
 
 export type GetFunction = <GT>(path: string) => Promise<GT | null>;
 
-export type GetDataKeyValueParams<T2 extends keyof FirebaseWrapperDatabase> = {
+export type GetDataKeyValueParams<T2 extends keyof FirebaseHechDatabase> = {
   get: GetFunction;
   dataType: T2;
   dataKey: string;
 };
 
-export type GetDataTypeValueParams<T2 extends keyof FirebaseWrapperDatabase> = {
+export type GetDataTypeValueParams<T2 extends keyof FirebaseHechDatabase> = {
   get: GetFunction;
   dataType: T2;
 };
 
-export type CudDataParams<T2 extends keyof FirebaseWrapperDatabase> = {
+export type CudDataParams<T2 extends keyof FirebaseHechDatabase> = {
   update: (path: string, d: UpdateObject<T2>, allowRootQuery?: boolean, isDelete?: boolean) => Promise<void>;
   updateObject?: UpdateObject<T2>;
   skipUpdate?: boolean;
@@ -113,19 +113,19 @@ export type CudDataParams<T2 extends keyof FirebaseWrapperDatabase> = {
 };
 
 export type Connections = {
-  type: keyof FirebaseWrapperDatabase;
+  type: keyof FirebaseHechDatabase;
   key: string;
 }[];
 
-export type CreateDataParams<T2 extends keyof FirebaseWrapperDatabase> = CudDataParams<T2> & {
-  data: FirebaseWrapperDatabase[T2];
+export type CreateDataParams<T2 extends keyof FirebaseHechDatabase> = CudDataParams<T2> & {
+  data: FirebaseHechDatabase[T2];
   owners: string[];
   connections?: Connections;
   connectionAccess?: StandardDataFields["connectionAccess"];
   ownershipAccess?: StandardDataFields["ownershipAccess"];
 };
 
-export type ChangeDataKey<T2 extends keyof FirebaseWrapperDatabase, T22 extends keyof FirebaseWrapperDatabase> = Pick<
+export type ChangeDataKey<T2 extends keyof FirebaseHechDatabase, T22 extends keyof FirebaseHechDatabase> = Pick<
   CudDataParams<T2>,
   "update"
 > & {
@@ -136,9 +136,9 @@ export type ChangeDataKey<T2 extends keyof FirebaseWrapperDatabase, T22 extends 
   newDataKey: string;
 };
 
-export type UpdateDataParams<T2 extends keyof FirebaseWrapperDatabase> = CudDataParams<T2> & {
+export type UpdateDataParams<T2 extends keyof FirebaseHechDatabase> = CudDataParams<T2> & {
   get: GetFunction;
-  data: Partial<FirebaseWrapperDatabase[T2]>;
+  data: Partial<FirebaseHechDatabase[T2]>;
   owners?: string[];
   connections?: Connections;
   connectionAccess?: StandardDataFields["connectionAccess"];
@@ -151,7 +151,7 @@ export type UpdateDataParams<T2 extends keyof FirebaseWrapperDatabase> = CudData
   includeUpdatedAt?: boolean;
 };
 
-export type RemoveDataKeyParams<T2 extends keyof FirebaseWrapperDatabase> = Omit<
+export type RemoveDataKeyParams<T2 extends keyof FirebaseHechDatabase> = Omit<
   CudDataParams<T2>,
   "publicAccess" | "now"
 > & {
@@ -160,14 +160,14 @@ export type RemoveDataKeyParams<T2 extends keyof FirebaseWrapperDatabase> = Omit
   existingConnections?: DataList;
 };
 
-export type GetOwnerDataParams<T2 extends keyof FirebaseWrapperDatabase> = {
+export type GetOwnerDataParams<T2 extends keyof FirebaseHechDatabase> = {
   get: GetFunction;
   dataType: T2;
   dataKey: string;
   uid: string;
 };
 
-export type GetOwnersDataParams<T2 extends keyof FirebaseWrapperDatabase> = {
+export type GetOwnersDataParams<T2 extends keyof FirebaseHechDatabase> = {
   get: GetFunction;
   dataType: T2;
   dataKey: string;
@@ -200,7 +200,7 @@ export type ListenerPaginationOptions = { orderBy?: "orderByKey" | "orderByValue
     }
 );
 
-export type OnDataValueParams<T2 extends keyof FirebaseWrapperDatabase> = {
+export type OnDataValueParams<T2 extends keyof FirebaseHechDatabase> = {
   onValue: (path: string, cb: (val: Nullable<Data<T2>>) => void) => VoidFunction;
   dataType: T2;
   dataKey: string;
@@ -219,7 +219,7 @@ export type QueryByKeyLimitParams = {
   limit: number;
 };
 
-export type QueryDataParams<T2 extends keyof FirebaseWrapperDatabase, T3 extends keyof Data<T2>> = {
+export type QueryDataParams<T2 extends keyof FirebaseHechDatabase, T3 extends keyof Data<T2>> = {
   queryOrderByChildEqualTo: <QT>(params: QueryOrderByChildParams) => Promise<Nullable<QT>>;
   dataType: T2;
   childKey: T3;
@@ -227,18 +227,18 @@ export type QueryDataParams<T2 extends keyof FirebaseWrapperDatabase, T3 extends
   limit?: number;
 };
 
-export type AfterCollisionFreeUpdateHandler<T2 extends keyof FirebaseWrapperDatabase, T3 extends keyof Data<T2>> = Pick<
+export type AfterCollisionFreeUpdateHandler<T2 extends keyof FirebaseHechDatabase, T3 extends keyof Data<T2>> = Pick<
   UpdateDataParams<T2>,
   "get" | "update" | "dataType" | "dataKey" | "makeGetRequests" | "makeConnectionsRequests" | "makeOwnersRequests"
 >;
 
-export type FirebaseWrapperIncrement<
-  T2 extends keyof FirebaseWrapperDatabase,
+export type FirebaseHechIncrement<
+  T2 extends keyof FirebaseHechDatabase,
   T3 extends keyof Data<T2>
 > = AfterCollisionFreeUpdateHandler<T2, T3> & { field: T3; delta: number };
 
-export type FirebaseWrapperTransactionWithCbParams<
-  T2 extends keyof FirebaseWrapperDatabase,
+export type FirebaseHechTransactionWithCbParams<
+  T2 extends keyof FirebaseHechDatabase,
   T3 extends keyof Data<T2>
 > = AfterCollisionFreeUpdateHandler<T2, T3> & {
   field: T3;
@@ -246,14 +246,14 @@ export type FirebaseWrapperTransactionWithCbParams<
   transactionWithCb: <T>(path: string, cb: (val: Nullable<T>) => T) => Promise<unknown>;
 };
 
-export type ModifyConnectionsType<T2 extends keyof FirebaseWrapperDatabase> = Pick<
+export type ModifyConnectionsType<T2 extends keyof FirebaseHechDatabase> = Pick<
   CudDataParams<T2>,
   "update" | "updateObject" | "now" | "skipUpdate"
 > & {
   connections: {
-    dataType: keyof FirebaseWrapperDatabase;
+    dataType: keyof FirebaseHechDatabase;
     dataKey: string;
-    connectionType: keyof FirebaseWrapperDatabase;
+    connectionType: keyof FirebaseHechDatabase;
     connectionKey: string;
   }[];
 };

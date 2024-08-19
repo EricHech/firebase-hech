@@ -1,8 +1,8 @@
-import { FirebaseWrapperDatabase, UpdateObject } from "../services/types";
+import { FirebaseHechDatabase, UpdateObject } from "../services/types";
 
 const FIREBASE_MAX_UPDATE_LIMIT = 999;
 
-export const createGetUpdateObjectFunction = <T2 extends keyof FirebaseWrapperDatabase>() => {
+export const createGetUpdateObjectFunction = <T2 extends keyof FirebaseHechDatabase>() => {
   let updateCount = 0;
   const updateObjects: UpdateObject<T2>[] = [];
 
