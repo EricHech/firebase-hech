@@ -1,7 +1,7 @@
 - Note: To update the package, bump the version, push to git, and `npm publish`. Then open `firebase-wrapper-ui`, run `yarn wrapper`, bump the version, push to git, and `npm publish`.
 
 # Firebase Wrapper Documentation
-SOIL is a strongly-typed opinionated wrapper around Firebase's Real-Time Database meant to supercharge Firebase and allow for better relational management and out-of-the-box security rules. It comes with a lot of other features as well, such as type-safety, easy authentication, and solutions for pagination, infinite scroll, and more as built-in results to using database keys effectively.
+Firebase Wrapper is a strongly-typed opinionated wrapper around Firebase's Real-Time Database meant to supercharge Firebase and allow for better relational management and out-of-the-box security rules. It comes with a lot of other features as well, such as type-safety, easy authentication, and solutions for pagination, infinite scroll, and more as built-in results to using database keys effectively.
 
 For more information about the security rules, the understanding of which is essential to using FirebaseWrapper, read the documentation found in `database.rules.js`. To make changes to the rules, copy this file out and run it as a node script in your repo to generate a rules json file.
 
