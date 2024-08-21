@@ -13,14 +13,15 @@ import type { CreateDataParams } from "./types";
 
 type UploadFileParams = Pick<
   CreateDataParams<"firebaseHechFile">,
-  "owners" | "publicAccess" | "connections" | "connectionAccess" | "ownershipAccess"
+  "publicAccess" | "connections" | "connectionAccess" | "ownershipAccess"
 > & {
+  owner: string;
   dataKey?: string;
   file: Blob | Uint8Array | ArrayBuffer;
 };
 
 export const uploadFile = async ({
-  owners,
+  owner,
   publicAccess,
   connections,
   connectionAccess,
@@ -28,13 +29,13 @@ export const uploadFile = async ({
   file,
   dataKey = pushKey(PATHS.dataType("firebaseHechFile")),
 }: UploadFileParams) => {
-  const downloadUrl = await firebaseStoragePut(PATHS.dataKey("firebaseHechFile", dataKey), file);
+  const downloadUrl = await firebaseStoragePut(PATHS.storageKey(owner, dataKey), file);
 
   await upsertData({
     dataType: "firebaseHechFile",
     dataKey,
     data: { downloadUrl },
-    owners,
+    owners: [owner],
     publicAccess,
     connections,
     connectionAccess,
@@ -46,7 +47,7 @@ export const uploadFile = async ({
 };
 
 export const uploadFileResumable = ({
-  owners,
+  owner,
   publicAccess,
   connections,
   connectionAccess,
@@ -54,7 +55,7 @@ export const uploadFileResumable = ({
   file,
   dataKey = pushKey(PATHS.dataType("firebaseHechFile")),
 }: UploadFileParams) => {
-  const task = firebaseStoragePutResumable(PATHS.dataKey("firebaseHechFile", dataKey), file);
+  const task = firebaseStoragePutResumable(PATHS.storageKey(owner, dataKey), file);
 
   const triggerUpsertData = async () => {
     const downloadUrl = await getDownloadURL((await task).ref);
@@ -63,7 +64,7 @@ export const uploadFileResumable = ({
       dataType: "firebaseHechFile",
       dataKey,
       data: { downloadUrl },
-      owners,
+      owners: [owner],
       publicAccess,
       connections,
       connectionAccess,

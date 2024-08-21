@@ -3,6 +3,9 @@ import type { Data, FirebaseHechDatabase } from "./types";
 type DataKey = string;
 
 export const PATHS = {
+  STORAGE: "firebaseHechFile",
+  storageKey: (userUid: string, dataKey: DataKey) => `${PATHS.STORAGE}/${userUid}/${dataKey}`,
+
   ADMINS: "admins",
   admin: (uid: string) => `${PATHS.ADMINS}/${uid}`,
 
