@@ -1,5 +1,9 @@
 - Note: To update the package, bump the version, push to git, and `npm publish`. Then open `firebase-hech-ui`, run `yarn firebase-hech`, bump the version, push to git, and `npm publish`.
 
+# Acknowledgements
+
+This project is based on the original work by [Daniel Murawsky](https://github.com/dmurawsky). Their contributions laid the foundation for this project.
+
 # Firebase Hech Documentation
 
 firebase-hech is a strongly-typed opinionated wrapper around Firebase's Real-Time Database meant to supercharge Firebase and allow for better relational management and out-of-the-box security rules. It comes with a lot of other features as well, such as type-safety, easy authentication, and solutions for pagination, infinite scroll, and more as built-in results to using database keys effectively.
