@@ -1,6 +1,6 @@
 // Services
 import { upsertData } from "./client-data";
-import { firebaseStoragePut, firebaseStoragePutResumable, pushKey } from "./firebase";
+import { firebaseStoragePut, firebaseStoragePutResumable, pushKey, UploadMetadata } from "./firebase";
 
 // Helpers
 import { getDownloadURL } from "firebase/storage";
@@ -18,6 +18,7 @@ type UploadFileParams = Pick<
   owner: string;
   dataKey?: string;
   file: Blob | Uint8Array | ArrayBuffer;
+  metadata?: UploadMetadata;
 };
 
 export const uploadFile = async ({
@@ -28,8 +29,9 @@ export const uploadFile = async ({
   ownershipAccess,
   file,
   dataKey = pushKey(PATHS.dataType("firebaseHechFile")),
+  metadata,
 }: UploadFileParams) => {
-  const downloadUrl = await firebaseStoragePut(PATHS.storageKey(owner, dataKey), file);
+  const downloadUrl = await firebaseStoragePut(PATHS.storageKey(owner, dataKey), file, metadata);
 
   await upsertData({
     dataType: "firebaseHechFile",
@@ -54,8 +56,9 @@ export const uploadFileResumable = ({
   ownershipAccess,
   file,
   dataKey = pushKey(PATHS.dataType("firebaseHechFile")),
+  metadata,
 }: UploadFileParams) => {
-  const task = firebaseStoragePutResumable(PATHS.storageKey(owner, dataKey), file);
+  const task = firebaseStoragePutResumable(PATHS.storageKey(owner, dataKey), file, metadata);
 
   const triggerUpsertData = async () => {
     const downloadUrl = await getDownloadURL((await task).ref);

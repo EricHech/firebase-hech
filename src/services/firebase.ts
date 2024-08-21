@@ -297,14 +297,19 @@ export const transactionWithCb = <T>(path: string, cb: (val: Nullable<T>) => T) 
 ███████║   ██║   ╚██████╔╝██║  ██║██║  ██║╚██████╔╝███████╗
 ╚══════╝   ╚═╝    ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝ ╚══════╝
 */
+export type UploadMetadata = storage.UploadMetadata;
+
 /** DO NOT USE outside of strongly typed services */
 export const firebaseStorageRef = (path: string) => storage.ref(storage.getStorage(), path);
 
-export const firebaseStoragePut = (path: string, file: Blob | Uint8Array | ArrayBuffer) =>
-  storage.uploadBytes(firebaseStorageRef(path), file).then(({ ref }) => getDownloadURL(ref));
+export const firebaseStoragePut = (path: string, file: Blob | Uint8Array | ArrayBuffer, metadata?: UploadMetadata) =>
+  storage.uploadBytes(firebaseStorageRef(path), file, metadata).then(({ ref }) => getDownloadURL(ref));
 
 export type UploadTaskSnapshot = FirebaseUploadTaskSnapshot;
-export const firebaseStoragePutResumable = (path: string, file: Blob | Uint8Array | ArrayBuffer) =>
-  storage.uploadBytesResumable(firebaseStorageRef(path), file);
+export const firebaseStoragePutResumable = (
+  path: string,
+  file: Blob | Uint8Array | ArrayBuffer,
+  metadata?: UploadMetadata
+) => storage.uploadBytesResumable(firebaseStorageRef(path), file, metadata);
 
 export const firebaseStorageDelete = (path: string) => storage.deleteObject(firebaseStorageRef(path));
