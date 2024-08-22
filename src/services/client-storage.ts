@@ -9,7 +9,7 @@ import { getDownloadURL } from "firebase/storage";
 import { PATHS } from "./paths";
 
 // Types
-import type { CreateDataParams } from "./types";
+import type { CreateDataParams, FirebaseHechDatabase, FirebaseHechFile } from "./types";
 
 type UploadFileParams = Pick<
   CreateDataParams<"firebaseHechFile">,
@@ -19,6 +19,7 @@ type UploadFileParams = Pick<
   dataKey?: string;
   file: Blob | Uint8Array | ArrayBuffer;
   metadata?: UploadMetadata;
+  firebaseHechFileMetadata?: FirebaseHechFile["metadata"];
 };
 
 export const uploadFile = async ({
@@ -30,6 +31,7 @@ export const uploadFile = async ({
   file,
   dataKey = pushKey(PATHS.dataType("firebaseHechFile")),
   metadata,
+  firebaseHechFileMetadata,
 }: UploadFileParams) => {
   const downloadUrl = await firebaseStoragePut(PATHS.storageKey(owner, dataKey), file, metadata);
 
@@ -48,10 +50,13 @@ export const uploadFile = async ({
   // Paired Comment #1 - firebaseHechFile.finished
   // Once the data has been saved and connections created, indicate that it is done
   // Reasoning: as an example, this would allow cloud functions to know when it is safe to operate
+  const data: Partial<FirebaseHechDatabase["firebaseHechFile"]> = { finished: true };
+  if (firebaseHechFileMetadata) data.metadata = firebaseHechFileMetadata;
+
   await updateData({
     dataType: "firebaseHechFile",
     dataKey,
-    data: { finished: true },
+    data,
     makeGetRequests: true,
   });
 
@@ -67,6 +72,7 @@ export const uploadFileResumable = ({
   file,
   dataKey = pushKey(PATHS.dataType("firebaseHechFile")),
   metadata,
+  firebaseHechFileMetadata,
 }: UploadFileParams) => {
   const task = firebaseStoragePutResumable(PATHS.storageKey(owner, dataKey), file, metadata);
 
@@ -88,10 +94,13 @@ export const uploadFileResumable = ({
     // Paired Comment #2 - firebaseHechFile.finished
     // Once the data has been saved and connections created, indicate that it is done
     // Reasoning: as an example, this would allow cloud functions to know when it is safe to operate
+    const data: Partial<FirebaseHechDatabase["firebaseHechFile"]> = { finished: true };
+    if (firebaseHechFileMetadata) data.metadata = firebaseHechFileMetadata;
+
     await updateData({
       dataType: "firebaseHechFile",
       dataKey,
-      data: { finished: true },
+      data,
       makeGetRequests: true,
     });
 
