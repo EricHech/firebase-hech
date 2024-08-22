@@ -36,7 +36,7 @@ export const uploadFile = async ({
   await upsertData({
     dataType: "firebaseHechFile",
     dataKey,
-    data: { downloadUrl },
+    data: { downloadUrl, uploadedByUid: owner },
     owners: [owner],
     publicAccess,
     connections,
@@ -76,7 +76,7 @@ export const uploadFileResumable = ({
     await upsertData({
       dataType: "firebaseHechFile",
       dataKey,
-      data: { downloadUrl },
+      data: { downloadUrl, uploadedByUid: owner },
       owners: [owner],
       publicAccess,
       connections,
