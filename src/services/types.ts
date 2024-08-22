@@ -3,6 +3,13 @@ export interface AppUser {
   username?: string;
 }
 
+export interface FirebaseHechFile {
+  downloadUrl: string;
+  uploadedByUid: string;
+  finished?: true;
+  metadata?: Record<string, unknown>;
+}
+
 export interface RemoteRequest {
   remoteRequestUid: string;
 }
@@ -11,7 +18,7 @@ export interface FirebaseHechDatabase {
   /** Firebase Hech reserved name: Must be `publicAccess === true`. */
   appUser: AppUser;
   /** Firebase Hech reserved name. */
-  firebaseHechFile: { downloadUrl: string; uploadedByUid: string; finished?: true; metadata?: Record<string, unknown> };
+  firebaseHechFile: FirebaseHechFile;
   /** Firebase Hech reserved name. See README. */
   remoteRequest: RemoteRequest;
 }
