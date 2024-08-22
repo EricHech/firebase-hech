@@ -1,5 +1,5 @@
 // Services
-import { upsertData } from "./client-data";
+import { updateData, upsertData } from "./client-data";
 import { firebaseStoragePut, firebaseStoragePutResumable, pushKey, UploadMetadata } from "./firebase";
 
 // Helpers
@@ -45,6 +45,16 @@ export const uploadFile = async ({
     makeGetRequests: true,
   });
 
+  // Paired Comment #1 - firebaseHechFile.finished
+  // Once the data has been saved and connections created, indicate that it is done
+  // Reasoning: as an example, this would allow cloud functions to know when it is safe to operate
+  await updateData({
+    dataType: "firebaseHechFile",
+    dataKey,
+    data: { finished: true },
+    makeGetRequests: true,
+  });
+
   return { dataKey, downloadUrl };
 };
 
@@ -72,6 +82,16 @@ export const uploadFileResumable = ({
       connections,
       connectionAccess,
       ownershipAccess,
+      makeGetRequests: true,
+    });
+
+    // Paired Comment #2 - firebaseHechFile.finished
+    // Once the data has been saved and connections created, indicate that it is done
+    // Reasoning: as an example, this would allow cloud functions to know when it is safe to operate
+    await updateData({
+      dataType: "firebaseHechFile",
+      dataKey,
+      data: { finished: true },
       makeGetRequests: true,
     });
 

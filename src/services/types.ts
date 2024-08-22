@@ -11,7 +11,7 @@ export interface FirebaseHechDatabase {
   /** Firebase Hech reserved name: Must be `publicAccess === true`. */
   appUser: AppUser;
   /** Firebase Hech reserved name. */
-  firebaseHechFile: { downloadUrl: string; metadata?: Record<string, string> };
+  firebaseHechFile: { downloadUrl: string; finished?: true; metadata?: Record<string, string> };
   /** Firebase Hech reserved name. See README. */
   remoteRequest: RemoteRequest;
 }
