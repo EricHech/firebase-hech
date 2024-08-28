@@ -117,6 +117,9 @@ export type CudDataParams<T2 extends keyof FirebaseHechDatabase> = {
   dataKey: string;
   publicAccess?: boolean;
   now?: number;
+  ownershipNow?: number;
+  connectionNow?: number;
+  publicNow?: number;
 };
 
 export type Connections = {

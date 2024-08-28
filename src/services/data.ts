@@ -386,11 +386,14 @@ export const isoCreateData = async <T2 extends keyof FirebaseHechDatabase>({
   connectionAccess,
   ownershipAccess,
   now = Date.now(),
+  ownershipNow = now,
+  connectionNow = now,
+  publicNow = now,
 }: CreateDataParams<T2>) => {
   /* eslint-disable no-param-reassign */
   owners.forEach((uid) => {
-    updateObject[PATHS.ownerDataKeyUid(dataType, dataKey, uid)] = now;
-    updateObject[PATHS.userDataKeyList(uid, dataType, dataKey)] = now;
+    updateObject[PATHS.ownerDataKeyUid(dataType, dataKey, uid)] = ownershipNow;
+    updateObject[PATHS.userDataKeyList(uid, dataType, dataKey)] = ownershipNow;
   });
 
   updateObject[PATHS.dataKey(dataType, dataKey)] = {
@@ -403,11 +406,11 @@ export const isoCreateData = async <T2 extends keyof FirebaseHechDatabase>({
   };
 
   connections?.forEach(({ type, key }) => {
-    updateObject[PATHS.connectionDataListConnectionKey(dataType, dataKey, type, key)] = now;
-    updateObject[PATHS.connectionDataListConnectionKey(type, key, dataType, dataKey)] = now;
+    updateObject[PATHS.connectionDataListConnectionKey(dataType, dataKey, type, key)] = connectionNow;
+    updateObject[PATHS.connectionDataListConnectionKey(type, key, dataType, dataKey)] = connectionNow;
   });
 
-  if (publicAccess) updateObject[PATHS.publicDataKeyList(dataType, dataKey)] = now;
+  if (publicAccess) updateObject[PATHS.publicDataKeyList(dataType, dataKey)] = publicNow;
   /* eslint-enable no-param-reassign */
 
   return skipUpdate ? updateObject : update("/", updateObject, true).then(() => updateObject);
@@ -427,6 +430,9 @@ export const isoUpdateData = async <T2 extends keyof FirebaseHechDatabase>({
   connectionAccess,
   ownershipAccess,
   now = Date.now(),
+  ownershipNow = now,
+  connectionNow = now,
+  publicNow = now,
   includeUpdatedAt = true,
   makeGetRequests = true,
   makeConnectionsRequests = true,
@@ -444,15 +450,17 @@ export const isoUpdateData = async <T2 extends keyof FirebaseHechDatabase>({
   if (makeGetRequests && makeOwnersRequests) {
     const existingOwners = await isoGetOwners(get, dataType, dataKey);
     Object.keys(existingOwners || {}).forEach((uid) => {
-      updateObject[PATHS.userDataKeyList(uid, dataType, dataKey)] = now;
+      updateObject[PATHS.userDataKeyList(uid, dataType, dataKey)] = ownershipNow;
     });
   }
   owners.forEach((uid) => {
-    updateObject[PATHS.ownerDataKeyUid(dataType, dataKey, uid)] = now;
-    updateObject[PATHS.userDataKeyList(uid, dataType, dataKey)] = now;
+    updateObject[PATHS.ownerDataKeyUid(dataType, dataKey, uid)] = ownershipNow;
+    updateObject[PATHS.userDataKeyList(uid, dataType, dataKey)] = ownershipNow;
   });
 
-  if (publicAccess) updateObject[PATHS.publicDataKeyList(dataType, dataKey)] = now;
+  if (publicAccess) {
+    updateObject[PATHS.publicDataKeyList(dataType, dataKey)] = publicNow;
+  }
 
   if (makeGetRequests && makeConnectionsRequests) {
     const existingConnections = await isoGetAllConnectionTypesKeys(get, dataType, dataKey);
@@ -464,14 +472,14 @@ export const isoUpdateData = async <T2 extends keyof FirebaseHechDatabase>({
 
       existingConnectionEntries.forEach(([dType, dObject]) =>
         Object.keys(dObject).forEach((dKey) => {
-          updateObject[PATHS.connectionDataListConnectionKey(dType, dKey, dataType, dataKey)] = now;
+          updateObject[PATHS.connectionDataListConnectionKey(dType, dKey, dataType, dataKey)] = connectionNow;
         })
       );
     }
   }
   connections?.forEach(({ type, key }) => {
-    updateObject[PATHS.connectionDataListConnectionKey(dataType, dataKey, type, key)] = now;
-    updateObject[PATHS.connectionDataListConnectionKey(type, key, dataType, dataKey)] = now;
+    updateObject[PATHS.connectionDataListConnectionKey(dataType, dataKey, type, key)] = connectionNow;
+    updateObject[PATHS.connectionDataListConnectionKey(type, key, dataType, dataKey)] = connectionNow;
   });
   /* eslint-enable no-param-reassign */
 
@@ -491,8 +499,14 @@ export const isoUpsertData = async <T2 extends keyof FirebaseHechDatabase>({
   connections,
   connectionAccess,
   ownershipAccess,
+  now = Date.now(),
+  ownershipNow = now,
+  connectionNow = now,
+  publicNow = now,
   includeUpdatedAt = true,
   makeGetRequests = true,
+  makeConnectionsRequests = true,
+  makeOwnersRequests = true,
 }: CreateDataParams<T2> & UpdateDataParams<T2>) => {
   const dataCreatedAt = await isoGetDataKeyFieldValue({
     get,
@@ -515,8 +529,14 @@ export const isoUpsertData = async <T2 extends keyof FirebaseHechDatabase>({
       connections,
       connectionAccess,
       ownershipAccess,
+      now,
+      ownershipNow,
+      connectionNow,
+      publicNow,
       includeUpdatedAt,
       makeGetRequests,
+      makeConnectionsRequests,
+      makeOwnersRequests,
     });
   }
 
@@ -532,6 +552,10 @@ export const isoUpsertData = async <T2 extends keyof FirebaseHechDatabase>({
     connections,
     connectionAccess,
     ownershipAccess,
+    now,
+    ownershipNow,
+    connectionNow,
+    publicNow,
   });
 };
 
