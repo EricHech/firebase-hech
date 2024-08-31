@@ -50,21 +50,20 @@ const logAndThrow =
     throw e;
   };
 
+const processOrderedSnap = <T>(snap: database.DataSnapshot) => {
+  const obj = {} as Record<string, unknown>;
+  snap.forEach((iteratedSnap) => {
+    obj[iteratedSnap.key] = iteratedSnap.val();
+  });
+
+  return obj as T;
+};
+
 export const get = <T>(path: string) =>
   database
     .get(getRef(path))
     .then((snap) => snap.val() as T)
     .catch(logAndThrow("get", path));
-
-export const getWithLimit = <T>(
-  path: string,
-  amount: number,
-  direction: Extract<database.QueryConstraintType, "limitToFirst" | "limitToLast">
-) =>
-  database
-    .get(database.query(getRef(path), database[direction](amount)))
-    .then((snap) => snap.val() as Nullable<T>)
-    .catch(logAndThrow("getWithLimit", path));
 
 export type GetChildrenEqualTo = { path: string; val: string | number | boolean | null };
 
@@ -75,8 +74,18 @@ export const getChildrenEqualTo = <T, V extends GetChildrenEqualTo["val"]>(
 ) =>
   database
     .get(database.query(getRef(path), database.orderByChild(childPath), database.equalTo(equalToValue)))
-    .then((snap) => snap.val() as Nullable<T>)
+    .then((snap) => processOrderedSnap<T>(snap))
     .catch(logAndThrow("getChildrenEqualTo", path));
+
+export const getWithLimit = <T>(
+  path: string,
+  amount: number,
+  direction: Extract<database.QueryConstraintType, "limitToFirst" | "limitToLast">
+) =>
+  database
+    .get(database.query(getRef(path), database[direction](amount)))
+    .then((snap) => processOrderedSnap<T>(snap))
+    .catch(logAndThrow("getWithLimit", path));
 
 export const getOrderByChildWithLimit = <T>(
   path: string,
@@ -85,7 +94,7 @@ export const getOrderByChildWithLimit = <T>(
 ) =>
   database
     .get(database.query(getRef(path), database.orderByChild(childPath), database[limit.direction](limit.amount)))
-    .then((snap) => snap.val() as Nullable<T>)
+    .then((snap) => processOrderedSnap<T>(snap))
     .catch(logAndThrow("getOrderByChildWithLimit", path));
 
 /**
@@ -129,7 +138,7 @@ export const getOrderByWithLimit = <T>(
 
   return database
     .get(database.query(getRef(path), ...contraints))
-    .then((snap) => snap.val() as Nullable<T>)
+    .then((snap) => processOrderedSnap<T>(snap))
     .catch(logAndThrow("getOrderByWithLimit", path));
 };
 
@@ -141,7 +150,7 @@ export const getOrderByExclusiveBetween = <T>(
 ) =>
   database
     .get(database.query(getRef(path), database[orderBy](), database.startAfter(start), database.endBefore(end)))
-    .then((snap) => snap.val() as Nullable<T>)
+    .then((snap) => processOrderedSnap<T>(snap))
     .catch(logAndThrow("getOrderByExclusiveBetween", path));
 
 const getContraints = (paginate: Maybe<ListenerPaginationOptions>) => {
@@ -278,7 +287,7 @@ export const onValue = <T>(path: string, cb: (val: T) => void) =>
 export const onValueWithLimit = <T>(path: string, amount: number, version: "first" | "last", cb: (val: T) => void) =>
   database.onValue(
     database.query(getRef(path), version === "first" ? database.limitToFirst(amount) : database.limitToLast(amount)),
-    (snap) => cb(snap.val()),
+    (snap) => cb(processOrderedSnap(snap)),
     logAndThrow("onValueWithLimit", path)
   );
 
