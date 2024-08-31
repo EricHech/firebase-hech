@@ -129,6 +129,9 @@ export const createData = async <T2 extends keyof FirebaseHechDatabase>({
   connectionAccess,
   ownershipAccess,
   now,
+  ownershipNow,
+  connectionNow,
+  publicNow,
 }: Omit<CreateDataParams<T2>, "update">) =>
   isoCreateData({
     update: firebaseHechUpdate,
@@ -143,6 +146,9 @@ export const createData = async <T2 extends keyof FirebaseHechDatabase>({
     connectionAccess,
     ownershipAccess,
     now,
+    ownershipNow,
+    connectionNow,
+    publicNow,
   });
 
 export const updateData = async <T2 extends keyof FirebaseHechDatabase>({
@@ -154,13 +160,16 @@ export const updateData = async <T2 extends keyof FirebaseHechDatabase>({
   owners,
   connections,
   publicAccess,
-  includeUpdatedAt,
   connectionAccess,
   ownershipAccess,
+  now,
+  ownershipNow,
+  connectionNow,
+  publicNow,
+  includeUpdatedAt,
   makeGetRequests,
   makeConnectionsRequests,
   makeOwnersRequests,
-  now,
 }: Omit<UpdateDataParams<T2>, "update" | "get" | "updateDataHandler" | "updateListHandler">) =>
   isoUpdateData({
     update: firebaseHechUpdate,
@@ -173,13 +182,16 @@ export const updateData = async <T2 extends keyof FirebaseHechDatabase>({
     owners,
     connections,
     publicAccess,
-    includeUpdatedAt,
     connectionAccess,
     ownershipAccess,
+    now,
+    ownershipNow,
+    connectionNow,
+    publicNow,
+    includeUpdatedAt,
     makeGetRequests,
     makeConnectionsRequests,
     makeOwnersRequests,
-    now,
   });
 
 export const upsertData = async <T2 extends keyof FirebaseHechDatabase>({
@@ -191,13 +203,16 @@ export const upsertData = async <T2 extends keyof FirebaseHechDatabase>({
   owners,
   publicAccess,
   connections,
-  includeUpdatedAt,
   connectionAccess,
   ownershipAccess,
+  now,
+  ownershipNow,
+  connectionNow,
+  publicNow,
+  includeUpdatedAt,
   makeGetRequests,
   makeConnectionsRequests,
   makeOwnersRequests,
-  now,
 }: Omit<CreateDataParams<T2> & UpdateDataParams<T2>, "update" | "get">) =>
   isoUpsertData({
     update: firebaseHechUpdate,
@@ -210,13 +225,16 @@ export const upsertData = async <T2 extends keyof FirebaseHechDatabase>({
     owners,
     publicAccess,
     connections,
-    includeUpdatedAt,
     connectionAccess,
     ownershipAccess,
+    now,
+    ownershipNow,
+    connectionNow,
+    publicNow,
+    includeUpdatedAt,
     makeGetRequests,
     makeConnectionsRequests,
     makeOwnersRequests,
-    now,
   });
 
 export const addOwners = async <T2 extends keyof FirebaseHechDatabase>({
