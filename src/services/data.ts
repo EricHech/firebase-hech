@@ -445,7 +445,10 @@ export const isoUpdateData = async <T2 extends keyof FirebaseHechDatabase>({
   if (publicAccess) updatedData.publicAccess = publicAccess;
 
   /* eslint-disable no-param-reassign */
-  updateObject[PATHS.dataKey(dataType, dataKey)] = updatedData;
+  updateObject[PATHS.dataKey(dataType, dataKey)] = {
+    ...(updateObject[PATHS.dataKey(dataType, dataKey)] as object),
+    ...updatedData,
+  };
 
   if (makeGetRequests && makeOwnersRequests) {
     const existingOwners = await isoGetOwners(get, dataType, dataKey);
