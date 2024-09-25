@@ -124,12 +124,17 @@ const INVERT_TERMINATION_VERSION = {
   startAt: "endAt",
 } as const;
 
+type OrderBy = Extract<database.QueryConstraintType, "orderByValue" | "orderByKey"> | { path: string };
+
 export const getOrderByWithLimit = <T>(
   path: string,
-  orderBy: Extract<database.QueryConstraintType, "orderByValue" | "orderByKey">,
+  orderBy: OrderBy,
   { amount, direction, termination }: Mandate<ListenerPaginationOptions, "limit">["limit"]
 ) => {
-  const contraints = [database[orderBy](), database[direction](amount)];
+  const contraints = [
+    typeof orderBy === "string" ? database[orderBy]() : database.orderByChild(orderBy.path),
+    database[direction](amount),
+  ];
 
   if (termination !== undefined) {
     const version = getTerminationVersion(direction, termination.version);
@@ -144,14 +149,17 @@ export const getOrderByWithLimit = <T>(
 
 export const getOrderByExclusiveBetween = <T>(
   path: string,
-  orderBy: Extract<database.QueryConstraintType, "orderByValue" | "orderByKey">,
+  orderBy: OrderBy,
   start: string | number,
   end: string | number
-) =>
-  database
-    .get(database.query(getRef(path), database[orderBy](), database.startAfter(start), database.endBefore(end)))
+) => {
+  const orderByQuery = typeof orderBy === "string" ? database[orderBy]() : database.orderByChild(orderBy.path);
+
+  return database
+    .get(database.query(getRef(path), orderByQuery, database.startAfter(start), database.endBefore(end)))
     .then((snap) => processOrderedSnap<T>(snap))
     .catch(logAndThrow("getOrderByExclusiveBetween", path));
+};
 
 const getContraints = (paginate: Maybe<ListenerPaginationOptions>) => {
   const contraints: database.QueryConstraint[] = [];
