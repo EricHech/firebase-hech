@@ -442,7 +442,7 @@ export const isoUpdateData = async <T2 extends keyof FirebaseHechDatabase>({
   if (includeUpdatedAt) updatedData.updatedAt = now;
   if (connectionAccess) updatedData.connectionAccess = connectionAccess;
   if (ownershipAccess) updatedData.ownershipAccess = ownershipAccess;
-  if (publicAccess) updatedData.publicAccess = publicAccess;
+  if (publicAccess !== undefined) updatedData.publicAccess = publicAccess;
 
   /* eslint-disable no-param-reassign */
   updateObject[PATHS.dataKey(dataType, dataKey)] = {
@@ -461,8 +461,8 @@ export const isoUpdateData = async <T2 extends keyof FirebaseHechDatabase>({
     updateObject[PATHS.userDataKeyList(uid, dataType, dataKey)] = ownershipNow;
   });
 
-  if (publicAccess) {
-    updateObject[PATHS.publicDataKeyList(dataType, dataKey)] = publicNow;
+  if (publicAccess !== undefined) {
+    updateObject[PATHS.publicDataKeyList(dataType, dataKey)] = publicAccess ? publicNow : null;
   }
 
   if (makeGetRequests && makeConnectionsRequests) {
