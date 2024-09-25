@@ -23,6 +23,38 @@ export interface FirebaseHechDatabase {
   remoteRequest: RemoteRequest;
 }
 
+/**
+ * This should look like the CDL, for example:
+ * ```
+ * {
+ *   appUser: {
+ *     [ParentK in string]: {
+ *       appUser: {
+ *         [ChildK in string]: {
+ *           updatedAt: number;
+ *         };
+ *       };
+ *     };
+ *   };
+ * }
+ * ```
+ *
+ * All terminal nodes should be numbers, and `updatedAt` is defaulted to every connection.
+ *
+ * A default is required for the types to work, so `appUser` to `appUser` with the default `updatedAt` was given.
+ */
+export interface ConnectionDataListDatabase {
+  appUser: {
+    [ParentK in string]: {
+      appUser: {
+        [ChildK in string]: {
+          updatedAt: number;
+        };
+      };
+    };
+  };
+}
+
 export type EmulatorOptions = {
   database?: {
     host: string;
@@ -117,40 +149,50 @@ export type CudDataParams<T2 extends keyof FirebaseHechDatabase> = {
   dataKey: string;
   publicAccess?: boolean;
   now?: number;
+  publicNow?: number;
   ownershipNow?: number;
   connectionNow?: number;
-  publicNow?: number;
 };
 
-export type Connections = {
+export type Connections<
+  ParentT extends keyof ConnectionDataListDatabase,
+  ParentK extends keyof ConnectionDataListDatabase[ParentT],
+  ChildT extends keyof ConnectionDataListDatabase[ParentT][ParentK],
+  ChildK extends keyof ConnectionDataListDatabase[ParentT][ParentK][ChildT]
+> = {
   type: keyof FirebaseHechDatabase;
   key: string;
+  connectionQueryData?: {
+    data: Partial<ConnectionDataListDatabase[ParentT][ParentK][ChildT][ChildK]>;
+    direction: "source" | "target" | "bi-directional";
+  };
 }[];
 
-export type CreateDataParams<T2 extends keyof FirebaseHechDatabase> = CudDataParams<T2> & {
+export type CreateDataParams<
+  T2 extends keyof FirebaseHechDatabase,
+  ParentT extends keyof ConnectionDataListDatabase,
+  ParentK extends keyof ConnectionDataListDatabase[ParentT],
+  ChildT extends keyof ConnectionDataListDatabase[ParentT][ParentK],
+  ChildK extends keyof ConnectionDataListDatabase[ParentT][ParentK][ChildT]
+> = CudDataParams<T2> & {
   data: FirebaseHechDatabase[T2];
   owners: string[];
-  connections?: Connections;
+  connections?: Connections<ParentT, ParentK, ChildT, ChildK>;
   connectionAccess?: StandardDataFields["connectionAccess"];
   ownershipAccess?: StandardDataFields["ownershipAccess"];
 };
 
-export type ChangeDataKey<T2 extends keyof FirebaseHechDatabase, T22 extends keyof FirebaseHechDatabase> = Pick<
-  CudDataParams<T2>,
-  "update"
-> & {
-  get: GetFunction;
-  existingDataType: T2;
-  existingDataKey: string;
-  newDataType?: T22;
-  newDataKey: string;
-};
-
-export type UpdateDataParams<T2 extends keyof FirebaseHechDatabase> = CudDataParams<T2> & {
+export type UpdateDataParams<
+  T2 extends keyof FirebaseHechDatabase,
+  ParentT extends keyof ConnectionDataListDatabase,
+  ParentK extends keyof ConnectionDataListDatabase[ParentT],
+  ChildT extends keyof ConnectionDataListDatabase[ParentT][ParentK],
+  ChildK extends keyof ConnectionDataListDatabase[ParentT][ParentK][ChildT]
+> = CudDataParams<T2> & {
   get: GetFunction;
   data: Partial<FirebaseHechDatabase[T2]>;
   owners?: string[];
-  connections?: Connections;
+  connections?: Connections<ParentT, ParentK, ChildT, ChildK>;
   connectionAccess?: StandardDataFields["connectionAccess"];
   ownershipAccess?: StandardDataFields["ownershipAccess"];
   /** Pass `false` if all `connections` and `owners` are being provided to avoid unnecessary requests */
@@ -161,9 +203,15 @@ export type UpdateDataParams<T2 extends keyof FirebaseHechDatabase> = CudDataPar
   includeUpdatedAt?: boolean;
 };
 
-export type RemoveDataKeyParams<T2 extends keyof FirebaseHechDatabase> = Omit<
+export type RemoveDataKeyParams<
+  T2 extends keyof FirebaseHechDatabase,
+  ParentT extends keyof ConnectionDataListDatabase,
+  ParentK extends keyof ConnectionDataListDatabase[ParentT],
+  ChildT extends keyof ConnectionDataListDatabase[ParentT][ParentK],
+  ChildK extends keyof ConnectionDataListDatabase[ParentT][ParentK][ChildT]
+> = Omit<
   CudDataParams<T2>,
-  "publicAccess" | "now"
+  "publicAccess" | "now" | "publicNow" | "ownershipNow" | "connectionNow" | "connectionQueryData"
 > & {
   get: GetFunction;
   existingOwners?: Nullable<string[]>;
@@ -237,33 +285,67 @@ export type QueryDataParams<T2 extends keyof FirebaseHechDatabase, T3 extends ke
   limit?: number;
 };
 
-export type AfterCollisionFreeUpdateHandler<T2 extends keyof FirebaseHechDatabase, T3 extends keyof Data<T2>> = Pick<
-  UpdateDataParams<T2>,
+export type AfterCollisionFreeUpdateHandler<
+  T2 extends keyof FirebaseHechDatabase,
+  ParentT extends keyof ConnectionDataListDatabase,
+  ParentK extends keyof ConnectionDataListDatabase[ParentT],
+  ChildT extends keyof ConnectionDataListDatabase[ParentT][ParentK],
+  ChildK extends keyof ConnectionDataListDatabase[ParentT][ParentK][ChildT]
+> = Pick<
+  UpdateDataParams<T2, ParentT, ParentK, ChildT, ChildK>,
   "get" | "update" | "dataType" | "dataKey" | "makeGetRequests" | "makeConnectionsRequests" | "makeOwnersRequests"
 >;
 
 export type FirebaseHechIncrement<
   T2 extends keyof FirebaseHechDatabase,
-  T3 extends keyof Data<T2>
-> = AfterCollisionFreeUpdateHandler<T2, T3> & { field: T3; delta: number };
+  T3 extends keyof Data<T2>,
+  ParentT extends keyof ConnectionDataListDatabase,
+  ParentK extends keyof ConnectionDataListDatabase[ParentT],
+  ChildT extends keyof ConnectionDataListDatabase[ParentT][ParentK],
+  ChildK extends keyof ConnectionDataListDatabase[ParentT][ParentK][ChildT]
+> = AfterCollisionFreeUpdateHandler<T2, ParentT, ParentK, ChildT, ChildK> & { field: T3; delta: number };
 
 export type FirebaseHechTransactionWithCbParams<
   T2 extends keyof FirebaseHechDatabase,
-  T3 extends keyof Data<T2>
-> = AfterCollisionFreeUpdateHandler<T2, T3> & {
+  T3 extends keyof Data<T2>,
+  ParentT extends keyof ConnectionDataListDatabase,
+  ParentK extends keyof ConnectionDataListDatabase[ParentT],
+  ChildT extends keyof ConnectionDataListDatabase[ParentT][ParentK],
+  ChildK extends keyof ConnectionDataListDatabase[ParentT][ParentK][ChildT]
+> = AfterCollisionFreeUpdateHandler<T2, ParentT, ParentK, ChildT, ChildK> & {
   field: T3;
   cb: (value: Nullable<Data<T2>[T3]>) => Data<T2>[T3];
   transactionWithCb: <T>(path: string, cb: (val: Nullable<T>) => T) => Promise<unknown>;
 };
 
-export type ModifyConnectionsType<T2 extends keyof FirebaseHechDatabase> = Pick<
-  CudDataParams<T2>,
-  "update" | "updateObject" | "now" | "skipUpdate"
-> & {
-  connections: {
-    dataType: keyof FirebaseHechDatabase;
-    dataKey: string;
-    connectionType: keyof FirebaseHechDatabase;
-    connectionKey: string;
-  }[];
+export type ConnectionsBaseType<
+  ParentT extends keyof ConnectionDataListDatabase & keyof FirebaseHechDatabase,
+  ParentK extends keyof ConnectionDataListDatabase[ParentT],
+  ChildT extends keyof ConnectionDataListDatabase[ParentT][ParentK],
+  ChildK extends keyof ConnectionDataListDatabase[ParentT][ParentK][ChildT]
+> = {
+  dataType: ParentT;
+  dataKey: ParentK;
+  connectionType: ChildT;
+  connectionKey: ChildK;
+};
+
+export type CreateConnectionsType<
+  ParentT extends keyof ConnectionDataListDatabase & keyof FirebaseHechDatabase,
+  ParentK extends keyof ConnectionDataListDatabase[ParentT],
+  ChildT extends keyof ConnectionDataListDatabase[ParentT][ParentK],
+  ChildK extends keyof ConnectionDataListDatabase[ParentT][ParentK][ChildT]
+> = Pick<CudDataParams<ParentT>, "update" | "updateObject" | "now" | "skipUpdate"> & {
+  connections: (ConnectionsBaseType<ParentT, ParentK, ChildT, ChildK> & {
+    connectionQueryData?: Connections<ParentT, ParentK, ChildT, ChildK>[number]["connectionQueryData"];
+  })[];
+};
+
+export type RemoveConnectionsType<
+  ParentT extends keyof ConnectionDataListDatabase & keyof FirebaseHechDatabase,
+  ParentK extends keyof ConnectionDataListDatabase[ParentT],
+  ChildT extends keyof ConnectionDataListDatabase[ParentT][ParentK],
+  ChildK extends keyof ConnectionDataListDatabase[ParentT][ParentK][ChildT]
+> = Pick<CudDataParams<ParentT>, "update" | "updateObject" | "now" | "skipUpdate"> & {
+  connections: ConnectionsBaseType<ParentT, ParentK, ChildT, ChildK>[];
 };

@@ -9,10 +9,15 @@ import { getDownloadURL } from "firebase/storage";
 import { PATHS } from "./paths";
 
 // Types
-import type { CreateDataParams, FirebaseHechDatabase, FirebaseHechFile } from "./types";
+import type { ConnectionDataListDatabase, CreateDataParams, FirebaseHechDatabase, FirebaseHechFile } from "./types";
 
-type UploadFileParams = Pick<
-  CreateDataParams<"firebaseHechFile">,
+type UploadFileParams<
+  ParentT extends keyof ConnectionDataListDatabase,
+  ParentK extends keyof ConnectionDataListDatabase[ParentT],
+  ChildT extends keyof ConnectionDataListDatabase[ParentT][ParentK],
+  ChildK extends keyof ConnectionDataListDatabase[ParentT][ParentK][ChildT]
+> = Pick<
+  CreateDataParams<"firebaseHechFile", ParentT, ParentK, ChildT, ChildK>,
   "publicAccess" | "connections" | "connectionAccess" | "ownershipAccess"
 > & {
   owner: string;
@@ -22,7 +27,12 @@ type UploadFileParams = Pick<
   firebaseHechFileMetadata?: FirebaseHechFile["metadata"];
 };
 
-export const uploadFile = async ({
+export const uploadFile = async <
+  ParentT extends keyof ConnectionDataListDatabase,
+  ParentK extends keyof ConnectionDataListDatabase[ParentT],
+  ChildT extends keyof ConnectionDataListDatabase[ParentT][ParentK],
+  ChildK extends keyof ConnectionDataListDatabase[ParentT][ParentK][ChildT]
+>({
   owner,
   publicAccess,
   connections,
@@ -32,7 +42,7 @@ export const uploadFile = async ({
   dataKey = pushKey(PATHS.dataType("firebaseHechFile")),
   metadata,
   firebaseHechFileMetadata,
-}: UploadFileParams) => {
+}: UploadFileParams<ParentT, ParentK, ChildT, ChildK>) => {
   const downloadUrl = await firebaseStoragePut(PATHS.storageKey(owner, dataKey), file, metadata);
 
   await upsertData({
@@ -63,7 +73,12 @@ export const uploadFile = async ({
   return { dataKey, downloadUrl };
 };
 
-export const uploadFileResumable = ({
+export const uploadFileResumable = <
+  ParentT extends keyof ConnectionDataListDatabase,
+  ParentK extends keyof ConnectionDataListDatabase[ParentT],
+  ChildT extends keyof ConnectionDataListDatabase[ParentT][ParentK],
+  ChildK extends keyof ConnectionDataListDatabase[ParentT][ParentK][ChildT]
+>({
   owner,
   publicAccess,
   connections,
@@ -73,7 +88,7 @@ export const uploadFileResumable = ({
   dataKey = pushKey(PATHS.dataType("firebaseHechFile")),
   metadata,
   firebaseHechFileMetadata,
-}: UploadFileParams) => {
+}: UploadFileParams<ParentT, ParentK, ChildT, ChildK>) => {
   const task = firebaseStoragePutResumable(PATHS.storageKey(owner, dataKey), file, metadata);
 
   const triggerUpsertData = async () => {

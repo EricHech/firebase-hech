@@ -103,7 +103,6 @@ export const initializeAdminApp = (
   if (isDev) {
     try {
       init();
-      // eslint-disable-next-line no-empty
     } catch (e) {}
   } else {
     init();
@@ -130,7 +129,7 @@ export const initializeAdminRemoteRequestApp = async <T extends StatefulData<"re
   databaseURL: string,
   { isDev }: { isDev?: boolean } = { isDev: false }
 ) => {
-  let app = initializeAdminApp(appOptions, databaseURL, {
+  const app = initializeAdminApp(appOptions, databaseURL, {
     isDev,
     databaseAuthVariableOverride: undefined,
   });

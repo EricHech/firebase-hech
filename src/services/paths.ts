@@ -1,4 +1,4 @@
-import type { Data, FirebaseHechDatabase } from "./types";
+import type { ConnectionDataListDatabase, Data, FirebaseHechDatabase } from "./types";
 
 type DataKey = string;
 
@@ -24,48 +24,60 @@ export const PATHS = {
   DATA: "data",
   dataType: <T2 extends keyof FirebaseHechDatabase>(dataType: T2) => `${PATHS.DATA}/${dataType}`,
   dataKey: <T2 extends keyof FirebaseHechDatabase>(dataType: T2, dataKey: DataKey) =>
-    `${PATHS.DATA}/${dataType}/${String(dataKey)}`,
+    `${PATHS.DATA}/${dataType}/${dataKey}`,
   dataKeyField: <T2 extends keyof FirebaseHechDatabase, T3 extends keyof Data<T2>>(
     dataType: T2,
     dataKey: DataKey,
     dataField: T3
-  ) => `${PATHS.DATA}/${dataType}/${String(dataKey)}/${String(dataField)}`,
+  ) => `${PATHS.DATA}/${dataType}/${dataKey}/${dataField as string}`,
 
   OWNERS: "owners",
   ownerDataType: <T2 extends keyof FirebaseHechDatabase>(dataType: T2) => `${PATHS.OWNERS}/${dataType}`,
   ownerDataKey: <T2 extends keyof FirebaseHechDatabase>(dataType: T2, dataKey: DataKey) =>
-    `${PATHS.OWNERS}/${dataType}/${String(dataKey)}`,
+    `${PATHS.OWNERS}/${dataType}/${dataKey}`,
   ownerDataKeyUid: <T2 extends keyof FirebaseHechDatabase>(dataType: T2, dataKey: DataKey, uid: string) =>
-    `${PATHS.OWNERS}/${dataType}/${String(dataKey)}/${uid}`,
+    `${PATHS.OWNERS}/${dataType}/${dataKey}/${uid}`,
 
   USER_DATA_LISTS: "userDataLists",
   userDataList: (uid: string) => `${PATHS.USER_DATA_LISTS}/${uid}`,
   userDataTypeList: <T2 extends keyof FirebaseHechDatabase>(uid: string, dataType: T2) =>
     `${PATHS.USER_DATA_LISTS}/${uid}/${dataType}`,
   userDataKeyList: <T2 extends keyof FirebaseHechDatabase>(uid: string, dataType: T2, dataKey: DataKey) =>
-    `${PATHS.USER_DATA_LISTS}/${uid}/${dataType}/${String(dataKey)}`,
+    `${PATHS.USER_DATA_LISTS}/${uid}/${dataType}/${dataKey}`,
 
   PUBLIC_DATA_LISTS: "publicDataLists",
   publicDataTypeList: <T2 extends keyof FirebaseHechDatabase>(dataType: T2) => `${PATHS.PUBLIC_DATA_LISTS}/${dataType}`,
   publicDataKeyList: <T2 extends keyof FirebaseHechDatabase>(dataType: T2, dataKey: DataKey) =>
-    `${PATHS.PUBLIC_DATA_LISTS}/${dataType}/${String(dataKey)}`,
+    `${PATHS.PUBLIC_DATA_LISTS}/${dataType}/${dataKey}`,
 
   CONNECTION_DATA_LISTS: "connectionDataLists",
-  connectionDataListType: <T2 extends keyof FirebaseHechDatabase>(dataType: T2) =>
+  connectionDataListType: <T2 extends keyof ConnectionDataListDatabase>(dataType: T2) =>
     `${PATHS.CONNECTION_DATA_LISTS}/${dataType}`,
-  connectionDataListKey: <T2 extends keyof FirebaseHechDatabase>(dataType: T2, dataKey: DataKey) =>
-    `${PATHS.CONNECTION_DATA_LISTS}/${dataType}/${String(dataKey)}`,
-  connectionDataListConnectionType: <T2 extends keyof FirebaseHechDatabase, T22 extends keyof FirebaseHechDatabase>(
-    dataType: T2,
-    dataKey: DataKey,
-    connectionType: T22
-  ) => `${PATHS.CONNECTION_DATA_LISTS}/${dataType}/${String(dataKey)}/${connectionType}`,
-  connectionDataListConnectionKey: <T2 extends keyof FirebaseHechDatabase, T22 extends keyof FirebaseHechDatabase>(
-    dataType: T2,
-    dataKey: DataKey,
-    connectionType: T22,
-    connectionKey: DataKey
-  ) => `${PATHS.CONNECTION_DATA_LISTS}/${dataType}/${String(dataKey)}/${connectionType}/${String(connectionKey)}`,
+  connectionDataListKey: <T2 extends keyof ConnectionDataListDatabase>(dataType: T2, dataKey: DataKey) =>
+    `${PATHS.CONNECTION_DATA_LISTS}/${dataType}/${dataKey}`,
+  connectionDataListConnectionType: <
+    ParentT extends keyof ConnectionDataListDatabase,
+    ParentK extends keyof ConnectionDataListDatabase[ParentT],
+    ChildT extends keyof ConnectionDataListDatabase[ParentT][ParentK]
+  >(
+    dataType: ParentT,
+    dataKey: ParentK,
+    connectionType: ChildT
+  ) => `${PATHS.CONNECTION_DATA_LISTS}/${dataType}/${dataKey as string}/${connectionType as string}`,
+  connectionDataListConnectionKey: <
+    ParentT extends keyof ConnectionDataListDatabase,
+    ParentK extends keyof ConnectionDataListDatabase[ParentT],
+    ChildT extends keyof ConnectionDataListDatabase[ParentT][ParentK],
+    ChildK extends keyof ConnectionDataListDatabase[ParentT][ParentK][ChildT]
+  >(
+    dataType: ParentT,
+    dataKey: ParentK,
+    connectionType: ChildT,
+    connectionKey: ChildK
+  ) =>
+    `${PATHS.CONNECTION_DATA_LISTS}/${dataType}/${dataKey as string}/${connectionType as string}/${
+      connectionKey as string
+    }`,
 };
 
 export const DB_DELIMITER = "__";

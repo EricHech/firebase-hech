@@ -44,7 +44,7 @@ const logAndThrow =
           100
         )}`;
       }
-      console.error(baseMessage); // eslint-disable-line no-console
+      console.error(baseMessage);
     }
 
     throw e;
