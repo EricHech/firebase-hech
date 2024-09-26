@@ -248,7 +248,7 @@ const rules = {
               "$dataType",
               "$dataKey"
             )}) && (${oneHalfOfConnectionWriteAccess("$connectionType", "$connectionKey")})`,
-            ".indexOn": ".value",
+            ".indexOn": ["updatedAt"],
             $queryKey: {
               ".validate": isNumber,
             },
