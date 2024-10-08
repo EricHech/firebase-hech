@@ -29,7 +29,7 @@ export interface FirebaseHechDatabase {
  * {
  *   appUser: {
  *     [ParentK in string]: {
- *       appUser: {
+ *       project: {
  *         [ChildK in string]: {
  *           updatedAt: number;
  *         };
@@ -41,12 +41,12 @@ export interface FirebaseHechDatabase {
  *
  * All terminal nodes should be numbers, and `updatedAt` is defaulted to every connection.
  *
- * A default is required for the types to work, so `appUser` to `appUser` with the default `updatedAt` was given.
+ * A default that cannot be overridden is required for the types to work, so `zDoNotUseParentKey` to `zDoNotUseChildKey` with the default `updatedAt` was given.
  */
 export interface ConnectionDataListDatabase {
-  appUser: {
+  zDoNotUseParentKey: {
     [ParentK in string]: {
-      appUser: {
+      zDoNotUseChildKey: {
         [ChildK in string]: {
           updatedAt: number;
         };
