@@ -23,8 +23,6 @@ import type {
   TrackingData,
   UpdateObject,
   ConnectionDataListDatabase,
-} from "./types";
-import type {
   AfterCollisionFreeUpdateHandler,
   AppUser,
   FirebaseHechDatabase,
