@@ -56,7 +56,7 @@ The structure that will be saved is as follows: `data/user/{uid}/userData` where
 
 ## Data Keys
 
-A data key is simply the key for accessing a particular instance of a data type. For example, the uid of a user is the data key for the user data type. You can use Firebase Push Keys for your data keys, but when possible, FirebaseHech really shines when you get creative with your keys. For example, the data key to a message could be `{userId}__{projectId}__{pushKey}`. In this way, without even fetching the message data, with the key alone you would be able to fetch the user who created the message and the project that the message is under.
+A data key is simply the key for accessing a particular instance of a data type. For example, the uid of a user is the data key for the user data type. You can use Firebase Push Keys for your data keys, but when possible, FirebaseHech really shines when you get creative with your keys. For example, the data key to a message could be `{userId}||{projectId}||{pushKey}`. In this way, without even fetching the message data, with the key alone you would be able to fetch the user who created the message and the project that the message is under.
 
 To generate keys like this, use the `generateDbKey` function, and the parse the same, use `parseDbKey`:
 

@@ -1,7 +1,6 @@
 import * as database from "firebase/database";
 import * as storage from "firebase/storage";
 import { getDownloadURL, UploadTaskSnapshot as FirebaseUploadTaskSnapshot } from "firebase/storage";
-import { cleanPushKey } from "./paths";
 import { isoFirebaseHechUpdate } from "./data";
 import { ListenerPaginationOptions } from "./types";
 
@@ -265,7 +264,7 @@ export const push = <T>(path: string, data: T) => {
   }
 };
 
-export const pushKey = (path: string) => cleanPushKey(database.push(getRef(path)).key!);
+export const pushKey = (path: string) => database.push(getRef(path)).key!;
 
 export const set = <T>(path: string, data: T) =>
   database.set(getRef(path), data).catch(logAndThrow("set", path, { data }));

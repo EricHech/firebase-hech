@@ -1,6 +1,6 @@
 {
   "name": "firebase-hech",
-  "version": "2.0.1",
+  "version": "2.1.0",
   "description": "A a strongly-typed opinionated wrapper around Firebase's Real-Time Database meant to supercharge Firebase and allow for better relational management and out-of-the-box security rules.",
   "exports": {
     ".": {

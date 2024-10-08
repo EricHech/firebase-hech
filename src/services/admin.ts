@@ -5,7 +5,6 @@ import { CreateRequest, getAuth, UpdateRequest } from "firebase-admin/auth";
 // Helpers
 import { isoFirebaseHechUpdate } from "./data";
 import { getDataKeyValue } from "./server-data";
-import { cleanPushKey } from "./paths";
 
 // Types
 import type { ServiceAccount } from "firebase-admin/app";
@@ -37,7 +36,7 @@ export const onChildAdded = <T>(
 
 export const push = <T>(path: string, data: T) => getRef(path).push(data);
 
-export const pushKey = (path: string) => cleanPushKey(getRef(path).push().key!);
+export const pushKey = (path: string) => getRef(path).push().key!;
 
 export const set = <T>(path: string, data: T) => getRef(path).set(data);
 
