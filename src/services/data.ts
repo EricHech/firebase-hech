@@ -810,13 +810,7 @@ export const isoCreateConnections = <
 ██║  ██║███████╗██║ ╚═╝ ██║╚██████╔╝ ╚████╔╝ ███████╗
 ╚═╝  ╚═╝╚══════╝╚═╝     ╚═╝ ╚═════╝   ╚═══╝  ╚══════╝
 */
-export const isoRemoveData = async <
-  T2 extends keyof FirebaseHechDatabase,
-  ParentT extends keyof ConnectionDataListDatabase,
-  ParentK extends keyof ConnectionDataListDatabase[ParentT],
-  ChildT extends keyof ConnectionDataListDatabase[ParentT][ParentK],
-  ChildK extends keyof ConnectionDataListDatabase[ParentT][ParentK][ChildT]
->({
+export const isoRemoveData = async <T2 extends keyof FirebaseHechDatabase>({
   update,
   get,
   updateObject = {},
@@ -825,7 +819,7 @@ export const isoRemoveData = async <
   dataKey,
   existingOwners,
   existingConnections,
-}: RemoveDataKeyParams<T2, ParentT, ParentK, ChildT, ChildK>) => {
+}: RemoveDataKeyParams<T2>) => {
   (
     Object.entries(
       existingConnections ||
@@ -855,17 +849,11 @@ export const isoRemoveData = async <
 };
 
 /** ! CAREFUL */
-export const isoRemoveDataType = async <
-  T2 extends keyof FirebaseHechDatabase,
-  ParentT extends keyof ConnectionDataListDatabase,
-  ParentK extends keyof ConnectionDataListDatabase[ParentT],
-  ChildT extends keyof ConnectionDataListDatabase[ParentT][ParentK],
-  ChildK extends keyof ConnectionDataListDatabase[ParentT][ParentK][ChildT]
->({
+export const isoRemoveDataType = async <T2 extends keyof FirebaseHechDatabase>({
   update,
   get,
   dataType,
-}: Omit<RemoveDataKeyParams<T2, ParentT, ParentK, ChildT, ChildK>, "dataKey" | "skipUpdate" | "updateObject">) => {
+}: Omit<RemoveDataKeyParams<T2>, "dataKey" | "skipUpdate" | "updateObject">) => {
   const { updateObjects, getUpdateObject } = createGetUpdateObjectFunction<T2>();
 
   const connections = await isoGetAllConnectionTypes(get, dataType as keyof ConnectionDataListDatabase);

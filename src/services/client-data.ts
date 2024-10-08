@@ -48,8 +48,8 @@ import type {
   Data,
   FirebaseHechIncrement,
   ConnectionDataListDatabase,
+  FirebaseHechDatabase,
 } from "./types";
-import type { FirebaseHechDatabase } from "..";
 
 export const createUser = <
   ParentT extends keyof ConnectionDataListDatabase,
@@ -439,18 +439,12 @@ export const firebaseHechTransactionWithCb = <
     makeOwnersRequests,
   });
 
-export const removeData = async <
-  T2 extends keyof FirebaseHechDatabase,
-  ParentT extends keyof ConnectionDataListDatabase,
-  ParentK extends keyof ConnectionDataListDatabase[ParentT],
-  ChildT extends keyof ConnectionDataListDatabase[ParentT][ParentK],
-  ChildK extends keyof ConnectionDataListDatabase[ParentT][ParentK][ChildT]
->({
+export const removeData = async <T2 extends keyof FirebaseHechDatabase>({
   updateObject,
   skipUpdate,
   dataType,
   dataKey,
-}: Omit<RemoveDataKeyParams<T2, ParentT, ParentK, ChildT, ChildK>, "update" | "get">) =>
+}: Omit<RemoveDataKeyParams<T2>, "update" | "get">) =>
   isoRemoveData({
     update: firebaseHechUpdate,
     get,

@@ -203,13 +203,7 @@ export type UpdateDataParams<
   includeUpdatedAt?: boolean;
 };
 
-export type RemoveDataKeyParams<
-  T2 extends keyof FirebaseHechDatabase,
-  ParentT extends keyof ConnectionDataListDatabase,
-  ParentK extends keyof ConnectionDataListDatabase[ParentT],
-  ChildT extends keyof ConnectionDataListDatabase[ParentT][ParentK],
-  ChildK extends keyof ConnectionDataListDatabase[ParentT][ParentK][ChildT]
-> = Omit<
+export type RemoveDataKeyParams<T2 extends keyof FirebaseHechDatabase> = Omit<
   CudDataParams<T2>,
   "publicAccess" | "now" | "publicNow" | "ownershipNow" | "connectionNow" | "connectionQueryData"
 > & {
