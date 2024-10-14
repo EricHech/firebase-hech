@@ -78,7 +78,7 @@ export const queryByKeyLimit = <T>({ path, limit }: QueryByKeyLimitParams) =>
     .once("value")
     .then((snap) => snap.val() as Nullable<T>);
 
-export const initializeAdminApp = (
+export const initializeAdminApp = async (
   appOptions: ServiceAccount,
   databaseURL: string,
   { isDev, databaseAuthVariableOverride }: { isDev?: boolean; databaseAuthVariableOverride?: { uid: string } } = {
@@ -86,9 +86,9 @@ export const initializeAdminApp = (
     databaseAuthVariableOverride: undefined,
   }
 ) => {
-  const init = () => {
+  const init = async () => {
     // To account for hot-module-reloading potentially having the wrong app initialized due to `initializeAdminRemoteRequestApp`
-    if (admin.apps.length && isDev) admin.app().delete();
+    if (admin.apps.length && isDev) await admin.app().delete();
 
     if (!admin.apps.length) {
       admin.initializeApp({
@@ -101,10 +101,10 @@ export const initializeAdminApp = (
 
   if (isDev) {
     try {
-      init();
+      await init();
     } catch (e) {}
   } else {
-    init();
+    await init();
   }
 
   return admin.app();
@@ -128,7 +128,7 @@ export const initializeAdminRemoteRequestApp = async <T extends StatefulData<"re
   databaseURL: string,
   { isDev }: { isDev?: boolean } = { isDev: false }
 ) => {
-  const app = initializeAdminApp(appOptions, databaseURL, {
+  const app = await initializeAdminApp(appOptions, databaseURL, {
     isDev,
     databaseAuthVariableOverride: undefined,
   });
