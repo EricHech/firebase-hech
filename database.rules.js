@@ -237,6 +237,7 @@ const rules = {
           // As long as you are logged in, you can read all the keys of a connection so that you can listen to the connection lists
           // ? Example: A user wanting to read connections between a product and a category, neither of which they own
           ".read": authNotNull,
+          ".indexOn": ["updatedAt"],
           $connectionKey: {
             // You can only write new connections if both ends follow the same rules.
             // This is because connections give you read access to data, and they are always two-way.
@@ -248,7 +249,6 @@ const rules = {
               "$dataType",
               "$dataKey"
             )}) && (${oneHalfOfConnectionWriteAccess("$connectionType", "$connectionKey")})`,
-            ".indexOn": ["updatedAt"],
             $queryKey: {
               ".validate": isNumber,
             },
