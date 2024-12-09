@@ -53,6 +53,15 @@ export interface ConnectionDataListDatabase {
       };
     };
   };
+  zDoNotUseChildKey: {
+    [ParentK in string]: {
+      zDoNotUseParentKey: {
+        [ChildK in string]: {
+          updatedAt: number;
+        };
+      };
+    };
+  };
 }
 
 export type EmulatorOptions = {
@@ -193,6 +202,7 @@ export type UpdateDataParams<
   data: Partial<FirebaseHechDatabase[T2]>;
   owners?: string[];
   connections?: Connections<ParentT, ParentK, ChildT, ChildK>;
+  queryData?: Partial<ConnectionDataListDatabase[ParentT][ParentK][ChildT][ChildK]>;
   connectionAccess?: StandardDataFields["connectionAccess"];
   ownershipAccess?: StandardDataFields["ownershipAccess"];
   /** Pass `false` if all `connections` and `owners` are being provided to avoid unnecessary requests */

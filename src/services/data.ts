@@ -475,6 +475,7 @@ export const isoUpdateData = async <
   data,
   owners = [],
   connections,
+  queryData,
   publicAccess,
   connectionAccess,
   ownershipAccess,
@@ -531,7 +532,7 @@ export const isoUpdateData = async <
               dataType as unknown as ChildT,
               dataKey as unknown as ChildK
             )
-          ] = { updatedAt: connectionNow };
+          ] = { updatedAt: connectionNow, ...queryData };
         })
       );
     }
@@ -594,7 +595,7 @@ export const isoUpsertData = async <
   makeGetRequests = true,
   makeConnectionsRequests = true,
   makeOwnersRequests = true,
-}: CreateDataParams<T2, ParentT, ParentK, ChildT, ChildK> & UpdateDataParams<T2, ParentT, ParentK, ChildT, ChildK>) => {
+}: CreateDataParams<T2, ParentT, ParentK, ChildT, ChildK> & Omit<UpdateDataParams<T2, ParentT, ParentK, ChildT, ChildK>, "queryData">) => {
   const dataCreatedAt = await isoGetDataKeyFieldValue({
     get,
     dataType,
@@ -859,7 +860,7 @@ export const isoRemoveDataType = async <T2 extends keyof FirebaseHechDatabase>({
   const connections = await isoGetAllConnectionTypes(get, dataType as keyof ConnectionDataListDatabase);
   if (connections) {
     Object.entries(connections).forEach(([dKey, dataList]) =>
-      Object.entries(dataList).forEach(([dType, dKeys]) =>
+      Object.entries(dataList as [string, Record<string, { updatedAt: number }>][]).forEach(([dType, dKeys]) =>
         Object.keys(dKeys).forEach((dk) => {
           if (dType !== dataType) {
             getUpdateObject()[
