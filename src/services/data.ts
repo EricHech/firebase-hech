@@ -381,7 +381,7 @@ export const isoFirebaseHechUpdate = async (
       await Promise.all(Object.entries(ownersUpdates).map(([key, val]) => firebaseHech.set(key, val)));
       await Promise.all(Object.entries(publicDataListUpdates).map(([key, val]) => firebaseHech.set(key, val)));
       await Promise.all(Object.entries(dataUpdates).map(([key, val]) => firebaseHech.update(key, val as object)));
-      await Promise.all(Object.entries(cdlUpdates).map(([key, val]) => firebaseHech.update(key, val as object)));
+      await Promise.all(Object.entries(cdlUpdates).map(([key, val]) => firebaseHech[val === null ? "set" : "update"](key, val as object)));
       await Promise.all(Object.entries(allOtherUpdates).map(([key, val]) => firebaseHech.set(key, val)));
     }
   } else {
