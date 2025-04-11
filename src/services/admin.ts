@@ -81,8 +81,9 @@ export const queryByKeyLimit = <T>({ path, limit }: QueryByKeyLimitParams) =>
 export const initializeAdminApp = async (
   appOptions: ServiceAccount,
   databaseURL: string,
-  { isDev, databaseAuthVariableOverride }: { isDev?: boolean; databaseAuthVariableOverride?: { uid: string } } = {
+  { isDev, emulatorOptions, databaseAuthVariableOverride }: { isDev?: boolean; emulatorOptions?: { host: string; authPort: string; dbPort: string; projectId: string }; databaseAuthVariableOverride?: { uid: string } } = {
     isDev: false,
+    emulatorOptions: undefined,
     databaseAuthVariableOverride: undefined,
   }
 ) => {
@@ -91,18 +92,33 @@ export const initializeAdminApp = async (
     if (admin.apps.length && isDev) await admin.app().delete();
 
     if (!admin.apps.length) {
-      admin.initializeApp({
-        credential: admin.credential.cert(appOptions),
-        databaseURL,
-        databaseAuthVariableOverride,
-      });
+      if (isDev && emulatorOptions) {
+        process.env.FIREBASE_AUTH_EMULATOR_HOST = `${emulatorOptions.host}:${emulatorOptions.authPort}`;
+        process.env.FIREBASE_DATABASE_EMULATOR_HOST = `${emulatorOptions.host}:${emulatorOptions.dbPort}`;
+
+        // In development with emulators, use the application default credentials and explicitly set the `projectId` to match the one used by the client token
+        admin.initializeApp({
+          projectId: emulatorOptions.projectId,
+          credential: admin.credential.applicationDefault(),
+          databaseURL: `http://${emulatorOptions.host}:${emulatorOptions.dbPort}?ns=${emulatorOptions.projectId}`,
+          databaseAuthVariableOverride,
+        });
+      } else {
+        admin.initializeApp({
+          credential: admin.credential.cert(appOptions),
+          databaseURL,
+          databaseAuthVariableOverride,
+        });
+      }
     }
   };
 
   if (isDev) {
     try {
       await init();
-    } catch (e) {}
+    } catch (e) {
+      if (emulatorOptions) console.error("Error initializing Firebase Admin app with emulators:", e);
+    }
   } else {
     await init();
   }
