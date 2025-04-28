@@ -1,3 +1,5 @@
+import type { FirebaseApp } from "firebase/app";
+
 // Services
 import { updateData, upsertData } from "./client-data";
 import { firebaseStoragePut, firebaseStoragePutResumable, pushKey, UploadMetadata } from "./firebase";
@@ -25,6 +27,8 @@ type UploadFileParams<
   file: Blob | Uint8Array | ArrayBuffer;
   metadata?: UploadMetadata;
   firebaseHechFileMetadata?: FirebaseHechFile["metadata"];
+  app?: FirebaseApp;
+  bucketUrl?: string;
 };
 
 export const uploadFile = async <
@@ -42,8 +46,10 @@ export const uploadFile = async <
   dataKey = pushKey(PATHS.dataType("firebaseHechFile")),
   metadata,
   firebaseHechFileMetadata,
+  app,
+  bucketUrl,
 }: UploadFileParams<ParentT, ParentK, ChildT, ChildK>) => {
-  const downloadUrl = await firebaseStoragePut(PATHS.storageKey(owner, dataKey), file, metadata);
+  const downloadUrl = await firebaseStoragePut(PATHS.storageKey(owner, dataKey), file, metadata, app, bucketUrl);
 
   await upsertData({
     dataType: "firebaseHechFile",
@@ -88,8 +94,10 @@ export const uploadFileResumable = <
   dataKey = pushKey(PATHS.dataType("firebaseHechFile")),
   metadata,
   firebaseHechFileMetadata,
+  app,
+  bucketUrl,
 }: UploadFileParams<ParentT, ParentK, ChildT, ChildK>) => {
-  const task = firebaseStoragePutResumable(PATHS.storageKey(owner, dataKey), file, metadata);
+  const task = firebaseStoragePutResumable(PATHS.storageKey(owner, dataKey), file, metadata, app, bucketUrl);
 
   const triggerUpsertData = async () => {
     const downloadUrl = await getDownloadURL((await task).ref);

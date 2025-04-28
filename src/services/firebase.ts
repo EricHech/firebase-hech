@@ -1,3 +1,4 @@
+import type { FirebaseApp } from "firebase/app";
 import * as database from "firebase/database";
 import * as storage from "firebase/storage";
 import { getDownloadURL, UploadTaskSnapshot as FirebaseUploadTaskSnapshot } from "firebase/storage";
@@ -316,16 +317,25 @@ export const transactionWithCb = <T>(path: string, cb: (val: Nullable<T>) => T) 
 export type UploadMetadata = storage.UploadMetadata;
 
 /** DO NOT USE outside of strongly typed services */
-export const firebaseStorageRef = (path: string) => storage.ref(storage.getStorage(), path);
+export const firebaseStorageRef = (path: string, app?: FirebaseApp, bucketUrl?: string) =>
+  storage.ref(storage.getStorage(app, bucketUrl), path);
 
-export const firebaseStoragePut = (path: string, file: Blob | Uint8Array | ArrayBuffer, metadata?: UploadMetadata) =>
-  storage.uploadBytes(firebaseStorageRef(path), file, metadata).then(({ ref }) => getDownloadURL(ref));
+export const firebaseStoragePut = (
+  path: string,
+  file: Blob | Uint8Array | ArrayBuffer,
+  metadata?: UploadMetadata,
+  app?: FirebaseApp,
+  bucketUrl?: string
+) =>
+  storage.uploadBytes(firebaseStorageRef(path, app, bucketUrl), file, metadata).then(({ ref }) => getDownloadURL(ref));
 
 export type UploadTaskSnapshot = FirebaseUploadTaskSnapshot;
 export const firebaseStoragePutResumable = (
   path: string,
   file: Blob | Uint8Array | ArrayBuffer,
-  metadata?: UploadMetadata
-) => storage.uploadBytesResumable(firebaseStorageRef(path), file, metadata);
+  metadata?: UploadMetadata,
+  app?: FirebaseApp,
+  bucketUrl?: string
+) => storage.uploadBytesResumable(firebaseStorageRef(path, app, bucketUrl), file, metadata);
 
-export const firebaseStorageDelete = (path: string) => storage.deleteObject(firebaseStorageRef(path));
+export const firebaseStorageDelete = (path: string, app?: FirebaseApp, bucketUrl?: string) => storage.deleteObject(firebaseStorageRef(path, app, bucketUrl));
