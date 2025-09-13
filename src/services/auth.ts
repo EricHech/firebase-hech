@@ -179,3 +179,10 @@ export const updateUserPassword = (newPassword: string) => {
   if (cu) return updatePassword(cu, newPassword);
   throw new Error("You must be signed in to update your password.");
 };
+
+export const resendEmailVerification = () => {
+  const currentUser = getCurrentUser();
+  if (!currentUser) throw new Error("You must be signed in to resend email verification.");
+
+  return sendEmailVerification(currentUser);
+};
