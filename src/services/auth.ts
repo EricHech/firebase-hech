@@ -8,6 +8,7 @@ import {
   updatePassword,
   signInAnonymously,
   linkWithCredential,
+  signInWithCredential,
   EmailAuthProvider,
   OAuthProvider,
   signInWithPopup,
@@ -150,6 +151,22 @@ export const signIn = (email: string, password: string, setError: (error: string
       ? linkWithCredential(auth.currentUser, EmailAuthProvider.credential(lowercasedEmail, password))
       : signInWithEmailAndPassword(auth, lowercasedEmail, password)
   ).catch((e) => setError(getFriendlyAuthError(e.message)));
+};
+
+export const signInWithGoogle = async (idToken: string, accessToken: string) => {
+  const credential = GoogleAuthProvider.credential(idToken, accessToken);
+  const auth = getAuth();
+
+  await signInWithCredential(auth, credential);
+};
+
+export const signInWithApple = async (idToken: string) => {
+  const provider = new OAuthProvider("apple.com");
+  const credential = provider.credential({ idToken });
+
+  const auth = getAuth();
+
+  await signInWithCredential(auth, credential);
 };
 
 export const signInAnon = () => {
