@@ -46,7 +46,7 @@ export const applyVerificationCode = (code: string) => applyActionCode(getAuth()
 
 export const firebaseUseDeviceLanguage = () => getAuth().useDeviceLanguage();
 
-const handleCreateUser = async (
+export const handleCreateUser = async (
   firebaseUser: FirebaseUser,
   profile: Maybe<FirebaseProfile>,
   appUser: AppUser,
