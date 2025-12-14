@@ -108,7 +108,7 @@ export const initializeAdminApp = async (
         // In development with emulators, use the application default credentials and explicitly set the `projectId` to match the one used by the client token
         admin.initializeApp({
           projectId: emulatorOptions.projectId,
-          credential: admin.credential.applicationDefault(),
+          credential: appOptions ? admin.credential.cert(appOptions) : admin.credential.applicationDefault(),
           databaseURL: emulatorOptions.dbPort
             ? `http://${emulatorOptions.host}:${emulatorOptions.dbPort}?ns=${emulatorOptions.projectId}`
             : databaseURL,
