@@ -97,11 +97,15 @@ export const initializeAdminApp = async (
 ) => {
   const init = async () => {
     // To account for hot-module-reloading potentially having the wrong app initialized due to `initializeAdminRemoteRequestApp`
-    if (admin.apps.length && isDev) await admin.app().delete();
+    if (isDev && admin.apps.length) await Promise.all(admin.apps.map((a) => a?.delete()));
 
     if (!admin.apps.length) {
       if (isDev && emulatorOptions) {
+        process.env.GCLOUD_PROJECT = emulatorOptions.projectId;
+        process.env.GOOGLE_CLOUD_PROJECT = emulatorOptions.projectId;
+
         process.env.FIREBASE_AUTH_EMULATOR_HOST = `${emulatorOptions.host}:${emulatorOptions.authPort}`;
+
         if (emulatorOptions.dbPort) process.env.FIREBASE_DATABASE_EMULATOR_HOST = `${emulatorOptions.host}:${emulatorOptions.dbPort}`;
         if (emulatorOptions.firestorePort) process.env.FIRESTORE_EMULATOR_HOST = `${emulatorOptions.host}:${emulatorOptions.firestorePort}`;
 
