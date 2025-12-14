@@ -1,4 +1,4 @@
-import admin from "firebase-admin";
+import { applicationDefault, cert, deleteApp, getApp, getApps, initializeApp } from "firebase-admin/app";
 import { getDatabase } from "firebase-admin/database";
 import { CreateRequest, getAuth, UpdateRequest } from "firebase-admin/auth";
 
@@ -7,7 +7,7 @@ import { isoFirebaseHechUpdate } from "./data";
 import { getDataKeyValue } from "./server-data";
 
 // Types
-import type { ServiceAccount } from "firebase-admin/app";
+import type { App, ServiceAccount } from "firebase-admin/app";
 import type { QueryByKeyLimitParams, QueryOrderByChildParams, StatefulData } from "./types";
 import type { Query } from "@firebase/database-types";
 
@@ -97,9 +97,9 @@ export const initializeAdminApp = async (
 ) => {
   const init = async () => {
     // To account for hot-module-reloading potentially having the wrong app initialized due to `initializeAdminRemoteRequestApp`
-    if (isDev && admin.apps.length) await Promise.all(admin.apps.map((a) => a?.delete()));
+    if (isDev && getApps().length) await Promise.all(getApps().map((a) => deleteApp(a)));
 
-    if (!admin.apps.length) {
+    if (!getApps().length) {
       if (isDev && emulatorOptions) {
         process.env.GCLOUD_PROJECT = emulatorOptions.projectId;
         process.env.GOOGLE_CLOUD_PROJECT = emulatorOptions.projectId;
@@ -110,17 +110,17 @@ export const initializeAdminApp = async (
         if (emulatorOptions.firestorePort) process.env.FIRESTORE_EMULATOR_HOST = `${emulatorOptions.host}:${emulatorOptions.firestorePort}`;
 
         // In development with emulators, use the application default credentials and explicitly set the `projectId` to match the one used by the client token
-        admin.initializeApp({
+        initializeApp({
           projectId: emulatorOptions.projectId,
-          credential: appOptions ? admin.credential.cert(appOptions) : admin.credential.applicationDefault(),
+          credential: appOptions ? cert(appOptions) : applicationDefault(),
           databaseURL: emulatorOptions.dbPort
             ? `http://${emulatorOptions.host}:${emulatorOptions.dbPort}?ns=${emulatorOptions.projectId}`
             : databaseURL,
           databaseAuthVariableOverride,
         });
       } else {
-        admin.initializeApp({
-          credential: admin.credential.cert(appOptions),
+        initializeApp({
+          credential: cert(appOptions),
           databaseURL,
           databaseAuthVariableOverride,
         });
@@ -138,7 +138,7 @@ export const initializeAdminApp = async (
     await init();
   }
 
-  return admin.app();
+  return getApp();
 };
 
 export const initializeAuthMimickApp = (
@@ -159,7 +159,7 @@ export const initializeAdminRemoteRequestApp = async <T extends StatefulData<"re
   databaseURL: string,
   { isDev }: { isDev?: boolean } = { isDev: false }
 ) => {
-  const app = await initializeAdminApp(appOptions, databaseURL, {
+  const app: App = await initializeAdminApp(appOptions, databaseURL, {
     isDev,
     databaseAuthVariableOverride: undefined,
   });
@@ -167,7 +167,7 @@ export const initializeAdminRemoteRequestApp = async <T extends StatefulData<"re
   const remoteRequest = await getDataKeyValue({ dataType: "remoteRequest", dataKey: remoteRequestKey });
   if (!remoteRequest?.remoteRequestUid) return null;
 
-  await app.delete();
+  await deleteApp(app);
 
   return {
     app: initializeAuthMimickApp(remoteRequest.remoteRequestUid, appOptions, databaseURL, { isDev }),

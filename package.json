@@ -1,6 +1,6 @@
 {
   "name": "firebase-hech",
-  "version": "2.1.14",
+  "version": "2.1.15",
   "description": "A a strongly-typed opinionated wrapper around Firebase's Real-Time Database meant to supercharge Firebase and allow for better relational management and out-of-the-box security rules.",
   "exports": {
     ".": {
@@ -38,6 +38,9 @@
     "type": "git",
     "url": "https://github.com/EricHech/firebase-hech"
   },
+  "engines": {
+    "node": ">=18"
+  },
   "author": "Eric Hechavarria",
   "license": "ISC",
   "devDependencies": {
@@ -48,7 +51,7 @@
   "dependencies": {
     "@types/node": "^20.9.0",
     "firebase": "^10.13.1",
-    "firebase-admin": "12.4.0",
+    "firebase-admin": "^13.2.0",
     "ts-node": "^10.9.1",
     "vite": "^4.5.0"
   }
