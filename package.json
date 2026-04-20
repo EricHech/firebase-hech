@@ -44,7 +44,7 @@
   "author": "Eric Hechavarria",
   "license": "ISC",
   "devDependencies": {
-    "firebase-admin": "^13.2.0",
+    "firebase-admin": "^13.8.0",
     "typescript": "^5.2.2",
     "vite-plugin-dts": "^3.6.3",
     "vite-plugin-externalize-deps": "^0.7.0"
@@ -54,7 +54,7 @@
   },
   "dependencies": {
     "@types/node": "^20.9.0",
-    "firebase": "^10.13.1",
+    "firebase": "^12.12.0",
     "ts-node": "^10.9.1",
     "vite": "^4.5.0"
   }
